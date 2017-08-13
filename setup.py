@@ -9,6 +9,7 @@ setup(name='rnaseq-lib',
       license='MIT',
       package_dir={'': 'src'},
       packages=find_packages('src'),
+      package_data={'rnaseq_lib.utils': ['samples.pickle']},
       install_requires=['pandas',
                         'numpy',
                         'seaborn'])
