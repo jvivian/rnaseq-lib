@@ -1,13 +1,14 @@
 from setuptools import setup, find_packages
 
 setup(name='rnaseq-lib',
-      version='1.0a2',
+      version='1.0a4',
       description='',
       url='http://github.com/jvivian/rnaseq-lib',
       author='John Vivian',
       author_email='jtvivian@gmail.com',
       license='MIT',
-      packages=find_packages(),
+      package_dir={'': 'src'},
+      packages=find_packages('src'),
       install_requires=['pandas',
                         'numpy',
                         'seaborn'])
