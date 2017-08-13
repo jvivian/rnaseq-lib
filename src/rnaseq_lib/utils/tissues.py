@@ -12,4 +12,4 @@ def return_samples():
     :return: Tissues are keys are list of samples are values
     :rtype: dict[list]
     """
-    return pickle.load(os.path.join(__location__, 'samples.pickle'))
+    return pickle.load(open(os.path.join(__location__, 'samples.pickle'), 'rb'))

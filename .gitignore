@@ -2,3 +2,5 @@
 .idea/**/workspace.xml
 
 *.pyc
+src/rnaseq_lib.egg-info
+dist/
