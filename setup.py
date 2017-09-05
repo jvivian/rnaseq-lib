@@ -12,4 +12,5 @@ setup(name='rnaseq-lib',
       package_data={'rnaseq_lib.utils': ['samples.pickle']},
       install_requires=['pandas',
                         'numpy',
-                        'seaborn'])
+                        'seaborn',
+                        'requests'])
