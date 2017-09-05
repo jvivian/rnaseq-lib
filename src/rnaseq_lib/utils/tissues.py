@@ -26,6 +26,13 @@ def get_gene_map():
     return pickle.load(open(os.path.join(__location__, 'data/gene_map.pickle'), 'rb'))
 
 
+def map_genes(df):
+    gene_map = get_gene_map()
+    genes = [gene_map[x.split('.')[0]] for x in df.index]
+    df.index = genes
+    return df
+
+
 def get_mab_targets():
     """
     Returns sorted list of MAB cancer drug targets
@@ -44,7 +51,7 @@ def get_ucsf_genes():
     :return: Sorted gene list
     :rtype: list
     """
-    path = os.path.join(__location__, 'data/UCSF-RNAPanel-Final-412-genes.csv')
+    path = os.path.join(__location__, 'data/UCSF-genes.csv')
     return sorted([x.strip() for x in open(path, 'r').readlines()])
 
 
@@ -56,9 +63,7 @@ def get_ucsf_subset(df):
     :return: Subset of Dataframe that only includes UCSF genes
     :rtype: pd.DataFrame
     """
-    gene_map = get_gene_map()
-    genes = [gene_map[x.split('.')[0]] for x in df.index]
-    df.index = genes
+    df = map_genes(df)
 
     ucsf_genes = get_ucsf_genes()
     ucsf_genes = [x for x in ucsf_genes if x in df.index]
