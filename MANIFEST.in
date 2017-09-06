@@ -1,1 +1,2 @@
 include src/rnaseq_lib/utils/data/*
+include utils/data/*
