@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='rnaseq-lib',
-      version='1.0a10',
+      version='1.0a11',
       description='',
       url='http://github.com/jvivian/rnaseq-lib',
       author='John Vivian',
