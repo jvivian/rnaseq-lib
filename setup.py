@@ -13,4 +13,5 @@ setup(name='rnaseq-lib',
       install_requires=['pandas',
                         'numpy',
                         'seaborn',
-                        'requests'])
+                        'requests',
+                        'sklearn'])
