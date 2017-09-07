@@ -55,6 +55,17 @@ def get_ucsf_genes():
     return sorted([x.strip() for x in open(path, 'r').readlines()])
 
 
+def get_civic_genes():
+    """
+    Returns sorted list of genes from CIViC
+
+    :return: Sorted gene list
+    :rtype: list
+    """
+    path = os.path.join(__location__, 'data/civic-genes.txt')
+    return sorted([x.strip() for x in open(path, 'r').readlines()])
+
+
 def get_ucsf_subset(df):
     """
     Subset UCSF dataframe and return.
