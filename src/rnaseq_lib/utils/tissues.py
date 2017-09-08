@@ -1,6 +1,10 @@
 import os
 import pickle
+
+import numpy as np
 import pandas as pd
+
+from rnaseq_lib.plotting import plot_boxplot
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -80,3 +84,52 @@ def get_ucsf_subset(df):
     ucsf_genes = [x for x in ucsf_genes if x in df.index]
 
     return df.loc[ucsf_genes]
+
+
+def get_tumor_samples(tissue):
+    """
+    Returns TCGA tumor samples for a tissue
+    :param str tissue:
+    :return: List of tumor samples
+    :rtype: list
+    """
+    samples = return_samples()
+    return [x for x in samples[tissue] if x.endswith('-01')]
+
+
+def get_gtex_samples(tissue):
+    """
+    Returns GTEx samples for a tissue
+
+    :param str tissue:
+    :return: List of GTEx samples
+    :rtype: list
+    """
+    samples = return_samples()
+    return [x for x in samples[tissue] if not x.startswith('TCGA')]
+
+
+def get_normal_samples(tissue):
+    """
+    Returns TCGA normal samples for a tissue
+    :param str tissue:
+    :return: List of TCGA normal samples
+    :rtype: list
+    """
+    samples = return_samples()
+    return [x for x in samples[tissue] if x.endswith('-11')]
+
+
+def plot_gene_boxplot(df, tissue, gene):
+    """
+    Returns a holoviews box and whisker object of a gene for a tissue
+
+    :param pd.DataFrame df:
+    :param str tissue:
+    :param str gene:
+    :return: Boxplot of gene for tissue
+    :rtype: hv.BoxWhisker
+    """
+    tumor = get_tumor_samples(tissue)
+    gtex = get_gtex_samples(tissue)
+    return plot_boxplot(df, gtex, tumor, 'GTEx', 'Tumor', gene, norm_func=lambda x: np.log2(x + 1))
