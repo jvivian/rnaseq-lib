@@ -14,4 +14,6 @@ setup(name='rnaseq-lib',
                         'numpy',
                         'seaborn',
                         'requests',
-                        'sklearn'])
+                        'sklearn',
+                        'progressbar',
+                        'holoviews'])
