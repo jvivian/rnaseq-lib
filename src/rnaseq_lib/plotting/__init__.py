@@ -21,7 +21,7 @@ def plot_boxplot(df,
     :param str value_label: Label to use for values in boxplot
     :param str group_label: Label to use for groups in dataset
     :return: Holoviews boxplot object
-    :rtype: hv.Box
+    :rtype: hv.BoxWhisker
     """
     # Apply normalization function if provided
     if norm_func:
