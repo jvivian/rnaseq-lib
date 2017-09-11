@@ -137,4 +137,4 @@ def gene_expression_boxplot(df, tissue, gene, normal=False):
     if normal:
         plot_info['Normal'] = get_normal_samples(tissue)
 
-    return plot_boxplot(df, plot_info=plot_info, feature=gene, norm_func=lambda x: np.log2(x + 1))
+    return plot_boxplot(df, plot_info=plot_info, feature=gene, title=tissue, norm_func=lambda x: np.log2(x + 1))
