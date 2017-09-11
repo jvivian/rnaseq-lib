@@ -15,7 +15,7 @@ def return_samples():
     Synapse ID: syn10296681
 
     :return: Tissues are keys are list of samples are values
-    :rtype: dict[list]
+    :rtype: dict(str, list(str))
     """
     return pickle.load(open(os.path.join(__location__, 'data/samples.pickle'), 'rb'))
 
