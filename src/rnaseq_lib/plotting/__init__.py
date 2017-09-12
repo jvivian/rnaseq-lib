@@ -1,5 +1,5 @@
-import pandas as pd
 import holoviews as hv
+import pandas as pd
 
 from rnaseq_lib.utils import flatten
 
