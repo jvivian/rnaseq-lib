@@ -65,6 +65,7 @@ def tete_of_dataset(df, title, num_neighbors=30, plot_info=None):
     :param pd.DataFrame df: Samples by features DataFrame
     :param str title: Title of plot
     :param int num_neighbors: Number of neighbors in t-ETE algorithm
+    :param dict plot_info: Additional information to include in plot
     :return: Holoviews scatter object
     :rtype: hv.Scatter
     """
