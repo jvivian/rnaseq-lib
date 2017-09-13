@@ -3,6 +3,8 @@ import textwrap
 from multiprocessing import cpu_count
 from subprocess import call
 
+import shutil
+
 from rnaseq_lib.tissues import get_tumor_samples, get_gtex_samples, get_normal_samples
 from rnaseq_lib.utils import mkdir_p
 
@@ -13,8 +15,9 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True):
     mkdir_p(work_dir)
 
     # Get samples for tissue
-    tumor = get_tumor_samples(tissue)
+    tumor = [x.replace('-', '.') for x in get_tumor_samples(tissue)]
     normal = get_gtex_samples(tissue) if gtex else get_normal_samples(tissue)
+    normal = [x.replace('-', '.') for x in normal]
 
     # Write out vectors
     tissue_vector = os.path.join(work_dir, 'tissue.vector')
@@ -110,3 +113,4 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True):
                   '/data/{}'.format(os.path.join('deseq2-results', 'work_dir', 'disease.vector'))]
 
     call(docker_parameters + parameters)
+    shutil.rmtree(work_dir)
