@@ -41,7 +41,7 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True):
             df_path <- args[1]
             tissue_path <- args[2]
             disease_path <- args[3]
-            tissue <- {tissue}
+            tissue <- '{tissue}'
             output_dir <- '/data/deseq2-results'
             
             # Read in table and process
