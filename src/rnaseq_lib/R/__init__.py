@@ -12,11 +12,11 @@ from rnaseq_lib.utils import mkdir_p
 
 def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
     """
-    Runs DESeq2 given on a specific tissue
+    Runs DESeq2 on a specific tissue
 
     :param str df_path: Path to samples by genes dataframe
     :param str tissue: Tissue to run
-    :param str output_dir: Directory to output
+    :param str output_dir: Full path to output directory
     :param bool gtex: If True uses GTEx as normal tissue. Otherwise uses TCGA Normal
     :param int cores: Number of cores to use. Defaults to # of cores on machine.
     """
