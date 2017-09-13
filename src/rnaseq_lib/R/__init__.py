@@ -1,17 +1,27 @@
 import os
+import shutil
 import textwrap
 from multiprocessing import cpu_count
 from subprocess import call
 
-import shutil
+import pandas as pd
 
-from rnaseq_lib.tissues import get_tumor_samples, get_gtex_samples, get_normal_samples
+from rnaseq_lib.tissues import get_tumor_samples, get_gtex_samples, get_normal_samples, map_genes
 from rnaseq_lib.utils import mkdir_p
 
 
-def run_deseq2(df_path, tissue, output_dir, gtex=True):
+def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
+    """
+    Runs DESeq2 given on a specific tissue
+
+    :param str df_path: Path to samples by genes dataframe
+    :param str tissue: Tissue to run
+    :param str output_dir: Directory to output
+    :param bool gtex: If True uses GTEx as normal tissue. Otherwise uses TCGA Normal
+    :param int cores: Number of cores to use. Defaults to # of cores on machine.
+    """
     # Make workspace directories
-    work_dir = os.path.join(output_dir, 'deseq2-results', 'work_dir')
+    work_dir = os.path.join(output_dir, 'work_dir')
     mkdir_p(work_dir)
 
     # Get samples for tissue
@@ -29,6 +39,7 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True):
         f.write('\n'.join(['T' if x in tumor else 'N' for x in tumor + normal]))
 
     # Write out script
+    cores = cores if cores else int(cpu_count())
     script_path = os.path.join(work_dir, 'deseq2.R')
     with open(script_path, 'w') as f:
         f.write(
@@ -42,7 +53,7 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True):
             tissue_path <- args[2]
             disease_path <- args[3]
             tissue <- '{tissue}'
-            output_dir <- '/data/deseq2-results'
+            output_dir <- '/data/'
             
             # Read in vectors
             tissue_vector <- read.table(tissue_path)$V1
@@ -100,7 +111,7 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True):
             pdf(ratio_path, width=7, height=7)
             barplot(ratios, xlab="mean normalized count", ylab="ratio of small $p$ values")
             dev.off()                                           
-            """.format(cores=cpu_count(), tissue=tissue)))
+            """.format(cores=cores, tissue=tissue)))
 
     # Call DESeq2
     docker_parameters = ['docker', 'run',
@@ -108,11 +119,18 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True):
                          '-v', '{}:/df'.format(os.path.dirname(df_path)),
                          'jvivian/deseq2']
 
-    parameters = ['/data/deseq2-results/work_dir/deseq2.R',
+    parameters = ['/data/work_dir/deseq2.R',
                   '/df/{}'.format(os.path.basename(df_path)),
-                  '/data/{}'.format(os.path.join('deseq2-results', 'work_dir', 'tissue.vector')),
-                  '/data/{}'.format(os.path.join('deseq2-results', 'work_dir', 'disease.vector'))]
+                  '/data/{}'.format(os.path.join('work_dir', 'tissue.vector')),
+                  '/data/{}'.format(os.path.join('work_dir', 'disease.vector'))]
 
     print '\nCalling: {}\n'.format(docker_parameters + parameters)
     call(docker_parameters + parameters)
+
+    # Add gene names to output
+    output_tsv = os.path.join(output_dir, '{}.tsv'.format(tissue))
+    df = map_genes(pd.read_csv(output_tsv, index_col=0, sep='\t'))
+    df.to_csv(output_tsv, sep='\t')
+
+    # Clean up
     shutil.rmtree(work_dir)
