@@ -112,5 +112,6 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True):
                   '/data/{}'.format(os.path.join('deseq2-results', 'work_dir', 'tissue.vector')),
                   '/data/{}'.format(os.path.join('deseq2-results', 'work_dir', 'disease.vector'))]
 
+    print '\nCalling: {}\n'.format(docker_parameters + parameters)
     call(docker_parameters + parameters)
-    shutil.rmtree(work_dir)
+    # shutil.rmtree(work_dir)
