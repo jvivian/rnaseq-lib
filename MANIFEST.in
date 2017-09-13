@@ -1,1 +1,1 @@
-include rnaseq_lib/utils/data/*
+include rnaseq_lib/data/*

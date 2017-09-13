@@ -14,7 +14,7 @@ def return_samples():
     :return: Tissues are keys are list of samples are values
     :rtype: dict(str, list(str))
     """
-    return pickle.load(open(os.path.join(os.path.dirname(__location__), 'utils/data/samples.pickle'), 'rb'))
+    return pickle.load(open(os.path.join(os.path.dirname(__location__), 'data/samples.pickle'), 'rb'))
 
 
 def get_gene_map():
@@ -24,7 +24,7 @@ def get_gene_map():
     :return: Gene map
     :rtype: dict
     """
-    return pickle.load(open(os.path.join(os.path.dirname(__location__), 'utils/data/gene_map.pickle'), 'rb'))
+    return pickle.load(open(os.path.join(os.path.dirname(__location__), 'data/gene_map.pickle'), 'rb'))
 
 
 def map_genes(df):
@@ -41,7 +41,7 @@ def get_mab_targets():
     :return: Sorted gene list
     :rtype: list
     """
-    path = os.path.join(__location__, 'data/cancer-MAB-gene-targets.txt')
+    path = os.path.join(os.path.dirname(__location__), 'data/cancer-MAB-gene-targets.txt')
     return sorted([x.strip() for x in open(path, 'r').readlines()])
 
 
@@ -52,7 +52,7 @@ def get_ucsf_genes():
     :return: Sorted gene list
     :rtype: list
     """
-    path = os.path.join(__location__, 'data/UCSF-genes.csv')
+    path = os.path.join(os.path.dirname(__location__), 'data/UCSF-genes.csv')
     return sorted([x.strip() for x in open(path, 'r').readlines()])
 
 
@@ -63,7 +63,7 @@ def get_civic_genes():
     :return: Sorted gene list
     :rtype: list
     """
-    path = os.path.join(__location__, 'data/civic-genes.txt')
+    path = os.path.join(os.path.dirname(__location__), 'data/civic-genes.txt')
     return sorted([x.strip() for x in open(path, 'r').readlines()])
 
 
