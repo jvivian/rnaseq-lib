@@ -14,7 +14,7 @@ def return_samples():
     :return: Tissues are keys are list of samples are values
     :rtype: dict(str, list(str))
     """
-    return pickle.load(open(os.path.join(__location__, 'data/samples.pickle'), 'rb'))
+    return pickle.load(open(os.path.join(os.path.dirname(__location__), 'utils/data/samples.pickle'), 'rb'))
 
 
 def get_gene_map():
@@ -24,7 +24,7 @@ def get_gene_map():
     :return: Gene map
     :rtype: dict
     """
-    return pickle.load(open(os.path.join(__location__, 'data/gene_map.pickle'), 'rb'))
+    return pickle.load(open(os.path.join(os.path.dirname(__location__), 'utils/data/gene_map.pickle'), 'rb'))
 
 
 def map_genes(df):
