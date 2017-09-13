@@ -45,13 +45,13 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True):
             output_dir <- '/data/deseq2-results'
             
             # Read in vectors
-            vector <- read.table(vector_path)$V1
+            tissue_vector <- read.table(tissue_path)$V1
             disease_vector <- read.table(disease_path)$V1
             
             # Read in table and process
             n <- read.table(df_path, sep='\\t', header=1, row.names=1)
-            sub <- n[, colnames(n)%in%vector]
-            setcolorder(sub, as.character(vector))
+            sub <- n[, colnames(n)%in%tissue_vector]
+            setcolorder(sub, as.character(tissue_vector))
             
             # Preprocessing
             countData <- round(sub)
