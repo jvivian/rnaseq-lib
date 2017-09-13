@@ -108,7 +108,7 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True):
                          '-v', '{}:/df'.format(os.path.dirname(df_path)),
                          'jvivian/deseq2']
 
-    parameters = ['Rscript', '/data/deseq2-results/work_dir/deseq.R',
+    parameters = ['/data/deseq2-results/work_dir/deseq.R',
                   '/df/{}'.format(os.path.basename(df_path)),
                   '/data/{}'.format(os.path.join('deseq2-results', 'work_dir', 'tissue.vector')),
                   '/data/{}'.format(os.path.join('deseq2-results', 'work_dir', 'disease.vector'))]
