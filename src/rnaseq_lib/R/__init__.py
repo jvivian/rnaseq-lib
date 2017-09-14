@@ -6,6 +6,7 @@ from subprocess import call
 
 import pandas as pd
 
+from rnaseq_lib.docker import fix_directory_ownership
 from rnaseq_lib.tissues import get_tumor_samples, get_gtex_samples, get_normal_samples, map_genes
 from rnaseq_lib.utils import mkdir_p
 
@@ -124,8 +125,11 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
                   '/data/{}'.format(os.path.join('work_dir', 'tissue.vector')),
                   '/data/{}'.format(os.path.join('work_dir', 'disease.vector'))]
 
-    print '\nCalling: {}\n'.format(docker_parameters + parameters)
+    print '\nCalling: {}\n'.format(' '.join(docker_parameters + parameters))
     call(docker_parameters + parameters)
+
+    # Fix output of files
+    fix_directory_ownership(output_dir=output_dir, tool='jvivian/deseq2')
 
     # Add gene names to output
     output_tsv = os.path.join(output_dir, '{}.tsv'.format(tissue))
