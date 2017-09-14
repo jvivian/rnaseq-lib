@@ -27,11 +27,27 @@ def get_gene_map():
     return pickle.load(open(os.path.join(os.path.dirname(__location__), 'data/gene_map.pickle'), 'rb'))
 
 
-def map_genes(df):
+def map_genes(genes, strict=True):
+    """
+    Maps gene IDs to gene names
+
+    :param list genes: ENSEMBL gene IDs to be mapped to gene names
+    :param bool strict: If true, raies a KeyError if gene is not found in the gene_map
+    :return: Mapped genes
+    :rtype: list
+    """
     gene_map = get_gene_map()
-    genes = [gene_map[x.split('.')[0]] for x in df.index]
-    df.index = genes
-    return df
+    if strict:
+        return [gene_map[x.split('.')[0]] for x in genes]
+    else:
+        mapped = []
+        for g in genes:
+            try:
+                mapped.append(gene_map[g.split('.')[0]])
+            except KeyError:
+                print '{} not found in gene_map, leaving as is'
+                mapped.append(g)
+        return mapped
 
 
 def get_mab_targets():
@@ -75,7 +91,7 @@ def get_ucsf_subset(df):
     :return: Subset of Dataframe that only includes UCSF genes
     :rtype: pd.DataFrame
     """
-    df = map_genes(df)
+    df.index = map_genes(df.index)
 
     ucsf_genes = get_ucsf_genes()
     ucsf_genes = [x for x in ucsf_genes if x in df.index]
