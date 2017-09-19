@@ -16,4 +16,6 @@ setup(name='rnaseq-lib',
                         'requests',
                         'sklearn',
                         'progressbar',
-                        'holoviews'])
+                        'holoviews',
+                        'bs4',
+                        'xmltodict'])
