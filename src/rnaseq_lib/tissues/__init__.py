@@ -102,7 +102,7 @@ def get_ucsf_subset(df):
 def get_tumor_samples(tissue):
     """
     Returns TCGA tumor samples for a tissue
-    :param str tissue:
+    :param str tissue: Tissue to grab TCGA tumor samples from
     :return: List of tumor samples
     :rtype: list
     """
@@ -114,7 +114,7 @@ def get_gtex_samples(tissue):
     """
     Returns GTEx samples for a tissue
 
-    :param str tissue:
+    :param str tissue: Tissue to grab GTEx samples from
     :return: List of GTEx samples
     :rtype: list
     """
@@ -125,7 +125,8 @@ def get_gtex_samples(tissue):
 def get_normal_samples(tissue):
     """
     Returns TCGA normal samples for a tissue
-    :param str tissue:
+
+    :param str tissue: Tissue to grab TCGA normal samples from
     :return: List of TCGA normal samples
     :rtype: list
     """
