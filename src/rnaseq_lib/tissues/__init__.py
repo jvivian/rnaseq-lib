@@ -136,7 +136,7 @@ def get_normal_samples(tissue):
     return [x for x in samples[tissue] if x.endswith('-11')]
 
 
-def identify_tissue_from_string(content):
+def identify_tissue_from_str(content):
     """
     Identifies possible tissue(s) referenced by a given string
 
