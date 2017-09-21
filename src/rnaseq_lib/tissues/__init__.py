@@ -3,6 +3,8 @@ import pickle
 
 import pandas as pd
 
+from rnaseq_lib.utils import flatten
+
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
@@ -132,3 +134,71 @@ def get_normal_samples(tissue):
     """
     samples = return_samples()
     return [x for x in samples[tissue] if x.endswith('-11')]
+
+
+def identify_tissue_from_string(content):
+    """
+    Identifies possible tissue(s) referenced by a given string
+
+    :param str content: Text to examine for terms associated with tissues
+    :return: Possible tissues referenced in input string
+    :rtype: set(str)
+    """
+    td_map = tissue_disease_mapping()
+    return set([k for k, v in td_map.iteritems() if any([term for term in v if term in content.lower()])])
+
+
+def tissue_disease_mapping():
+    """
+    Maps tissue types to words associated with cancers of that tissue
+
+    :return: Tissue / disease term mapping
+    :rtype: dict(str, list(str))
+    """
+    return {
+        'Adrenal': ['adrenal', 'adrenocortical', 'cortical', 'oncocytic', 'myxoid'],
+        'Bladder': ['bladder'],
+        'Brain': ['anaplastic', 'astrocytoma', 'neurocytoma', 'choroid', 'plexus', 'neuroepithelial', 'ependymal',
+                  'fibrillary', 'giant-cell', 'glioblastoma', 'multiforme', 'gliomatosis', 'cerebri', 'gliosarcoma',
+                  'hemangiopericytoma', 'medulloblastoma', 'medulloepithelioma', 'meningeal', 'neuroblastoma',
+                  'neurocytoma', 'oligoastrocytoma', 'optic', 'ependymoma', 'pilocytic', 'pinealoblastoma',
+                  'pineocytoma', 'meningioma', 'subependymoma', 'retinoblastoma', 'neuro'],
+        'Breast': ['breast'],
+        'Cervix': ['cervix', 'cervical'],
+        'Colon-Small_intestine': ['colon', 'rectal', 'colorectal', 'intestine', 'intestinal', 'bowel'],
+        'Esophagus': ['esophagus', 'esophogeal'],
+        'Kidney': ['kidney', 'renal', 'nephron', 'nephroma', 'wilm', 'chromophobe'],
+        'Liver': ['liver', 'hepatic', 'hepato', 'parenchymal', 'cholang'],
+        'Lung': ['lung', 'small-cell', 'non-small-cell', 'small cell', 'non small cell', 'non small-cell'],
+        'Ovary': ['ovary', 'ovarian', 'endometrioid', 'fallopian', 'cord', 'stromal'],
+        'Pancreas': ['pancreas', 'pancreatic', 'cystadenocarcinomas'],
+        'Prostate': ['prostate'],
+        'Skin-Head': ['head', 'neck', 'skin', 'basal', 'melanoma', ],
+        'Stomach': ['stomach', 'gastric'],
+        'Testis': ['testis', 'testicular', 'testes', 'gonad', ],
+        'Thyroid': ['thyroid'],
+        'Uterus': ['uterus', 'uterine', 'endometrial', 'ureteral', 'gestational']
+    }
+
+
+def grep_cancer_terms(content, replace_newlines_with_periods=True, comprehensive=False):
+    """
+    Returns sentences with cancer terms
+
+    :param str content: String containing sentences to check for cancer terms
+    :param bool replace_newlines_with_periods: If True, replaces newlines with periods so they count as "sentences"
+    :param bool comprehensive: if True, adds all values from tissue_disease_mapping
+    :return: Sentences with matches
+    :rtype: list(str)
+    """
+    terms = {'cancer', 'leukemia', 'carcinoma', 'squamous', 'lymphoma',
+             'malignant', 'metastasis', 'metastatic', 'sarcoma', 'tumor'}
+
+    # Add all terms from tissue_disease_mapping to grep list
+    terms = terms.union(set(flatten(tissue_disease_mapping().values()))) if comprehensive else terms
+
+    # Replace newlines with periods
+    content = content.replace('\n', '.') if replace_newlines_with_periods else content
+
+    # Return sentences that include terms
+    return [x for x in content.split('.') if any(y for y in terms if y.upper() in x.upper())]
