@@ -1,5 +1,6 @@
 import os
 import pickle
+import re
 
 import pandas as pd
 
@@ -138,14 +139,17 @@ def get_normal_samples(tissue):
 
 def identify_tissue_from_str(content):
     """
-    Identifies possible tissue(s) referenced by a given string
+    Identifies possible tissue(s) referenced by a given string by matching terms that are "complete words"
 
     :param str content: Text to examine for terms associated with tissues
     :return: Possible tissues referenced in input string
     :rtype: set(str)
     """
     td_map = tissue_disease_mapping()
-    return set([k for k, v in td_map.iteritems() if any([term for term in v if term in content.lower()])])
+
+    # \b Matches the empty string, but only at the beginning or end of a word
+    return set([k for k, v in td_map.iteritems() if
+                any([term for term in v if re.search(r'\b{}\b'.format(term), content, flags=re.IGNORECASE)])])
 
 
 def tissue_disease_mapping():
