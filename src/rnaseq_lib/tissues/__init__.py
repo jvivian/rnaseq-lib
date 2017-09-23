@@ -172,7 +172,7 @@ def tissue_disease_mapping():
         'Colon-Small_intestine': ['colon', 'rectal', 'colorectal', 'intestine', 'intestinal', 'bowel', 'lynch',
                                   'rectum'],
         'Esophagus': ['esophagus', 'barrett', 'esophageal', 'oropharyngeal', 'oropharynx', 'laryngeal'],
-        'Kidney': ['kidney', 'renal', 'nephron', 'nephroma', 'wilm', 'chromophobe', 'Rhabdoid'],
+        'Kidney': ['kidney', 'renal ', 'nephron', 'nephroma', 'wilm', 'chromophobe', 'rhabdoid'],
         'Liver': ['liver', 'hepatic', 'hepato', 'parenchymal', 'cholang'],
         'Lung': ['lung', 'small-cell', 'non-small-cell', 'small cell', 'non small cell', 'non small-cell',
                  'mesothelioma'],
