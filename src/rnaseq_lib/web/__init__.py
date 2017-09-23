@@ -155,10 +155,9 @@ def find_gene_given_alias(alias, strict=True):
     # Iterate through hits for gene
     gene = None
     for hit in hits:
-        if hit['symbol'] in valid_genes:
+        if hit['symbol'] in valid_genes or hit['symbol'].upper() in valid_genes:
             gene = hit['symbol']
-        elif hit['symbol'].upper() in valid_genes:
-            gene = hit['symbol'].upper()
+            break
 
         # If no matching symbol is found, look for ensemble name
         else:
