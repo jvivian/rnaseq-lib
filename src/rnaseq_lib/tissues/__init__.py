@@ -2,6 +2,7 @@ import os
 import pickle
 import re
 
+import mygene
 import pandas as pd
 
 from rnaseq_lib.utils import flatten
@@ -212,3 +213,38 @@ def grep_cancer_terms(content, replace_newlines_with_periods=True, comprehensive
 
     # Return sentences that include terms
     return [x for x in content.split('.') if any(y for y in terms if y.upper() in x.upper())]
+
+
+def find_gene_given_alias(alias, strict=True):
+    # Create valid gene set from gene_map
+    gene_map = get_gene_map()
+    valid_genes = set(gene_map.keys() + gene_map.values())
+
+    # MyGene query
+    mg = mygene.MyGeneInfo()
+    try:
+        hits = mg.query(alias, fields='symbol,ensembl.gene')['hits']
+    except KeyError:
+        hits = []
+
+    # Iterate through hits for gene
+    gene = None
+    for hit in hits:
+        if hit['symbol'] in valid_genes:
+            gene = hit['symbol']
+        elif hit['symbol'].upper() in valid_genes:
+            gene = hit['symbol'].upper()
+
+        # If no matching symbol is found, look for ensemble name
+        else:
+            try:
+                if hit['ensembl']['gene'] in valid_genes:
+                    gene = hit['ensembl']['gene']
+            except KeyError:
+                pass
+
+    if gene in valid_genes:
+        return gene
+    elif gene and not strict:
+        print 'WARNING: Gene found, but invalid: {}'.format(gene)
+    return gene
