@@ -164,7 +164,7 @@ def tissue_disease_mapping():
         'Bladder': ['bladder', 'urothelial'],
         'Blood': ['blood', 'leukemia', 'lymphoma', 'myeloma', 'hemato'],
         'Bone': ['bone', 'osteosarcoma', 'ewing'],
-        'Brain': ['brain', 'anaplastic', 'astrocytoma', 'neurocytoma', 'choroid', 'plexus', 'neuroepithelial',
+        'Brain': ['brain', 'astrocytoma', 'neurocytoma', 'choroid', 'plexus', 'neuroepithelial',
                   'ependymal',
                   'fibrillary', 'giant-cell', 'glioblastoma', 'multiforme', 'gliomatosis', 'cerebri', 'gliosarcoma',
                   'hemangiopericytoma', 'medulloblastoma', 'medulloepithelioma', 'meningeal', 'neuroblastoma',
@@ -176,7 +176,7 @@ def tissue_disease_mapping():
         'Colon-Small_intestine': ['colon', 'rectal', 'colorectal', 'intestine', 'intestinal', 'bowel', 'lynch',
                                   'rectum'],
         'Esophagus': ['esophagus', 'barrett', 'esophageal', 'oropharyngeal', 'oropharynx', 'laryngeal'],
-        'Kidney': ['kidney', 'renal ', 'nephron', 'nephroma', 'wilm', 'chromophobe', 'rhabdoid'],
+        'Kidney': ['kidney', 'renal ', 'nephron', 'nephroma', 'wilm', 'chromophobe', 'rhabdoid', 'papillary renal'],
         'Liver': ['liver', 'hepatic', 'hepato', 'parenchymal', 'cholang'],
         'Lung': ['lung', 'small-cell', 'non-small-cell', 'small cell', 'non small cell', 'non small-cell',
                  'mesothelioma'],
@@ -186,7 +186,7 @@ def tissue_disease_mapping():
         'Skin-Head': ['head', 'neck', 'skin', 'basal', 'melanoma', 'oral', 'merkel', 'salivary'],
         'Stomach': ['stomach', 'gastric', 'bile', 'cholangiocarcinoma'],
         'Testis': ['testis', 'testicular', 'testes', 'gonad', ],
-        'Thyroid': ['thyroid', 'papillary'],
+        'Thyroid': ['thyroid', 'papillary carcinoma'],
         'Uterus': ['uterus', 'uterine', 'endometrial', 'ureteral', 'gestational']
     }
 
