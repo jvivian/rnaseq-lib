@@ -133,6 +133,14 @@ def get_drug_usage_nih(drug):
 
 
 def find_gene_given_alias(alias, strict=True):
+    """
+    Queries MyGene to look for valid gene aliases
+
+    :param str alias: Gene alias/name to query
+    :param bool strict: If strict, will only return gene if part of gene_map set
+    :return: gene
+    :rtype: str
+    """
     # Create valid gene set from gene_map
     gene_map = get_gene_map()
     valid_genes = set(gene_map.keys() + gene_map.values())
