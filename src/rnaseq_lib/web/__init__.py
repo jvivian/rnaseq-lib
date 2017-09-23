@@ -1,8 +1,11 @@
 import urllib2
 
+import mygene
 import requests
 import xmltodict
 from bs4 import BeautifulSoup
+
+from rnaseq_lib.tissues import get_gene_map
 
 
 def get_drug_target_from_wiki(drug):
@@ -127,6 +130,41 @@ def get_drug_usage_nih(drug):
 
     else:
         return None
+
+
+def find_gene_given_alias(alias, strict=True):
+    # Create valid gene set from gene_map
+    gene_map = get_gene_map()
+    valid_genes = set(gene_map.keys() + gene_map.values())
+
+    # MyGene query
+    mg = mygene.MyGeneInfo()
+    try:
+        hits = mg.query(alias, fields='symbol,ensembl.gene')['hits']
+    except KeyError:
+        hits = []
+
+    # Iterate through hits for gene
+    gene = None
+    for hit in hits:
+        if hit['symbol'] in valid_genes:
+            gene = hit['symbol']
+        elif hit['symbol'].upper() in valid_genes:
+            gene = hit['symbol'].upper()
+
+        # If no matching symbol is found, look for ensemble name
+        else:
+            try:
+                if hit['ensembl']['gene'] in valid_genes:
+                    gene = hit['ensembl']['gene']
+            except KeyError:
+                pass
+
+    if gene in valid_genes:
+        return gene
+    elif gene and not strict:
+        print 'WARNING: Gene found, but invalid: {}'.format(gene)
+    return gene
 
 
 def _rget(url, params=None):
