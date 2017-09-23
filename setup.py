@@ -18,4 +18,5 @@ setup(name='rnaseq-lib',
                         'progressbar',
                         'holoviews',
                         'bs4',
-                        'xmltodict'])
+                        'xmltodict',
+                        'mygene'])
