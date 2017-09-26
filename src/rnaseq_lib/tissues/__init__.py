@@ -162,7 +162,7 @@ def tissue_disease_mapping():
     return {
         'Adrenal': ['adrenal', 'adrenocortical', 'cortical', 'oncocytic', 'myxoid'],
         'Bladder': ['bladder', 'urothelial'],
-        'Blood': ['blood', 'leukemia', 'lymphoma', 'myeloma', 'hematologic'],
+        'Blood': ['blood', 'leukemia', 'myeloma', 'hematologic'],
         'Bone': ['bone', 'osteosarcoma', 'ewing'],
         'Brain': ['brain', 'astrocytoma', 'neurocytoma', 'choroid', 'plexus', 'neuroepithelial',
                   'ependymal', 'Pleomorphic Xanthoastrocytoma', 'fibrillary', 'giant-cell', 'glioblastoma',
