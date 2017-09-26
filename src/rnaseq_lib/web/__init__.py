@@ -1,11 +1,15 @@
+import time
 import urllib2
 
 import mygene
 import requests
 import xmltodict
 from bs4 import BeautifulSoup
+from progressbar import ProgressBar
 
 from rnaseq_lib.tissues import get_gene_map
+
+bar = ProgressBar()
 
 
 def get_drug_target_from_wiki(drug):
@@ -69,6 +73,68 @@ def get_info_from_wiki(drug):
         return name_box.text.strip()
     else:
         print 'No table found for {}'.format(drug)
+        return None
+
+
+def openfda_drug_label(drug):
+    """
+    Search OpenFDA drug
+
+    :param str drug:
+    :return:
+    """
+    # Clean input
+    drug = drug.lower()
+
+    # Look for drug label on openFDA
+    for d in [drug, drug.capitalize(), drug.upper()]:
+        for name in ['generic_name', 'brand_name']:
+            url = 'https://api.fda.gov/drug/label.json?search=openfda.{}:{}&limit=1'.format(name, d)
+            time.sleep(1)
+            r = _rget(url)
+            if r:
+                return r
+    return None
+
+
+def openfda_get_drugs_by_query(query, limit=100, field='indications_and_usage'):
+    """
+    Search OpenFDA API for drugs that match query
+
+    :param str query: Query string to search by
+    :param int limit: Limit request, cannot be higher than 100
+    :param str field: OpenFDA field to search. Example: "openfda.brand_name"
+    :return: Return drugs by query term
+    :rtype: list(tuple(str, str))
+    """
+    assert limit <= 100, 'OpenFDA API does not allow a limit higher than 100'
+    url = 'https://api.fda.gov/drug/label.json?search={}:{}&limit={}'.format(field, query, limit)
+    r = _rget(url)
+    if r:
+        # Convert to JSON
+        r = r.json()
+
+        # Get total number of hits
+        total_terms = r['meta']['results']['total']
+        print 'Found a total of {} terms'.format(total_terms)
+
+        # Collect first batch
+        drugs = [(','.join(x['openfda']['brand_name']), ','.join(x['openfda']['generic_name']))
+                 for x in r['results']]
+
+        # Collect results in batches
+        skip = limit
+        for _ in bar(xrange(int(total_terms) / limit)):
+            time.sleep(1)
+            print 'Collecting samples {} - {}'.format(skip, skip + limit)
+            r = _rget(url + '&skip={}'.format(skip))
+            if r:
+                r = r.json()
+                drugs.extend([(','.join(x['openfda']['brand_name']), ','.join(x['openfda']['generic_name']))
+                              for x in r['results']])
+                skip += limit
+        return drugs
+    else:
         return None
 
 
