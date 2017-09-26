@@ -90,7 +90,7 @@ def openfda_drug_label(drug):
     for d in [drug, drug.capitalize(), drug.upper()]:
         for name in ['generic_name', 'brand_name']:
             url = 'https://api.fda.gov/drug/label.json?search=openfda.{}:{}&limit=1'.format(name, d)
-            time.sleep(1)
+            time.sleep(0.1)
             r = _rget(url)
             if r:
                 return r
