@@ -78,10 +78,11 @@ def get_info_from_wiki(drug):
 
 def openfda_drug_label(drug):
     """
-    Search OpenFDA drug
+    Search OpenFDA drug label API by name
 
-    :param str drug:
-    :return:
+    :param str drug: Drug to query by
+    :return: Response containing first match
+    :rtype: requests.models.Response
     """
     # Clean input
     drug = drug.lower()
