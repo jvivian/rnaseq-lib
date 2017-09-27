@@ -2,6 +2,10 @@ import os
 from subprocess import call
 
 
+def base_docker_call(mount):
+    return ['docker', 'run', '--rm', '-v', '{}:/data'.format(mount)]
+
+
 def fix_directory_ownership(output_dir, tool):
     """
     Uses a Docker container to change ownership recursively of a directory
