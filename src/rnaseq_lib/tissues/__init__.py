@@ -5,7 +5,6 @@ import re
 import pandas as pd
 
 from rnaseq_lib.utils import flatten
-import rnaseq_lib.web as web
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -216,6 +215,8 @@ def grep_cancer_terms(content, replace_newlines_with_periods=True, comprehensive
 
 
 def validate_genes(input_genes):
+    from rnaseq_lib.web import find_gene_given_alias
+
     # Create valid_genes list
     gene_map = get_gene_map()
     valid_genes = set(gene_map.keys() + gene_map.values())
@@ -232,7 +233,7 @@ def validate_genes(input_genes):
         # If gene invalid, search MyGene
         if not gene:
             print 'No valid gene found for {}, querying mygene'.format(g)
-            gene = web.find_gene_given_alias(g)
+            gene = find_gene_given_alias(g)
             if gene:
                 print 'Found valid gene name {} for {}'.format(gene, g)
 
