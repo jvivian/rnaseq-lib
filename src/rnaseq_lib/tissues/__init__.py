@@ -227,7 +227,7 @@ def validate_genes(input_genes):
 
         # Check if listed Gene is valid
         gene = None
-        if gene in valid_genes:
+        if g in valid_genes:
             gene = g
 
         # If gene invalid, search MyGene
