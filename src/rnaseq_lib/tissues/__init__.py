@@ -5,7 +5,7 @@ import re
 import pandas as pd
 
 from rnaseq_lib.utils import flatten
-from rnaseq_lib.web import find_gene_given_alias
+import rnaseq_lib.web as web
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -232,7 +232,7 @@ def validate_genes(input_genes):
         # If gene invalid, search MyGene
         if not gene:
             print 'No valid gene found for {}, querying mygene'.format(g)
-            gene = find_gene_given_alias(g)
+            gene = web.find_gene_given_alias(g)
             if gene:
                 print 'Found valid gene name {} for {}'.format(gene, g)
 
