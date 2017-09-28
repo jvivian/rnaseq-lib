@@ -2,7 +2,7 @@ import os
 from subprocess import call
 
 
-def resize_image(img_path, resize='28x28', grayscale=True, output_prefix='resized'):
+def resize_image(img_path, resize='28x28', grayscale=True, output_prefix='resized.'):
     """
     Resizes and image using ImageMagick
 
