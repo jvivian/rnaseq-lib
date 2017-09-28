@@ -232,13 +232,7 @@ def validate_genes(input_genes):
 
         # If gene invalid, search MyGene
         if not gene:
-            print 'No valid gene found for {}, querying mygene'.format(g)
             gene = find_gene_given_alias(g)
-            if gene:
-                print 'Found valid gene name {} for {}'.format(gene, g)
-
-        if not gene:
-            print 'No valid gene found for: {}'.format(g)
 
         # Append gene or None
         genes.append(gene)
