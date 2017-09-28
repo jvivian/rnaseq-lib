@@ -5,6 +5,7 @@ import re
 import pandas as pd
 
 from rnaseq_lib.utils import flatten
+from rnaseq_lib.web import find_gene_given_alias
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -212,3 +213,33 @@ def grep_cancer_terms(content, replace_newlines_with_periods=True, comprehensive
 
     # Return sentences that include terms
     return [x for x in content.split('.') if any(y for y in terms if y.upper() in x.upper())]
+
+
+def validate_genes(input_genes):
+    # Create valid_genes list
+    gene_map = get_gene_map()
+    valid_genes = set(gene_map.keys() + gene_map.values())
+
+    # Iterate through genes
+    genes = []
+    for g in input_genes:
+
+        # Check if listed Gene is valid
+        gene = None
+        if gene in valid_genes:
+            gene = g
+
+        # If gene invalid, search MyGene
+        if not gene:
+            print 'No valid gene found for {}, querying mygene'.format(g)
+            gene = find_gene_given_alias(g)
+            if gene:
+                print 'Found valid gene name {} for {}'.format(gene, g)
+
+        if not gene:
+            print 'No valid gene found for: {}'.format(g)
+
+        # Append gene or None
+        genes.append(gene)
+
+    return genes
