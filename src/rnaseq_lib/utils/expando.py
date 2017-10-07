@@ -1,4 +1,6 @@
 # Taken from: https://github.com/BD2KGenomics/bd2k-python-lib
+from collections import OrderedDict
+
 
 class Expando(dict):
     """
@@ -88,13 +90,14 @@ class Expando(dict):
     True
     """
 
-    def __init__( self, *args, **kwargs ):
-        super( Expando, self ).__init__( *args, **kwargs )
+    def __init__(self, *args, **kwargs):
+        super(Expando, self).__init__(*args, **kwargs)
         self.__slots__ = None
         self.__dict__ = self
 
     def copy(self):
         return type(self)(self)
+
 
 class MagicExpando(Expando):
     """
@@ -109,10 +112,50 @@ class MagicExpando(Expando):
     >>> o
     {'foo': 42, 'bar': {'hello': 'hi'}}
     """
-    def __getattribute__( self, name ):
+
+    def __getattribute__(self, name):
         try:
-            return super( Expando, self ).__getattribute__( name )
+            return super(Expando, self).__getattribute__(name)
         except AttributeError:
-            child = self.__class__( )
+            child = self.__class__()
             self[name] = child
             return child
+
+
+def recursive_expando(d):
+    """
+    Recursively iterate through a nested dict / list object
+    to convert all dictionaries to Expando objects
+
+    :param dict d: Dictionary to convert to nested Expando objects
+    :return: Converted ditionary
+    :rtype: Expando
+    """
+    e = Expando()
+    for k, v in d.iteritems():
+        if isinstance(v, dict) or isinstance(v, OrderedDict):
+            e[k] = recursive_expando(v)
+        elif isinstance(v, list) or isinstance(v, tuple) or isinstance(v, set):
+            e[k] = _recursive_expando_iter_helper(v)
+        else:
+            e[k] = v
+    return e
+
+
+def _recursive_expando_iter_helper(input_iter):
+    """
+    Recursively handle iterables for recursive_expando
+
+    :param iter input_iter: Iterable to process
+    :return: Converated iterable
+    :rtype: list
+    """
+    l = []
+    for v in input_iter:
+        if isinstance(v, dict) or isinstance(v, OrderedDict):
+            l.append(recursive_expando(v))
+        elif isinstance(v, list) or isinstance(v, tuple) or isinstance(v, set):
+            l.append(_recursive_expando_iter_helper(v))
+        else:
+            l.append(v)
+    return l
