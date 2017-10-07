@@ -217,6 +217,9 @@ def grep_cancer_terms(content, replace_newlines_with_periods=True, comprehensive
 def validate_genes(input_genes):
     from rnaseq_lib.web import find_gene_given_alias
 
+    # Check if user submits single gene as a string
+    input_genes = [input_genes] if type(input_genes) == str else input_genes
+
     # Create valid_genes list
     gene_map = get_gene_map()
     valid_genes = set(gene_map.keys() + gene_map.values())
