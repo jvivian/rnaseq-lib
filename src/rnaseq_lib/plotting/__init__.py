@@ -1,6 +1,6 @@
 import holoviews as hv
+import numpy as np
 import pandas as pd
-
 from rnaseq_lib.dim_red import run_tsne, run_tete
 from rnaseq_lib.utils import flatten
 
@@ -61,7 +61,6 @@ def tete_of_dataset(df, title, num_neighbors=30, plot_info=None):
     """
     t-ETE plot of a dataset
 
-
     :param pd.DataFrame df: Samples by features DataFrame
     :param str title: Title of plot
     :param int num_neighbors: Number of neighbors in t-ETE algorithm
@@ -92,3 +91,16 @@ def _scatter_dataset(z, title, info=None):
                       kdims=['x'],
                       vdims=['y'] + [x for x in info.keys() if not x == 'x' and not x == 'y'],
                       group=title)
+
+
+def plot_deseq2(df, info):
+    z = np.array(df[['baseMean', 'log2FoldChange']])
+    z[:, 0] = map(lambda x: np.log2(x + 1), z[:, 0])
+    info['x'] = z[:, 0]
+    info['y'] = z[:, 1]
+    info['Name'] = df.index
+
+    return hv.Scatter(pd.DataFrame.from_dict(info),
+                      kdims=[('x', 'Log2 Mean')],
+                      vdims=[('y', 'Log2 Fold Change')] + [k for k in info.keys() if k not in ['x', 'y']],
+                      group='Lung')
