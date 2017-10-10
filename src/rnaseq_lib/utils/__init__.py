@@ -1,6 +1,12 @@
-import os
-
 import errno
+import os
+from collections import OrderedDict
+from collections import defaultdict
+
+from rnaseq_lib.utils.expando import Expando
+
+dict_types = (dict, OrderedDict, defaultdict)
+iter_types = (list, tuple, set, frozenset)
 
 
 def mkdir_p(path):
@@ -16,6 +22,7 @@ def mkdir_p(path):
             pass
         else:
             raise
+
 
 def flatten(x):
     """
@@ -42,3 +49,44 @@ def merge_dicts(x, y):
     z = x.copy()
     z.update(y)
     return z
+
+
+def rexpando(d):
+    """
+    Recursive Expando!
+
+    Recursively iterate through a nested dict / list object
+    to convert all dictionaries to Expando objects
+
+    :param dict d: Dictionary to convert to nested Expando objects
+    :return: Converted dictionary
+    :rtype: Expando
+    """
+    e = Expando()
+    for k, v in d.iteritems():
+        if any(isinstance(v, t) for t in dict_types):
+            e[k] = rexpando(v)
+        elif any(isinstance(v, t) for t in iter_types):
+            e[k] = _rexpando_iter_helper(v)
+        else:
+            e[k] = v
+    return e
+
+
+def _rexpando_iter_helper(input_iter):
+    """
+    Recursively handle iterables for recursive_expando
+
+    :param iter input_iter: Iterable to process
+    :return: Converated iterable
+    :rtype: list
+    """
+    l = []
+    for v in input_iter:
+        if any(isinstance(v, t) for t in dict_types):
+            l.append(rexpando(v))
+        elif any(isinstance(v, t) for t in iter_types):
+            l.append(_rexpando_iter_helper(v))
+        else:
+            l.append(v)
+    return l

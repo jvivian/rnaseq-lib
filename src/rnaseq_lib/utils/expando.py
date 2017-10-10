@@ -1,5 +1,4 @@
 # Taken from: https://github.com/BD2KGenomics/bd2k-python-lib
-from collections import OrderedDict
 
 
 class Expando(dict):
@@ -120,42 +119,3 @@ class MagicExpando(Expando):
             child = self.__class__()
             self[name] = child
             return child
-
-
-def recursive_expando(d):
-    """
-    Recursively iterate through a nested dict / list object
-    to convert all dictionaries to Expando objects
-
-    :param dict d: Dictionary to convert to nested Expando objects
-    :return: Converted ditionary
-    :rtype: Expando
-    """
-    e = Expando()
-    for k, v in d.iteritems():
-        if isinstance(v, dict) or isinstance(v, OrderedDict):
-            e[k] = recursive_expando(v)
-        elif isinstance(v, list) or isinstance(v, tuple) or isinstance(v, set):
-            e[k] = _recursive_expando_iter_helper(v)
-        else:
-            e[k] = v
-    return e
-
-
-def _recursive_expando_iter_helper(input_iter):
-    """
-    Recursively handle iterables for recursive_expando
-
-    :param iter input_iter: Iterable to process
-    :return: Converated iterable
-    :rtype: list
-    """
-    l = []
-    for v in input_iter:
-        if isinstance(v, dict) or isinstance(v, OrderedDict):
-            l.append(recursive_expando(v))
-        elif isinstance(v, list) or isinstance(v, tuple) or isinstance(v, set):
-            l.append(_recursive_expando_iter_helper(v))
-        else:
-            l.append(v)
-    return l
