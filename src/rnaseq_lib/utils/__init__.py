@@ -75,10 +75,10 @@ def rexpando(d):
 
 def _rexpando_iter_helper(input_iter):
     """
-    Recursively handle iterables for recursive_expando
+    Recursively handle iterables for rexpando
 
     :param iter input_iter: Iterable to process
-    :return: Converated iterable
+    :return: Processed iterable
     :rtype: list
     """
     l = []
