@@ -1,12 +1,9 @@
 import errno
 import os
-from collections import OrderedDict
-from collections import defaultdict
 
 from rnaseq_lib.utils.expando import Expando
 
-dict_types = (dict, OrderedDict, defaultdict)
-iter_types = (list, tuple, set, frozenset)
+_iter_types = (list, tuple, set, frozenset)
 
 
 def mkdir_p(path):
@@ -51,6 +48,41 @@ def merge_dicts(x, y):
     return z
 
 
+def which(name, path=None):
+    """
+    Look for an executable file of the given name in the given list of directories,
+    or the directories listed in the PATH variable of the current environment. Roughly the
+    equivalent of the `which` program. Does not work on Windows.
+
+    :type name: str
+    :param name: the name of the program
+
+    :type path: Iterable
+    :param path: the directory paths to consider or None if the directories referenced in the
+    PATH environment variable should be used instead
+
+    :returns: an iterator yielding the full path to every occurrance of an executable file of the
+    given name in a directory on the given path or the PATH environment variable if no path was
+    passed
+
+    >>> next( which('ls') )
+    '/bin/ls'
+    >>> list( which('asdalskhvxjvkjhsdasdnbmfiewwewe') )
+    []
+    >>> list( which('ls', path=()) )
+    []
+    """
+    if path is None:
+        path = os.environ.get('PATH')
+        if path is None:
+            return
+        path = path.split(os.pathsep)
+    for bin_dir in path:
+        executable_path = os.path.join(bin_dir, name)
+        if os.access(executable_path, os.X_OK):
+            yield executable_path
+
+
 def rexpando(d):
     """
     Recursive Expando!
@@ -64,9 +96,10 @@ def rexpando(d):
     """
     e = Expando()
     for k, v in d.iteritems():
-        if any(isinstance(v, t) for t in dict_types):
+        k = _key_to_attribute(k)
+        if isinstance(v, dict):
             e[k] = rexpando(v)
-        elif any(isinstance(v, t) for t in iter_types):
+        elif isinstance(v, _iter_types):
             e[k] = _rexpando_iter_helper(v)
         else:
             e[k] = v
@@ -83,10 +116,24 @@ def _rexpando_iter_helper(input_iter):
     """
     l = []
     for v in input_iter:
-        if any(isinstance(v, t) for t in dict_types):
+        if isinstance(v, dict):
             l.append(rexpando(v))
-        elif any(isinstance(v, t) for t in iter_types):
+        elif isinstance(v, _iter_types):
             l.append(_rexpando_iter_helper(v))
         else:
             l.append(v)
     return l
+
+
+def _key_to_attribute(key):
+    """
+    Processes key for attribute accession by replacing illegal chars with a single '_'
+
+    :param str key: Dictionary key to process
+    :return: Processed key
+    :rtype: str
+    """
+    illegal_chars = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '.', ',', '+', '/', '\\']
+    for c in illegal_chars:
+        key = key.replace(c, '_')
+    return '_'.join(x for x in key.split('_') if x)  # Remove superfluous '_' chars
