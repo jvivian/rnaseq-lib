@@ -26,9 +26,8 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
     mkdir_p(work_dir)
 
     # Get samples for tissue
-    tumor = [x.replace('-', '.') for x in get_tumor_samples(tissue)]
+    tumor = get_tumor_samples(tissue)
     normal = get_gtex_samples(tissue) if gtex else get_normal_samples(tissue)
-    normal = [x.replace('-', '.') for x in normal]
 
     # Write out vectors
     tissue_vector = os.path.join(work_dir, 'tissue.vector')
@@ -61,7 +60,7 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
             disease_vector <- read.table(disease_path)$V1
             
             # Read in table and process
-            n <- read.table(df_path, sep='\\t', header=1, row.names=1)
+            n <- read.table(df_path, sep='\\t', header=1, row.names=1, check.names=FALSE)
             sub <- n[, colnames(n)%in%tissue_vector]
             setcolorder(sub, as.character(tissue_vector))
             
