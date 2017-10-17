@@ -132,7 +132,8 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
 
     # Add gene names to output
     output_tsv = os.path.join(output_dir, '{}.tsv'.format(tissue))
-    df = map_genes(pd.read_csv(output_tsv, index_col=0, sep='\t'))
+    df = pd.read_csv(output_tsv, index_col=0, sep='\t')
+    df.index = map_genes(df.index)
     df.to_csv(output_tsv, sep='\t')
 
     # Clean up
