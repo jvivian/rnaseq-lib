@@ -3,7 +3,14 @@ from subprocess import call
 
 
 def base_docker_call(mount):
-    return ['docker', 'run', '--rm', '-v', '{}:/data'.format(mount)]
+    """
+    Returns the boilerplate array used for Docker calls
+
+    :param str mount: Directory to mount
+    :return: Docker run parameters
+    :rtype: list(str)
+    """
+    return ['docker', 'run', '--rm', '-v', '{}:/data'.format(os.path.abspath(mount))]
 
 
 def fix_directory_ownership(output_dir, tool):
