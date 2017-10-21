@@ -11,7 +11,7 @@ def load_drug_gene_tissue_table():
     :return: Dataframe
     :rtype: pd.DataFrame
     """
-    return pd.read_csv(os.path.join(_cwd, 'drug-gene-tissue-deseq2.tsv'), sep='\t', index_col=0)
+    return pd.read_csv(os.path.join(_cwd, 'drugs', 'drug-gene-tissue-deseq2.tsv'), sep='\t', index_col=0)
 
 
 def load_gene_tissue_drug_map():
