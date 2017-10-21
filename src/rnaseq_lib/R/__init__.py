@@ -5,8 +5,7 @@ from multiprocessing import cpu_count
 from subprocess import call
 
 import pandas as pd
-
-from rnaseq_lib.docker import fix_directory_ownership
+from rnaseq_lib.docker import fix_directory_ownership, base_docker_call
 from rnaseq_lib.tissues import get_tumor_samples, get_gtex_samples, get_normal_samples, map_genes
 from rnaseq_lib.utils import mkdir_p
 
@@ -138,3 +137,96 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
 
     # Clean up
     shutil.rmtree(work_dir)
+
+
+def deseq2_normalize(df_path, output_dir='.', map_gene_names=True, clean_workdir=True, normalize_fn=None):
+    """
+    Accepts a gene by sample expression matrix normalized values with DESeq2
+    Output filename: <INPUT>.deseq2-normalized.tsv
+
+    :param str df_path: Path to input expression gene by sample dataframe
+    :param str output_dir: Output directory
+    :param bool map_gene_names: If True, maps gene IDs to gene names
+    :param bool clean_workdir: If True, deletes temporary work directory
+    :param fn normalize_fn: Pass a function to apply to the dataframe before normalization. e.g. lambda x: 2**x + 1
+    :return: Path to normalized dataframe
+    :rtype: str
+    """
+    # Make workspace directory
+    output_dir = os.path.abspath(output_dir)
+    work_dir = os.path.join(output_dir, 'work_dir')
+    mkdir_p(work_dir)
+
+    # Write out pseudo-vector
+    samples = [x.strip() for x in open(df_path, 'r').readline().split()[1:]]
+    tissue_vector = os.path.join(work_dir, 'tissue.vector')
+    with open(tissue_vector, 'w') as f:
+        f.write('\n'.join(samples))
+
+    if normalize_fn:
+        df = pd.read_csv(df_path, sep='\t', index_col=0)
+        df = df.apply(normalize_fn)
+        df_path = os.path.join(os.path.dirname(df_path), 'processed.' + os.path.basename(df_path))
+        df.to_csv(df_path, sep='\t')
+
+    # Write normalization script
+    output_path = os.path.join(output_dir, os.path.basename(df_path).split('.')[0] + '.deseq2-normalized.tsv')
+    script_path = os.path.join(work_dir, 'deseq2.R')
+    with open(script_path, 'w') as f:
+        f.write(
+            textwrap.dedent("""
+            suppressMessages(library('DESeq2'))
+
+            # Argument parsing
+            output_dir <- '/data/'
+            
+            # Read in pseudo-vector
+            tissue_vector <- read.table('/data/work_dir/tissue.vector')$V1
+
+            # Read in table and process
+            print("Reading in dataframe")
+            n <- read.table('/df/{df_path}', sep='\\t', header=1, row.names=1, check.names=FALSE)
+
+            # Preprocessing
+            print("Rounding data to integers")
+            countData <- round(n)
+            
+            print("Creating DESeq2 Dataset Object")
+            colData <- data.frame(tissue=tissue_vector, row.names=colnames(countData))
+            dds <- DESeqDataSetFromMatrix(countData = countData, colData = colData, design = ~ tissue)
+            
+            # Estimate size factors
+            print("Estimating Size Factors")
+            dds <- estimateSizeFactors(dds)
+            
+            # Extract Normalized Counts and Write
+            print("Extracting normalized counts")
+            norm <- counts(dds, normalized = TRUE)
+            
+            print("Writing output: {output_name}")
+            write.table(norm, file="/data/{output_name}", sep='\\t', quote=F, dec='.', col.names=NA) 
+            """.format(df_path=os.path.basename(df_path), output_name=os.path.basename(output_path))))
+
+    # Call Docker
+    base_params = base_docker_call(os.path.dirname(output_path))
+    parameters = base_params + ['-v', '{}:/df'.format(os.path.abspath(os.path.dirname(df_path))),
+                                'jvivian/deseq2',
+                                '/data/work_dir/deseq2.R']
+
+    print '\nCalling: {}\n'.format(' '.join(parameters))
+    call(parameters)
+
+    # Fix output of files
+    fix_directory_ownership(output_dir=output_dir, tool='jvivian/deseq2')
+
+    # Map gene IDs to gene names
+    if map_gene_names:
+        df = pd.read_csv(output_path, index_col=0, sep='\t')
+        df.index = map_genes(df.index)
+        df.to_csv(output_path, sep='\t')
+
+    # Clean up
+    if clean_workdir:
+        shutil.rmtree(work_dir)
+
+    return output_path
