@@ -3,7 +3,6 @@ import pickle
 import re
 
 import pandas as pd
-
 from rnaseq_lib.utils import flatten
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -201,8 +200,8 @@ def grep_cancer_terms(content, replace_newlines_with_periods=True, comprehensive
     :return: Sentences with matches
     :rtype: list(str)
     """
-    terms = {'cancer', 'leukemia', 'carcinoma', 'squamous', 'lymphoma',
-             'malignant', 'metastasis', 'metastatic', 'sarcoma', 'tumor'}
+    terms = {'cancer', 'leukemia', 'carcinoma', 'squamous', 'lymphoma', 'malignant',
+             'metastasis', 'metastatic', 'sarcoma', 'tumor', 'adenocarcinoma'}
 
     # Add all terms from tissue_disease_mapping to grep list
     terms = terms.union(set(flatten(tissue_disease_mapping().values()))) if comprehensive else terms
