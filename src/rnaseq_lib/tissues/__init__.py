@@ -180,7 +180,7 @@ def tissue_disease_mapping():
         'Liver': ['liver', 'hepatic', 'Hepatocellular', 'parenchymal', 'cholang'],
         'Lung': ['lung', 'small-cell carcinoma', 'non-small-cell carcinoma', 'small cell carcinoma',
                  'non small cell carcinoma', 'non small-cell carcinoma', 'mesothelioma'],
-        'Ovary': ['ovary', 'ovarian', 'endometrioid', 'fallopian', 'cord'],
+        'Ovary': ['ovary', 'ovarian', 'endometrioid', 'fallopian', 'cord', 'bronchogenic'],
         'Pancreas': ['pancreas', 'pancreatic', 'cystadenocarcinomas'],
         'Prostate': ['prostate'],
         'Skin-Head': ['head', 'neck', 'skin', 'basal', 'melanoma', 'oral', 'merkel', 'salivary'],
