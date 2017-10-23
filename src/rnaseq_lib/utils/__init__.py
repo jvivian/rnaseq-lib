@@ -133,7 +133,7 @@ def _key_to_attribute(key):
     :return: Processed key
     :rtype: str
     """
-    illegal_chars = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '.', ',', '+', '/', '\\']
+    illegal_chars = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '.', ',', '+', '/', '\\', ':', ';']
     for c in illegal_chars:
         key = key.replace(c, '_')
     return '_'.join(x for x in key.split('_') if x)  # Remove superfluous '_' chars
