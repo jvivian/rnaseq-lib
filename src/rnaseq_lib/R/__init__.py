@@ -158,6 +158,7 @@ def deseq2_normalize(df_path, output_dir='.', map_gene_names=True, clean_workdir
     mkdir_p(work_dir)
 
     # Write out pseudo-vector
+    # Tested that results are the same regardless of vector grouping
     samples = [x.strip() for x in open(df_path, 'r').readline().split()[1:]]
     tissue_vector = os.path.join(work_dir, 'tissue.vector')
     with open(tissue_vector, 'w') as f:
