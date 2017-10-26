@@ -1,11 +1,15 @@
 import time
 import urllib2
+import pandas as pd
 
 import mygene
 import requests
 import xmltodict
 from bs4 import BeautifulSoup
+from collections import defaultdict
 from progressbar import ProgressBar
+
+from rnaseq_lib.utils import rexpando
 
 bar = ProgressBar()
 
@@ -74,7 +78,7 @@ def get_info_from_wiki(drug):
         return None
 
 
-def openfda_drug_label(drug):
+def openfda_query_drug(drug):
     """
     Search OpenFDA drug label API by name
 
@@ -135,6 +139,68 @@ def openfda_get_drugs_by_query(query, limit=100, field='indications_and_usage'):
         return drugs
     else:
         return None
+
+
+def openfda_drugs_to_dataframe(drugs):
+    """
+    Convert a list of drugs to an OpenFDA DataFrame
+
+    :param list(str) drugs:
+    :return: DataFrame of OpenFDA information
+    """
+    # Create dictionary to store table info
+    info = defaultdict(list)
+
+    # For each drug, check openFDA for info
+    bar = ProgressBar()
+    for drug in bar(drugs):
+        drug = drug.lower()
+        r = openfda_query_drug(drug)
+        if r:
+            hits = rexpando(r.json()).results
+
+            # If more than one hit is returned, find exact match
+            if len(hits) != 1:
+                for h in hits:
+                    if drug in h.openfda.brand_name.lower() or drug in h.openfda.generic_name.lower():
+                        res = h
+            else:
+                res = hits[0]
+
+            # Collect info if description references cancer
+            if 'indications_and_usage' in res:
+                usage = res.indications_and_usage[0] if type(
+                    res.indications_and_usage) is list else res.indications_and_usage
+                if [x for x in usage.replace('\n', '.').split('.') if 'cancer' in x]:
+
+                    # Get generic name
+                    try:
+                        info['generic_name'].append(str(res.openfda.generic_name).strip("u'[]"))
+                    except AttributeError:
+                        info['generic_name'].append(None)
+
+                    # Get brand name
+                    try:
+                        info['brand_name'].append(str(res.openfda.brand_name).strip("u'[]"))
+                    except AttributeError:
+                        info['brand_name'].append(None)
+
+                    # Get usage
+                    try:
+                        info['usage'].append(str(res.indications_and_usage).strip('[]'))
+                    except AttributeError:
+                        info['usage'].append(None)
+
+                    # Get mechanism of action
+                    try:
+                        info['mech_action'].append(str(res.mechanism_of_action).strip('[]'))
+                    except AttributeError:
+                        try:
+                            info['mech_action'].append(str(res.clinical_pharmacology).strip('[]'))
+                        except AttributeError:
+                            info['mech_action'].append(None)
+
+    return pd.DataFrame.from_dict(info)
 
 
 def get_drug_usage_nih(drug):
