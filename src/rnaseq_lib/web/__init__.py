@@ -6,6 +6,9 @@ import xmltodict
 from bs4 import BeautifulSoup
 from progressbar import ProgressBar
 
+import rnaseq_lib.web.openfda
+import rnaseq_lib.web.synapse
+
 bar = ProgressBar()
 
 
