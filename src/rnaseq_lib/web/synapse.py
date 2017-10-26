@@ -4,6 +4,7 @@ from synapseclient import Synapse, File
 
 expression = 'syn11311347'
 
+
 def upload_file(file_path, login, parent, description=None):
     """
     Uploads file to Synapse. Password must be stored in environment variable SYNAPSE_PASS
@@ -14,11 +15,11 @@ def upload_file(file_path, login, parent, description=None):
     :param str description: Optional description to add
     """
 
-    description = '' if None else None
-    file = File(file_path, description=description, parent=parent)
+    description = '' if None else description
+    f = File(file_path, description=description, parent=parent)
 
     assert 'SYNAPSE_PASS' in os.environ, 'SYNAPSE_PASS must be set as an environment variable'
 
     syn = Synapse()
     syn.login(login, os.environ)
-    syn.store(file)
+    syn.store(f)

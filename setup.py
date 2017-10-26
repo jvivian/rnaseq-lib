@@ -19,4 +19,5 @@ setup(name='rnaseq-lib',
                         'holoviews',
                         'bs4',
                         'xmltodict',
-                        'mygene'])
+                        'mygene',
+                        'synapseclient'])

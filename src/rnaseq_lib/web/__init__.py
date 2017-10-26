@@ -1,15 +1,10 @@
-import time
 import urllib2
-import pandas as pd
 
 import mygene
 import requests
 import xmltodict
 from bs4 import BeautifulSoup
-from collections import defaultdict
 from progressbar import ProgressBar
-
-from rnaseq_lib.utils import rexpando
 
 bar = ProgressBar()
 
