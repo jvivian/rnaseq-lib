@@ -11,4 +11,7 @@ import rnaseq_lib.images
 import rnaseq_lib.plotting
 import rnaseq_lib.tissues
 import rnaseq_lib.utils
+
 import rnaseq_lib.web
+import rnaseq_lib.web.openfda
+import rnaseq_lib.web.synapse
