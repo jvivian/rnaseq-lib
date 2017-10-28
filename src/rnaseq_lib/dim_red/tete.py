@@ -156,6 +156,7 @@ def tete(X, num_dims = 2, num_neighbs = 50, Yinit=[]):
         
         if (itr+1) % 100 == 0:
             #print 'Iteration: %4d, Loss: %3.3f, Violated triplets: %0.4f' % (itr+1, C, float(num_viol)/num_triplets)
+            pass
     return best_Y
 
 def load_known_size(fname):
