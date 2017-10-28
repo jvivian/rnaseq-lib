@@ -81,7 +81,7 @@ def drugs_to_dataframe(drugs):
     # Create dictionary to store table info
     info = defaultdict(list)
 
-    # For each drug, check openFDA for info
+    # For each drug, query openFDA
     bar = ProgressBar()
     for drug in bar(drugs):
         drug = drug.lower()
