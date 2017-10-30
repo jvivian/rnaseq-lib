@@ -1,8 +1,41 @@
 import os
+import pickle
 
 import pandas as pd
 
 _cwd = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+
+def load_samples():
+    """
+    Returns sample dictionary which maps TCGA and GTEx samples to a tissue.
+    Synapse ID: syn10296681
+
+    :return: Tissues are keys are list of samples are values
+    :rtype: dict(str, list(str))
+    """
+    return pickle.load(open(os.path.join(_cwd, 'samples.pickle'), 'rb'))
+
+
+def load_gene_map():
+    """
+    Dictionary mapping gene ID to gene name
+
+    :return: Gene map
+    :rtype: dict
+    """
+    return pickle.load(open(os.path.join(_cwd, 'gene_map.pickle'), 'rb'))
+
+
+def load_mab_targets():
+    """
+    Returns sorted list of MAB cancer drug targets
+
+    :return: Sorted gene list
+    :rtype: list
+    """
+    path = os.path.join(_cwd, 'cancer-MAB-gene-targets.txt')
+    return sorted([x.strip() for x in open(path, 'r').readlines()])
 
 
 def load_drug_gene_tissue_table():
@@ -27,7 +60,7 @@ def load_gene_tissue_drug_map():
             for k, g in df.groupby('gene')}
 
 
-def get_ucsf_genes():
+def load_ucsf_genes():
     """
     Returns sorted list of UCSF genes
 
@@ -38,7 +71,7 @@ def get_ucsf_genes():
     return sorted([x.strip() for x in open(path, 'r').readlines()])
 
 
-def get_civic_genes():
+def load_civic_genes():
     """
     Returns sorted list of genes from CIViC
 

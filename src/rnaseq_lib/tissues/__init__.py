@@ -1,34 +1,12 @@
 import os
-import pickle
 import re
 
 import pandas as pd
 
-from rnaseq_lib.data import get_ucsf_genes
+from rnaseq_lib.data import load_ucsf_genes, load_gene_map, load_samples
 from rnaseq_lib.utils import flatten
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-
-
-def return_samples():
-    """
-    Returns sample dictionary which maps TCGA and GTEx samples to a tissue.
-    Synapse ID: syn10296681
-
-    :return: Tissues are keys are list of samples are values
-    :rtype: dict(str, list(str))
-    """
-    return pickle.load(open(os.path.join(os.path.dirname(__location__), 'data/samples.pickle'), 'rb'))
-
-
-def get_gene_map():
-    """
-    Dictionary mapping gene ID to gene name
-
-    :return: Gene map
-    :rtype: dict
-    """
-    return pickle.load(open(os.path.join(os.path.dirname(__location__), 'data/gene_map.pickle'), 'rb'))
 
 
 def map_genes(genes, strict=True):
@@ -40,7 +18,7 @@ def map_genes(genes, strict=True):
     :return: Mapped genes
     :rtype: list
     """
-    gene_map = get_gene_map()
+    gene_map = load_gene_map()
     if strict:
         return [gene_map[x.split('.')[0]] for x in genes]
     else:
@@ -54,17 +32,6 @@ def map_genes(genes, strict=True):
         return mapped
 
 
-def get_mab_targets():
-    """
-    Returns sorted list of MAB cancer drug targets
-
-    :return: Sorted gene list
-    :rtype: list
-    """
-    path = os.path.join(os.path.dirname(__location__), 'data/cancer-MAB-gene-targets.txt')
-    return sorted([x.strip() for x in open(path, 'r').readlines()])
-
-
 def get_ucsf_subset(df):
     """
     Subset UCSF dataframe and return.
@@ -75,7 +42,7 @@ def get_ucsf_subset(df):
     """
     df.index = map_genes(df.index)
 
-    ucsf_genes = get_ucsf_genes()
+    ucsf_genes = load_ucsf_genes()
     ucsf_genes = [x for x in ucsf_genes if x in df.index]
 
     return df.loc[ucsf_genes]
@@ -88,7 +55,7 @@ def get_tumor_samples(tissue):
     :return: List of tumor samples
     :rtype: list
     """
-    samples = return_samples()
+    samples = load_samples()
     return [x for x in samples[tissue] if x.endswith('-01')]
 
 
@@ -100,7 +67,7 @@ def get_gtex_samples(tissue):
     :return: List of GTEx samples
     :rtype: list
     """
-    samples = return_samples()
+    samples = load_samples()
     return [x for x in samples[tissue] if not x.startswith('TCGA')]
 
 
@@ -112,7 +79,7 @@ def get_normal_samples(tissue):
     :return: List of TCGA normal samples
     :rtype: list
     """
-    samples = return_samples()
+    samples = load_samples()
     return [x for x in samples[tissue] if x.endswith('-11')]
 
 
@@ -200,7 +167,7 @@ def validate_genes(input_genes):
     input_genes = [input_genes] if type(input_genes) == str else input_genes
 
     # Create valid_genes list
-    gene_map = get_gene_map()
+    gene_map = load_gene_map()
     valid_genes = set(gene_map.keys() + gene_map.values())
 
     # Iterate through genes
