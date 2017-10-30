@@ -22,5 +22,5 @@ def upload_file(file_path, login, parent, description=None):
     assert 'SYNAPSE_PASS' in os.environ, 'SYNAPSE_PASS must be set as an environment variable'
 
     syn = Synapse()
-    syn.login(login, os.environ)
+    syn.login(login, os.environ['SYNAPSE_PASS'])
     syn.store(f)
