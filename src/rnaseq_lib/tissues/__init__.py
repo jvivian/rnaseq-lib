@@ -3,6 +3,8 @@ import pickle
 import re
 
 import pandas as pd
+
+from rnaseq_lib.data import get_ucsf_genes
 from rnaseq_lib.utils import flatten
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -60,28 +62,6 @@ def get_mab_targets():
     :rtype: list
     """
     path = os.path.join(os.path.dirname(__location__), 'data/cancer-MAB-gene-targets.txt')
-    return sorted([x.strip() for x in open(path, 'r').readlines()])
-
-
-def get_ucsf_genes():
-    """
-    Returns sorted list of UCSF genes
-
-    :return: Sorted gene list
-    :rtype: list
-    """
-    path = os.path.join(os.path.dirname(__location__), 'data/UCSF-genes.csv')
-    return sorted([x.strip() for x in open(path, 'r').readlines()])
-
-
-def get_civic_genes():
-    """
-    Returns sorted list of genes from CIViC
-
-    :return: Sorted gene list
-    :rtype: list
-    """
-    path = os.path.join(os.path.dirname(__location__), 'data/civic-genes.txt')
     return sorted([x.strip() for x in open(path, 'r').readlines()])
 
 
