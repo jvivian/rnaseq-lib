@@ -4,6 +4,7 @@ import re
 import pandas as pd
 
 from rnaseq_lib.data import load_ucsf_genes, load_gene_map, load_samples
+from rnaseq_lib.gtf import get_protein_coding_genes
 from rnaseq_lib.utils import flatten
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -187,3 +188,16 @@ def validate_genes(input_genes):
         genes.append(gene)
 
     return genes
+
+
+def subset_protein_coding_genes(df, gtf_path):
+    """
+    Return dataframe with protein-coding genes
+
+    :param pd.DataFrame df: Genes by samples gene expression dataframe
+    :param str gtf_path:
+    :return: Subset dataframe
+    :rtype: pd.DataFrame
+    """
+    genes = get_protein_coding_genes(gtf_path)
+    return df.loc[genes]
