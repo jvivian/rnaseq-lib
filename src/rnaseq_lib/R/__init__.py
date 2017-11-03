@@ -139,7 +139,12 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
     shutil.rmtree(work_dir)
 
 
-def deseq2_normalize(df_path, output_dir='.', map_gene_names=True, clean_workdir=True, normalize_fn=None):
+def deseq2_normalize(df_path,
+                     output_dir='.',
+                     map_gene_names=True,
+                     clean_workdir=True,
+                     normalize_fn=None,
+                     suffix='deseq2-normalized.tsv'):
     """
     Accepts a gene by sample expression matrix normalized values with DESeq2
     Output filename: <INPUT>.deseq2-normalized.tsv
@@ -149,6 +154,7 @@ def deseq2_normalize(df_path, output_dir='.', map_gene_names=True, clean_workdir
     :param bool map_gene_names: If True, maps gene IDs to gene names
     :param bool clean_workdir: If True, deletes temporary work directory
     :param fn normalize_fn: Pass a function to apply to the dataframe before normalization. e.g. lambda x: 2**x + 1
+    :param str suffix: Suffix added after df_paths basename
     :return: Path to normalized dataframe
     :rtype: str
     """
@@ -171,7 +177,7 @@ def deseq2_normalize(df_path, output_dir='.', map_gene_names=True, clean_workdir
         df.to_csv(df_path, sep='\t')
 
     # Write normalization script
-    output_path = os.path.join(output_dir, os.path.basename(df_path).split('.')[0] + '.deseq2-normalized.tsv')
+    output_path = os.path.join(output_dir, os.path.basename(df_path).split('.')[0] + suffix)
     script_path = os.path.join(work_dir, 'deseq2.R')
     with open(script_path, 'w') as f:
         f.write(
