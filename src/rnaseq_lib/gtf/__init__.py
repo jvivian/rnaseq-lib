@@ -128,6 +128,13 @@ def _get_value(value):
 
 
 def get_protein_coding_genes(filename):
+    """
+    Collect protein-coding genes from GTF file
+
+    :param str filename: Path to GTF file to parse
+    :return: Protein coding genes
+    :rtype: list(str)
+    """
     genes = []
     with open(filename, 'r') as f:
         for line in f:
