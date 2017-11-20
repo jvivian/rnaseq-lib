@@ -33,15 +33,16 @@ def map_genes(genes, strict=True):
         return mapped
 
 
-def get_ucsf_subset(df):
+def get_ucsf_subset(df, strict=False):
     """
     Subset UCSF dataframe and return.
 
     :param pd.DataFrame df: Input Dataframe in the format of "Genes by Samples"
+    :param bool strict: If True, raises an error if gene is unmapped
     :return: Subset of Dataframe that only includes UCSF genes
     :rtype: pd.DataFrame
     """
-    df.index = map_genes(df.index)
+    df.index = map_genes(df.index, strict=strict)
 
     ucsf_genes = load_ucsf_genes()
     ucsf_genes = [x for x in ucsf_genes if x in df.index]
