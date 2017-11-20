@@ -28,7 +28,6 @@ def map_genes(genes, strict=True):
             try:
                 mapped.append(gene_map[g.split('.')[0]])
             except KeyError:
-                print '{} not found in gene_map, leaving as is'
                 mapped.append(g)
         return mapped
 
