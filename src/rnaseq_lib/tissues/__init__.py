@@ -56,8 +56,7 @@ def get_tumor_samples(tissue):
     :return: List of tumor samples
     :rtype: list
     """
-    samples = load_samples()
-    return [x for x in samples[tissue] if x.endswith('-01')]
+    return load_samples()[tissue]['tcga-t']
 
 
 def get_gtex_samples(tissue):
@@ -68,8 +67,7 @@ def get_gtex_samples(tissue):
     :return: List of GTEx samples
     :rtype: list
     """
-    samples = load_samples()
-    return [x for x in samples[tissue] if not x.startswith('TCGA')]
+    return load_samples()[tissue]['gtex']
 
 
 def get_normal_samples(tissue):
@@ -80,8 +78,7 @@ def get_normal_samples(tissue):
     :return: List of TCGA normal samples
     :rtype: list
     """
-    samples = load_samples()
-    return [x for x in samples[tissue] if x.endswith('-11')]
+    return load_samples()[tissue]['tcga-n']
 
 
 def identify_tissue_from_str(content):
