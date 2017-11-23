@@ -2,9 +2,10 @@ import os
 import shutil
 import textwrap
 from multiprocessing import cpu_count
-from subprocess import call
+from subprocess import call, Popen, PIPE
 
 import pandas as pd
+
 from rnaseq_lib.docker import fix_directory_ownership, base_docker_call
 from rnaseq_lib.tissues import get_tumor_samples, get_gtex_samples, get_normal_samples, map_genes
 from rnaseq_lib.utils import mkdir_p
@@ -124,7 +125,11 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
                   '/data/{}'.format(os.path.join('work_dir', 'disease.vector'))]
 
     print '\nCalling: {}\n'.format(' '.join(docker_parameters + parameters))
-    call(docker_parameters + parameters)
+    p = Popen(docker_parameters + parameters, stderr=PIPE, stdout=PIPE)
+    out, err = p.communicate()
+    if out or err:
+        print out
+        print err
 
     # Fix output of files
     fix_directory_ownership(output_dir=output_dir, tool='jvivian/deseq2')
