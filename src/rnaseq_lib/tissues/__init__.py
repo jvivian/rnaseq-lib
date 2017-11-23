@@ -56,7 +56,7 @@ def get_tumor_samples(tissue):
     :return: List of tumor samples
     :rtype: list
     """
-    return load_samples()[tissue]['tcga-t']
+    return load_samples()[tissue]['tcga_t']
 
 
 def get_gtex_samples(tissue):
@@ -78,7 +78,7 @@ def get_normal_samples(tissue):
     :return: List of TCGA normal samples
     :rtype: list
     """
-    return load_samples()[tissue]['tcga-n']
+    return load_samples()[tissue]['tcga_n']
 
 
 def identify_tissue_from_str(content):
