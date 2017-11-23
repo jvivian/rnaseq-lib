@@ -5,6 +5,7 @@ import pandas as pd
 from progressbar import ProgressBar
 from rnaseq_lib.utils import rexpando
 from rnaseq_lib.web import _rget
+from rnaseq_lib.tissues import grep_cancer_terms
 
 
 def query_drug(drug):
@@ -131,3 +132,20 @@ def drugs_to_dataframe(drugs):
                             info['mech_action'].append(None)
 
     return pd.DataFrame.from_dict(info)
+
+
+def indications_and_usage(drug):
+    """
+    Returns indications and usage, split by cancer terms
+
+    :param str drug: Name of drug
+    :return: Indications and usage split by cancer terms
+    :rtype: str
+    """
+    r = query_drug(drug)
+    if not r:
+        print 'No drug found'
+        return None
+
+    return '\n\n'.join(grep_cancer_terms(str(rexpando(
+        r.json()['results'][0])['indications_and_usage'])))
