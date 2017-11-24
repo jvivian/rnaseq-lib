@@ -4,11 +4,25 @@ import textwrap
 from multiprocessing import cpu_count
 from subprocess import call, Popen, PIPE
 
+import numpy as np
 import pandas as pd
 
 from rnaseq_lib.docker import fix_directory_ownership, base_docker_call
 from rnaseq_lib.tissues import get_tumor_samples, get_gtex_samples, get_normal_samples, map_genes
 from rnaseq_lib.utils import mkdir_p
+
+
+def l2fc(a, b):
+    """
+    Calculate the log2 Fold Change between two arrays, floats, or integers
+    a and b cannot be, nor contain, values less than 0
+
+    :param (int/float/np.array) a: Value or array
+    :param (int/float/np.array) b: Value or array
+    :return: L2FC array or value
+    :rtype: (int/float/np.array)
+    """
+    return np.log2(a + 1) - np.log2(b + 1)
 
 
 def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
@@ -46,7 +60,7 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
             textwrap.dedent("""
             library('DESeq2'); library('data.table'); library('BiocParallel')
             register(MulticoreParam({cores}))
-            
+
             # Argument parsing
             args <- commandArgs(trailingOnly = TRUE)
             df_path <- args[1]
@@ -54,16 +68,16 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
             disease_path <- args[3]
             tissue <- '{tissue}'
             output_dir <- '/data/'
-            
+
             # Read in vectors
             tissue_vector <- read.table(tissue_path)$V1
             disease_vector <- read.table(disease_path)$V1
-            
+
             # Read in table and process
             n <- read.table(df_path, sep='\\t', header=1, row.names=1, check.names=FALSE)
             sub <- n[, colnames(n)%in%tissue_vector]
             setcolorder(sub, as.character(tissue_vector))
-            
+
             # Preprocessing
             countData <- round(sub)
             colData <- data.frame(disease=disease_vector, row.names=colnames(countData))
@@ -73,13 +87,13 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
             y <- DESeq(y, parallel=TRUE)
             res <- results(y, parallel=TRUE)
             summary(res)
-            
+
             # Write out table
             resOrdered <- res[order(res$padj),]
             res_name <- paste(tissue, '.tsv', sep='')
             res_path <- paste(output_dir, res_name, sep='/')
             write.table(as.data.frame(resOrdered), file=res_path, col.names=NA, sep='\\t',  quote=FALSE)
-                        
+
             # MA Plot
             ma_name <- paste(tissue, '-MA.pdf', sep='')
             ma_path <- paste(output_dir, ma_name, sep='/')
@@ -93,14 +107,14 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
             pdf(disp_path, width=7, height=7)
             plotDispEsts( y, ylim = c(1e-6, 1e1) )
             dev.off()
-            
+
             # PVal Hist
             hist_name <- paste(tissue, '-pval-hist.pdf', sep='')
             hist_path <- paste(output_dir, hist_name, sep='/')
             pdf(hist_path, width=7, height=7)
             hist( res$pvalue, breaks=20, col="grey" )
             dev.off()
-            
+
             # Ratios plots
             qs <- c( 0, quantile( res$baseMean[res$baseMean > 0], 0:7/7 ) )
             bins <- cut( res$baseMean, qs )
@@ -191,7 +205,7 @@ def deseq2_normalize(df_path,
 
             # Argument parsing
             output_dir <- '/data/'
-            
+
             # Read in pseudo-vector
             tissue_vector <- read.table('/data/work_dir/tissue.vector')$V1
 
@@ -202,19 +216,19 @@ def deseq2_normalize(df_path,
             # Preprocessing
             print("Rounding data to integers")
             countData <- round(n)
-            
+
             print("Creating DESeq2 Dataset Object")
             colData <- data.frame(tissue=tissue_vector, row.names=colnames(countData))
             dds <- DESeqDataSetFromMatrix(countData = countData, colData = colData, design = ~ tissue)
-            
+
             # Estimate size factors
             print("Estimating Size Factors")
             dds <- estimateSizeFactors(dds)
-            
+
             # Extract Normalized Counts and Write
             print("Extracting normalized counts")
             norm <- counts(dds, normalized = TRUE)
-            
+
             print("Writing output: {output_name}")
             write.table(norm, file="/data/{output_name}", sep='\\t', quote=F, dec='.', col.names=NA) 
             """.format(df_path=os.path.basename(df_path), output_name=os.path.basename(output_path))))
