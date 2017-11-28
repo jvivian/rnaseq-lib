@@ -2,6 +2,7 @@ import holoviews as hv
 
 from rnaseq_lib.diff_exp import log2fc
 from rnaseq_lib.tissues import subset_by_dataset
+import numpy as np
 
 df_cols = ['id', 'tissue', 'dataset', 'tumor', 'type']
 
@@ -17,15 +18,15 @@ def gene_curves(df, tissue, gene):
     # Get values for plot
     records = []
     for perc_tumor in [x * 0.1 for x in xrange(1, 11)]:
-        # Get expression value for top x% tumor samples
-        exp = (float(tumor.iloc[int(len(tumor) * perc_tumor) - 1].ERBB2))
+        # Get log2 expression value for top x% tumor samples
+        exp = np.log2((float(tumor.iloc[int(len(tumor) * perc_tumor) - 1].ERBB2)) + 1)
 
         # Get percentage of samples in GTEx
-        perc_normal = (len(gtex[gtex.ERBB2 > exp]) * 1.0) / len(gtex)
+        perc_normal = (len(gtex[gtex.ERBB2.apply(lambda x: np.log2(x+1)) > exp]) * 1.0) / len(gtex)
 
         # Compute L2FC for tumor sample subset vs GTEx
-        tumor_mean = tumor.iloc[:int(len(tumor) * perc_tumor) - 1].ERBB2.apply(lambda x: 2 ** x - 1).median()
-        gtex_mean = gtex.ERBB2.apply(lambda x: 2 ** x - 1).median()
+        tumor_mean = tumor.iloc[:int(len(tumor) * perc_tumor) - 1].ERBB2.median()
+        gtex_mean = gtex.ERBB2.median()
         l2fc = log2fc(tumor_mean, gtex_mean)
 
         # Store
