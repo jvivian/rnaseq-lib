@@ -12,7 +12,7 @@ from rnaseq_lib.tissues import get_tumor_samples, get_gtex_samples, get_normal_s
 from rnaseq_lib.utils import mkdir_p
 
 
-def l2fc(a, b):
+def log2fc(a, b):
     """
     Calculate the log2 Fold Change between two arrays, floats, or integers
     a and b cannot be, nor contain, values less than 0
