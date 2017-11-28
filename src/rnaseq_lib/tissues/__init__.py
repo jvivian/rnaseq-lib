@@ -96,6 +96,20 @@ def identify_tissue_from_str(content):
                 any([term for term in v if re.search(r'\b{}\b'.format(term), content, flags=re.IGNORECASE)])])
 
 
+def subset_by_dataset(df):
+    """
+    Returns tumor, normal, and GTEx dataframe subsets
+
+    :param pd.Dataframe df: Dataframe containing a "dataset" and "tumor" column
+    :return: One dataframe per dataset
+    :rtype: tuple(pd.Dataframe, pd.Dataframe, pd.Dataframe)
+    """
+    tumor = df[(df.dataset == 'tcga') & (df.tumor == 'yes')]
+    normal = df[(df.dataset == 'tcga') & (df.tumor == 'no')]
+    gtex = df[(df.dataset == 'gtex')]
+    return tumor, normal, gtex
+
+
 def tissue_disease_mapping():
     """
     Maps tissue types to words associated with cancers of that tissue
