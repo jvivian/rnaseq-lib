@@ -4,6 +4,7 @@ from synapseclient import Synapse, File
 
 expression = 'syn11311347'
 metadata = 'syn11311931'
+objects = 'syn11515014'
 
 
 def upload_file(file_path, login, parent, description=None):
