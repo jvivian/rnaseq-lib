@@ -4,8 +4,8 @@ import holoviews as hv
 import numpy as np
 import pandas as pd
 
-from rnaseq_lib.plotting import plot_boxplot
-from rnaseq_lib.tissues import get_gtex_samples, return_samples
+from rnaseq_lib.plot import plot_boxplot
+from rnaseq_lib.tissues import get_gtex_samples, load_samples
 from rnaseq_lib.tissues import get_normal_samples
 from rnaseq_lib.tissues import get_tumor_samples
 
@@ -35,7 +35,7 @@ def get_tcga_gtex_label_info():
     :return: Returns TCGA and GTEx label, tissue, and samples information
     :rtype: defaultdict
     """
-    samples = return_samples()
+    samples = load_samples()
     info = defaultdict(list)
     for tissue in sorted(samples):
         info['label'].extend(['Tumor' if x.endswith('-01')
