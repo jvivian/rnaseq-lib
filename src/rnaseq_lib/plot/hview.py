@@ -24,7 +24,7 @@ def gene_curves(df, tissue, gene):
         perc_normal = (len(gtex[gtex.ERBB2 > exp]) * 1.0) / len(gtex)
 
         # Compute L2FC for tumor sample subset vs GTEx
-        tumor_mean = tumor.iloc[:int(len(tumor) * perc_tumor)].ERBB2.apply(lambda x: 2 ** x - 1).median()
+        tumor_mean = tumor.iloc[:int(len(tumor) * perc_tumor) - 1].ERBB2.apply(lambda x: 2 ** x - 1).median()
         gtex_mean = gtex.ERBB2.apply(lambda x: 2 ** x - 1).median()
         l2fc = log2fc(tumor_mean, gtex_mean)
 
