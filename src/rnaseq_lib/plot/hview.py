@@ -12,6 +12,9 @@ def gene_curves(df, tissue, gene):
     df = df[df.tissue == tissue]
     df = df[df_cols + [gene]].sort_values(gene, ascending=False)
 
+    # Logscale gene for calculations
+    df[gene] = df[gene].apply(lambda x: np.log2(x+1))
+
     # Subset by dataset
     tumor, normal, gtex = subset_by_dataset(df)
 
@@ -19,14 +22,14 @@ def gene_curves(df, tissue, gene):
     records = []
     for perc_tumor in [x * 0.1 for x in xrange(1, 11)]:
         # Get log2 expression value for top x% tumor samples
-        exp = np.log2((float(tumor.iloc[int(len(tumor) * perc_tumor) - 1].ERBB2)) + 1)
+        exp = float(tumor.iloc[int(len(tumor) * perc_tumor) - 1][gene])
 
         # Get percentage of samples in GTEx
-        perc_normal = (len(gtex[gtex.ERBB2.apply(lambda x: np.log2(x+1)) > exp]) * 1.0) / len(gtex)
+        perc_normal = (len(gtex[gtex[gene] > exp]) * 1.0) / len(gtex)
 
         # Compute L2FC for tumor sample subset vs GTEx
-        tumor_mean = tumor.iloc[:int(len(tumor) * perc_tumor) - 1].ERBB2.median()
-        gtex_mean = gtex.ERBB2.median()
+        tumor_mean = tumor.iloc[:int(len(tumor) * perc_tumor) - 1][gene].apply(lambda x: 2**x - 1).median()
+        gtex_mean = gtex[gene].apply(lambda x: 2**x - 1).median()
         l2fc = log2fc(tumor_mean, gtex_mean)
 
         # Store
