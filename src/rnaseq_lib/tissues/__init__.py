@@ -10,6 +10,24 @@ from rnaseq_lib.utils import flatten
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
+# dtype for metadata-expression dataframe
+dtype = {'id': object,
+         'reads': int,
+         'size_MB': float,
+         'sex': object,
+         'tissue': object,
+         'seq_site': object,
+         'weight': float,
+         'height': float,
+         'mapped_reads': float,
+         'race': object,
+         'age': float,
+         'qc': float,
+         'dataset': object,
+         'tumor': object,
+         'type': object}
+
+
 def map_genes(genes, strict=True):
     """
     Maps gene IDs to gene names
