@@ -42,10 +42,14 @@ class Holoview:
         tumor, normal, gtex = subset_by_dataset(df)
 
         # Create KDE objects
-        t = hv.Dimension(tumor[gene].apply(lambda x: np.log2(x + 1)), label='Tumor')
-        g = hv.Dimension(gtex[gene].apply(lambda x: np.log2(x + 1)), label='GTEx')
+        t = hv.Distribution(tumor[gene].apply(lambda x: np.log2(x + 1)), label='Tumor-{}'.format(tissue))
+        g = hv.Distribution(gtex[gene].apply(lambda x: np.log2(x + 1)), label='GTEx-{}'.format(tissue))
 
-        return t * g
+        return hv.Overlay([t, g], label='{} Expression'.format(gene))
+
+    def two_tissue_gene_kde(self, tissue_1, tissue_2, gene):
+        return hv.Overlay([self.gene_kde(tissue_1, gene), self.gene_kde(tissue_2, gene)],
+                          label='{} Expression'.format(gene))
 
     def gene_curves(self, tissue, gene):
         """
