@@ -188,7 +188,6 @@ def _rget(url, params=None):
     """
     r = requests.get(url, params=params)
     if r.status_code != 200:
-        # print 'Error Status Code {}'.format(r.status_code)
         return None
     else:
         return r
