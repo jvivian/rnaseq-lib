@@ -44,12 +44,24 @@ def get_drug_info(drug):
 
 def get_drug_class(drug):
     text = get_drug_info(drug)
-    for line in text.split('\n'):
-        if line.startswith('CLASS'):
-            return str(line.split()[-1])
+    values = []
 
-    if text:
+    # Flag for once the BRITE is reached
+    brite = False
+    for line in text.split('\n'):
+        line = line.strip().split()
+        if not line:
+            break
+        if line[0] == 'BRITE':
+            brite = True
+        if line[0].startswith('L') and brite:
+            values.append(' '.join(line))
+
+    # Handle returning values (or notify user if no values found)
+    if text and not values:
         print 'Response found, but no drug class provided'
+    else:
+        return values
 
 
 # Internal Functions
