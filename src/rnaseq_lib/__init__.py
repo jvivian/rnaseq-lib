@@ -19,3 +19,4 @@ import rnaseq_lib.utils
 import rnaseq_lib.web
 import rnaseq_lib.web.openfda
 import rnaseq_lib.web.synapse
+import rnaseq_lib.web.kegg
