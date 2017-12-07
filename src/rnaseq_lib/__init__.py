@@ -7,6 +7,7 @@ import rnaseq_lib.drugs
 import rnaseq_lib.graphs
 import rnaseq_lib.gtf
 import rnaseq_lib.images
+import rnaseq_lib.jupyter
 
 import rnaseq_lib.plot
 import rnaseq_lib.plot.opts
@@ -17,6 +18,6 @@ import rnaseq_lib.tissues.plots
 import rnaseq_lib.utils
 
 import rnaseq_lib.web
+import rnaseq_lib.web.kegg
 import rnaseq_lib.web.openfda
 import rnaseq_lib.web.synapse
-import rnaseq_lib.web.kegg
