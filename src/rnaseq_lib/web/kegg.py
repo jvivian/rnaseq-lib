@@ -1,12 +1,14 @@
+import io
 import os
 
 import pandas as pd
+from Bio.KEGG.KGML import KGML_parser
 
 from rnaseq_lib.web import _rget
 
 
 # Gene Functions
-def find_gene(query, database='genes', human_only=True):
+def find_gene_label(query, database='genes', human_only=True):
     r = _kegg_search(operation='find', database=database, query=query)
     if r:
         for hit in r.text.split('\n'):
@@ -21,9 +23,19 @@ def find_gene(query, database='genes', human_only=True):
 
 
 def get_gene_dataframe(gene):
-    label = find_gene(gene)
+    label = find_gene_label(gene)
     r = _get(label)
     return _parse_gene_get(r.text)
+
+
+def get_gene_names_from_label(label):
+    genes = set()
+    r = _get(label)
+    for line in r.text.split('\n'):
+        if line.startswith('NAME'):
+            line = line.split()[1:]
+            genes.add(line[0].rstrip(','))
+    return genes
 
 
 # Drug Functions
@@ -33,7 +45,7 @@ def find_drug_label(drug):
         try:
             return line.split()[0]
         except IndexError:
-            print 'No drug found, check spelling'
+            print 'No entry for {}, check spelling'.format(drug)
 
 
 def get_drug_info(drug):
@@ -59,19 +71,47 @@ def get_drug_class(drug):
 
     # Handle returning values (or notify user if no values found)
     if text and not values:
-        print 'Response found, but no drug class provided'
+        print 'Response found for {}, but no drug class provided'.format(drug)
     else:
         return values
 
 
+# Pathway Functions
+def find_pathway(query):
+    return _kegg_search(operation='find', database='pathway', query=query)
+
+
+def get_genes_from_pathway(pathway):
+    kgml = _get(pathway, form='kgml').text
+
+    # Wrap text in a file handle for KGML parser
+    f = io.BytesIO(kgml.encode('utf-8'))
+    k = KGML_parser.read(f)
+
+    genes = set()
+    for gene in k.genes:
+        g = get_gene_names_from_label(gene)
+        genes = genes.union(g)
+
+    return genes
+
+
 # Internal Functions
-def _kegg_search(operation, database, query):
+def _kegg_search(operation, database, query=None, form=None):
+    # Set arguments to empty strings if None
+    query = '' if query is None else query
+    form = '' if form is None else form
+
+    # Define base URL
     url = 'http://rest.kegg.jp'
-    return _rget(os.path.join(url, operation, database, query))
+
+    # Make get request
+    request = os.path.join(url, operation, database, query, form)
+    return _rget(request)
 
 
-def _get(query):
-    return _kegg_search(operation='get', database='', query=query)
+def _get(query, form=None):
+    return _kegg_search(operation='get', database='', query=query, form=form)
 
 
 def _parse_drug_line(line, index=1):
