@@ -76,6 +76,24 @@ def get_drug_class(drug):
         return values
 
 
+def get_drug_disease(drug):
+    text = get_drug_info(drug)
+    values = []
+
+    disease = True
+    for line in text.split('\n'):
+        line = line.strip().split()
+        if not line:
+            break
+        if line[0].isupper() and disease:
+            break
+        if line[0].upper() == 'DISEASE':
+            disease = True
+        if disease:
+            line.remove('DISEASE')
+            values.append(' '.join(line))
+
+
 # Pathway Functions
 def find_pathway(query):
     return _kegg_search(operation='find', database='pathway', query=query)
