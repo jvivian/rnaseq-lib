@@ -4,6 +4,7 @@ import pandas as pd
 
 from rnaseq_lib.diff_exp import log2fc
 from rnaseq_lib.dim_red import run_tsne, run_tete
+from rnaseq_lib.plot.opts import gene_curves_opts, gene_kde_opts
 from rnaseq_lib.tissues import subset_by_dataset
 from rnaseq_lib.utils import flatten
 
@@ -22,16 +23,20 @@ class Holoview:
         self.df = df
         self.df_cols = ['id', 'tissue', 'dataset', 'tumor', 'type']
 
-    def subset(self, tissue, gene):
+        # Style attributes - used in conjunction with '.opts()'
+        self.gene_curves_opts = gene_curves_opts
+        self.gene_kde_opts = gene_kde_opts
+
+    def subset(self, gene, tissue):
         df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
         return df[df.tissue == tissue]
 
-    def gene_kde(self, tissue, gene):
+    def gene_kde(self, gene, tissue):
         """
         Returns KDE of gene expression (log2) for given tissue
 
-        :param str tissue: Tissue (ex: Breast) to select
         :param str gene: Gene (ex: ERBB2) to select
+        :param str tissue: Tissue (ex: Breast) to select
         :return: Returns holoviews Overlay object of gene KDE
         :rtype: hv.Overlay
         """
@@ -50,16 +55,57 @@ class Holoview:
 
         return hv.Overlay([t, g], label='{} Expression'.format(gene))
 
-    def two_tissue_gene_kde(self, tissue_1, tissue_2, gene):
-        return hv.Overlay([self.gene_kde(tissue_1, gene), self.gene_kde(tissue_2, gene)],
+    def multiple_tissue_gene_kde(self, gene, *tissues):
+        return hv.Overlay([self.gene_kde(gene, t) for t in tissues],
                           label='{} Expression'.format(gene))
 
-    def gene_curves(self, tissue, gene):
+    def gene_distribution(self, gene, extents=None):
+        # Subset dataframe by gene
+        df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
+
+        # Normalize gene expression
+        df[gene] = df[gene].apply(lambda x: np.log2(x + 1))
+
+        # Subset for Tumor and GTEx
+        df = df[((df.tumor == 'yes') | (df.dataset == 'gtex'))]
+
+        # return grouped box and whiskers:
+        return hv.BoxWhisker((df.tissue, df.dataset, df[gene]), kdims=['tissue', 'dataset'], vdims='gene')
+
+    def gene_DE(self, gene, extents=None):
+        # Subset dataframe by gene
+        df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
+
+        # Subset by dataset
+        tumor, normal, gtex = subset_by_dataset(df)
+
+        # For each tissue, calculate L2FC and mean expression
+        records = []
+        for tissue in sorted(df.tissue.unique()):
+            exp = df[(df.tissue==tissue) & ((df.tumor == 'yes') | (df.dataset == 'gtex'))][gene].apply(lambda x: np.log2(x + 1)).median()
+
+            t = tumor[tumor.tissue == tissue][gene].median()
+            g = gtex[gtex.tissue == tissue][gene].median()
+            l2fc = log2fc(t, g)
+
+            records.append((exp, l2fc, tissue))
+
+        kdims = ['Expression']
+        vdims = ['L2FC', 'Tissue']
+
+        plot = pd.DataFrame.from_records(records, columns=kdims + vdims)
+
+        if extents:
+            return hv.Scatter(plot, kdims=kdims, vdims=vdims, extents=extents)
+        else:
+            return hv.Scatter(plot, kdims=kdims, vdims=vdims)
+
+    def gene_curves(self, gene, tissue):
         """
         Returns set of 3 plots for tissue / gene given a dataframe of metadata and expression values
 
-        :param str tissue: Tissue (ex: Breast) to select
         :param str gene: Gene (ex: ERBB2) to select
+        :param str tissue: Tissue (ex: Breast) to select
         :return: Returns holoviews Layout object containing 3 plots for selected Tisssue / Gene
         :rtype: hv.Layout
         """
