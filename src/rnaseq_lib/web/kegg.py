@@ -81,6 +81,25 @@ def find_pathway(query):
     return _kegg_search(operation='find', database='pathway', query=query)
 
 
+def get_kgml(pathway):
+    kgml = _get(pathway, form='kgml').text
+
+    # Wrap text in a file handle for KGML parser
+    f = io.BytesIO(kgml.encode('utf-8'))
+    k = KGML_parser.read(f)
+    return k
+
+
+def get_pathway_info(pathway):
+    return _get(pathway).text
+
+
+def pathway_image(pathway):
+    from IPython.display import Image
+    k = get_kgml(pathway)
+    return Image(k.image)
+
+
 def get_genes_from_pathway(pathway):
     kgml = _get(pathway, form='kgml').text
 
