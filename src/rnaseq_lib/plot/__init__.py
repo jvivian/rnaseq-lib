@@ -28,7 +28,16 @@ class Holoview:
         self.gene_distribution_opts = gene_distribution_opts
         self.gene_de_opts = gene_de_opts
 
-    def subset(self, gene, tissue):
+    @staticmethod
+    def l2norm(x):
+        """
+        Log2 noramlization function for gene counts
+
+        :param float x: Input value
+        :return: log2(x+1) normalized value
+        :rtype: float
+        """
+        return np.log2(x + 1)
         df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
         return df[df.tissue == tissue]
 
