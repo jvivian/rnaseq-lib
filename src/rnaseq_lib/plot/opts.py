@@ -22,5 +22,5 @@ gene_distribution_opts = {
 
 gene_de_opts = {
     'Scatter': {'plot': dict(color_index='Tissue', legend_position='left', width=700, height=500, tools=['hover']),
-                'styple': dict(cmap='tab20', size=10, alpha=0.5)}
+                'style': dict(cmap='tab20', size=10, alpha=0.5)}
 }
