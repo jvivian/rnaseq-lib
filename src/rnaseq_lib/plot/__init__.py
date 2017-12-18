@@ -75,7 +75,7 @@ class Holoview:
         :rtype: hv.Overlay
         """
         # Subset dataframe by tissue and gene
-        df = self.subset(tissue, gene)
+        df = self._subset(tissue, gene)
 
         # Subset by dataset
         tumor, normal, gtex = subset_by_dataset(df)
@@ -84,8 +84,8 @@ class Holoview:
         x = hv.Dimension('Gene Expression', unit='log2(x+1)')
 
         # Create KDE objects
-        t = hv.Distribution(tumor[gene].apply(lambda x: np.log2(x + 1)), kdims=[x], label='Tumor-{}'.format(tissue))
-        g = hv.Distribution(gtex[gene].apply(lambda x: np.log2(x + 1)), kdims=[x], label='GTEx-{}'.format(tissue))
+        t = hv.Distribution(tumor[gene].apply(self.l2norm), kdims=[x], label='Tumor-{}'.format(tissue))
+        g = hv.Distribution(gtex[gene].apply(self.l2norm), kdims=[x], label='GTEx-{}'.format(tissue))
 
         return hv.Overlay([t, g], label='{} Expression'.format(gene))
 
