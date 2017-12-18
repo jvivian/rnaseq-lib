@@ -51,6 +51,20 @@ class Holoview:
         df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
         return df[df.tissue == tissue]
 
+    def _gene_cutoff(self, gene, tissue, percent):
+        # Subset dataframe by tissue and gene
+        df = self._subset(tissue, gene)
+
+        # Subset by dataset
+        tumor, normal, gtex = subset_by_dataset(df)
+
+        # Calculate gene expression cutoffs for each dataset
+        cutoffs = [x[gene].sort_values(ascending=False).iloc[int(len(x) * percent) - 1]
+                   for x in [tumor, normal, gtex]]
+
+        # Return mapping of dataset to cutoff
+        return {x: y for x, y in zip(['tumor', 'normal', 'gtex'], cutoffs)}
+
     def gene_kde(self, gene, tissue):
         """
         Returns KDE of gene expression (log2) for given tissue
