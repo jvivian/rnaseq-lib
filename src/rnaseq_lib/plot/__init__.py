@@ -240,54 +240,46 @@ class Holoview:
 
         return (c1 * s1 + c2 * s2 + c3 * s3).cols(1)
 
+    def trimap(self, genes, title, tissue_subset=None, num_neighbors=50):
+        """
+        Dimensionality reduction
 
-def tsne_of_dataset(df, title, perplexity=50, learning_rate=1000, plot_info=None):
-    """
-    t-SNE plot of a dataset
+        :param list(str) genes: List of genes to subset by
+        :param list(str) tissue_subset: List of tissues to subset by
+        :return: Scatterplot of dimensionality reduction
+        :rtype: hv.Scatter
+        """
+        # Subset dataframe by genes (keeping some metadata)
+        df = self.df[self.df_cols + genes]
 
-    :param pd.DataFrame df: Samples by features DataFrame
-    :param str title: Title of plot
-    :param int perplexity: Perplexity hyperparamter for t-SNE
-    :param int learning_rate: Learning rate hyperparameter for t-SNE
-    :param dict plot_info: Additional information to include in plot
-    :return: Holoviews scatter object
-    :rtype: hv.Scatter
-    """
-    z = run_tsne(df, num_dims=2, perplexity=perplexity, learning_rate=learning_rate)
-    return _scatter_dataset(z=z, title=title, info=plot_info)
+        # Subset by tissues
+        if tissue_subset:
+            df = df[df.tissue.isin(tissue_subset)]
 
+        # Run Trimap (used to be called t-ETE)
+        z = run_tete(df[genes], num_dims=2, num_neighbors=num_neighbors)
 
-def tete_of_dataset(df, title, num_neighbors=30, plot_info=None):
-    """
-    t-ETE plot of a dataset
+        # Add results to dataframe
+        df['x'] = z[:, 0]
+        df['y'] = z[:, 1]
 
-    :param pd.DataFrame df: Samples by features DataFrame
-    :param str title: Title of plot
-    :param int num_neighbors: Number of neighbors in t-ETE algorithm
-    :param dict plot_info: Additional information to include in plot
-    :return: Holoviews scatter object
-    :rtype: hv.Scatter
-    """
-    z = run_tete(df, num_dims=2, num_neighbors=num_neighbors)
-    return _scatter_dataset(z, title=title, info=plot_info)
+        return hv.Scatter(df, kdims=['x'], ydims=['y'] + self.df_cols,
+                          group=title)
 
+    def tsne(self, genes, title, tissue_subset=None, perplexity=50, learning_rate=1000):
+        # Subset dataframe by genes (keeping some metadata)
+        df = self.df[self.df_cols + genes]
 
-def _scatter_dataset(z, title, info=None):
-    """
-    Internal function for scattering dataset
+        # Subset by tissues
+        if tissue_subset:
+            df = df[df.tissue.isin(tissue_subset)]
 
-    :param np.array z: An [n x 2] matrix of values to plot
-    :param dict info: Additional info for plotting. Lengths of values must match x and y vectors derived from z
-    """
-    # Collect information for plotting
-    if info is None:
-        info = dict()
+        # Run Trimap (used to be called t-ETE)
+        z = run_tsne(df[genes], num_dims=2, perplexity=perplexity, learning_rate=learning_rate)
 
-    info['x'] = z[:, 0]
-    info['y'] = z[:, 1]
+        # Add results to dataframe
+        df['x'] = z[:, 0]
+        df['y'] = z[:, 1]
 
-    # Return Holoviews Scatter object
-    return hv.Scatter(pd.DataFrame.from_dict(info),
-                      kdims=['x'],
-                      vdims=['y'] + [x for x in info.keys() if not x == 'x' and not x == 'y'],
-                      group=title)
+        return hv.Scatter(df, kdims=['x'], ydims=['y'] + self.df_cols,
+                          group=title)
