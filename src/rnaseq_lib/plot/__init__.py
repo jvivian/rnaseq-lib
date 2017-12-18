@@ -10,7 +10,7 @@ from rnaseq_lib.tissues import subset_by_dataset
 
 class Holoview:
     """
-    Object for Holoviews plots. Created for use with Holomap and DynamicMap which cannot
+    Object for Holoviews plots of gene expression data. Created for use with Holomap and DynamicMap which cannot
     accept dataframes as arguments. This class circumvents that limitation by referencing
     the dataframe internally.
     """
