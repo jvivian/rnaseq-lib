@@ -121,6 +121,14 @@ class Holoview:
                              vdims='gene', label='{} Expression'.format(gene))
 
     def gene_DE(self, gene, extents=None):
+        """
+        Scatter plot of differential expression across all tissues
+
+        :param str gene: Gene (ex: ERBB2) to select
+        :param tuple extents: xmin/ymin/xmax/ymax values
+        :return: Scatterplot of values
+        :rtype: hv.Scatter
+        """
         # Subset dataframe by gene
         df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
 
@@ -130,17 +138,24 @@ class Holoview:
         # For each tissue, calculate L2FC and mean expression
         records = []
         for tissue in sorted(df.tissue.unique()):
-            exp = df[(df.tissue==tissue) & ((df.tumor == 'yes') | (df.dataset == 'gtex'))][gene].apply(lambda x: np.log2(x + 1)).median()
+            # Calculate mean expression for TCGA tumor and GTEx
+            exp = df[(df.tissue == tissue) & ((df.tumor == 'yes') | (df.dataset == 'gtex'))][gene].apply(self.l2norm).median()
 
+            # Calculate tumor and normal expression
             t = tumor[tumor.tissue == tissue][gene].median()
             g = gtex[gtex.tissue == tissue][gene].median()
+
+            # Calculate log2 fold change
             l2fc = log2fc(t, g)
 
+            # Store as record
             records.append((exp, l2fc, tissue))
 
+        # Define dimensions of plot
         kdims = ['Expression']
         vdims = ['L2FC', 'Tissue']
 
+        # Create dataframe
         plot = pd.DataFrame.from_records(records, columns=kdims + vdims)
 
         if extents:
@@ -158,7 +173,7 @@ class Holoview:
         :rtype: hv.Layout
         """
         # Subset dataframe for gene and tissue
-        df = self.subset(tissue, gene)
+        df = self._subset(tissue, gene)
 
         # Logscale gene for calculations
         df[gene] = df[gene].apply(lambda x: np.log2(x + 1))
