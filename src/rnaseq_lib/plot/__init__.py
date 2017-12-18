@@ -93,9 +93,22 @@ class Holoview:
         return hv.Overlay([self.gene_kde(gene, t) for t in tissues],
                           label='{} Expression'.format(gene))
 
-    def gene_distribution(self, gene, extents=None):
+    def gene_distribution(self, gene, tissue_subset=None, extents=None):
+        """
+        Box and Whisker expression distribution across tissues
+
+        :param str gene: Gene (ex: ERBB2) to select
+        :param list tissue_subset: List of tissues to subset by
+        :param tuple extents: xmin/ymin/xmax/ymax values
+        :return: Returns holoviews BoxWhisker object
+        :rtype: hv.BoxWhisker
+        """
         # Subset dataframe by gene
         df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
+
+        # Subset by tissues
+        if tissue_subset:
+            df = df[df.tissue.isin(tissue_subset)]
 
         # Normalize gene expression
         df[gene] = df[gene].apply(lambda x: np.log2(x + 1))
@@ -104,7 +117,8 @@ class Holoview:
         df = df[((df.tumor == 'yes') | (df.dataset == 'gtex'))]
 
         # return grouped box and whiskers:
-        return hv.BoxWhisker((df.tissue, df.dataset, df[gene]), kdims=['tissue', 'dataset'], vdims='gene')
+        return hv.BoxWhisker((df.tissue, df.dataset, df[gene]), kdims=['tissue', 'dataset'],
+                             vdims='gene', label='{} Expression'.format(gene))
 
     def gene_DE(self, gene, extents=None):
         # Subset dataframe by gene
