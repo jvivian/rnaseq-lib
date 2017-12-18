@@ -4,9 +4,8 @@ import pandas as pd
 
 from rnaseq_lib.diff_exp import log2fc
 from rnaseq_lib.dim_red import run_tsne, run_tete
-from rnaseq_lib.plot.opts import gene_curves_opts, gene_kde_opts
+from rnaseq_lib.plot.opts import gene_curves_opts, gene_kde_opts, gene_distribution_opts, gene_de_opts
 from rnaseq_lib.tissues import subset_by_dataset
-from rnaseq_lib.utils import flatten
 
 
 class Holoview:
@@ -26,6 +25,8 @@ class Holoview:
         # Style attributes - used in conjunction with '.opts()'
         self.gene_curves_opts = gene_curves_opts
         self.gene_kde_opts = gene_kde_opts
+        self.gene_distribution_opts = gene_distribution_opts
+        self.gene_de_opts = gene_de_opts
 
     def subset(self, gene, tissue):
         df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
