@@ -242,7 +242,7 @@ class Holoview:
 
     def trimap(self, genes, title, tissue_subset=None, num_neighbors=50):
         """
-        Dimensionality reduction
+        Dimensionality reduction via Trimap
 
         :param list(str) genes: List of genes to subset by
         :param list(str) tissue_subset: List of tissues to subset by
@@ -267,6 +267,14 @@ class Holoview:
                           group=title)
 
     def tsne(self, genes, title, tissue_subset=None, perplexity=50, learning_rate=1000):
+        """
+        Dimensionality reduction via t-SNE
+
+        :param list(str) genes: List of genes to subset by
+        :param list(str) tissue_subset: List of tissues to subset by
+        :return: Scatterplot of dimensionality reduction
+        :rtype: hv.Scatter
+        """
         # Subset dataframe by genes (keeping some metadata)
         df = self.df[self.df_cols + genes]
 
@@ -274,7 +282,7 @@ class Holoview:
         if tissue_subset:
             df = df[df.tissue.isin(tissue_subset)]
 
-        # Run Trimap (used to be called t-ETE)
+        # Run t-SNE
         z = run_tsne(df[genes], num_dims=2, perplexity=perplexity, learning_rate=learning_rate)
 
         # Add results to dataframe
