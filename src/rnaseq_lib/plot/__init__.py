@@ -139,7 +139,8 @@ class Holoview:
         records = []
         for tissue in sorted(df.tissue.unique()):
             # Calculate mean expression for TCGA tumor and GTEx
-            exp = df[(df.tissue == tissue) & ((df.tumor == 'yes') | (df.dataset == 'gtex'))][gene].apply(self.l2norm).median()
+            exp = df[(df.tissue == tissue) & ((df.tumor == 'yes') | (df.dataset == 'gtex'))][gene].apply(
+                self.l2norm).median()
 
             # Calculate tumor and normal expression
             t = tumor[tumor.tissue == tissue][gene].median()
