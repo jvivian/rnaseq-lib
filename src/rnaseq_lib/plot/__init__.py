@@ -38,6 +38,16 @@ class Holoview:
         :rtype: float
         """
         return np.log2(x + 1)
+
+    def _subset(self, gene, tissue):
+        """
+        Subset dataframe by gene and tissue with default columns `self.df_cols`
+
+        :param str gene: Gene (ex: ERBB2) to select
+        :param str tissue: Tissue (ex: Breast) to select
+        :return: Subset dataframe
+        :rtype: pd.DataFrame
+        """
         df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
         return df[df.tissue == tissue]
 
