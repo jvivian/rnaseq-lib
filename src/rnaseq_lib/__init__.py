@@ -13,7 +13,6 @@ import rnaseq_lib.plot
 import rnaseq_lib.plot.opts
 
 import rnaseq_lib.tissues
-import rnaseq_lib.tissues.plots
 
 import rnaseq_lib.utils
 
