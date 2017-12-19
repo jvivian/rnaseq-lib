@@ -75,7 +75,7 @@ class Holoview:
         :rtype: hv.Overlay
         """
         # Subset dataframe by tissue and gene
-        df = self._subset(tissue, gene)
+        df = self._subset(gene, tissue)
 
         # Subset by dataset
         tumor, normal, gtex = subset_by_dataset(df)
