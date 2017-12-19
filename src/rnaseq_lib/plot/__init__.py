@@ -59,7 +59,7 @@ class Holoview:
         tumor, normal, gtex = subset_by_dataset(df)
 
         # Calculate gene expression cutoffs for each dataset
-        cutoffs = [x[gene].sort_values(ascending=False).iloc[int(len(x) * percent) - 1]
+        cutoffs = [x[gene].apply(self.l2norm).sort_values(ascending=False).iloc[int(len(x) * percent) - 1]
                    for x in [tumor, normal, gtex]]
 
         # Return mapping of dataset to cutoff
