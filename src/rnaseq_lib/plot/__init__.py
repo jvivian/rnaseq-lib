@@ -53,7 +53,7 @@ class Holoview:
 
     def _gene_cutoff(self, gene, tissue, percent):
         # Subset dataframe by tissue and gene
-        df = self._subset(tissue, gene)
+        df = self._subset(gene, tissue)
 
         # Subset by dataset
         tumor, normal, gtex = subset_by_dataset(df)
@@ -174,7 +174,7 @@ class Holoview:
         :rtype: hv.Layout
         """
         # Subset dataframe for gene and tissue
-        df = self._subset(tissue, gene)
+        df = self._subset(gene, tissue)
 
         # Logscale gene for calculations
         df[gene] = df[gene].apply(lambda x: np.log2(x + 1))
