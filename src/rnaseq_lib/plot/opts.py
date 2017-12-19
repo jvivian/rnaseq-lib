@@ -12,7 +12,7 @@ gene_curves_opts = {
     'Scatter': {'style': dict(color='red', size=3)}}
 
 gene_kde_opts = {
-    'Disribution': {'plot': dict(filled=False),
+    'Distribution': {'plot': dict(filled=False),
                     'style': dict(line_color=hv.Cycle())}
 }
 
