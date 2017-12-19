@@ -120,7 +120,7 @@ class Holoview:
         return hv.BoxWhisker((df.tissue, df.dataset, df[gene]), kdims=['tissue', 'dataset'],
                              vdims='gene', label='{} Expression'.format(gene))
 
-    def gene_DE(self, gene, extents=None):
+    def gene_de(self, gene, extents=None):
         """
         Scatter plot of differential expression across all tissues
 
