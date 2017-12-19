@@ -263,7 +263,7 @@ class Holoview:
         df['x'] = z[:, 0]
         df['y'] = z[:, 1]
 
-        return hv.Scatter(df, kdims=['x'], ydims=['y'] + self.df_cols,
+        return hv.Scatter(df, kdims=['x'], vdims=['y'] + self.df_cols,
                           group=title)
 
     def tsne(self, genes, title, tissue_subset=None, perplexity=50, learning_rate=1000):
@@ -289,5 +289,5 @@ class Holoview:
         df['x'] = z[:, 0]
         df['y'] = z[:, 1]
 
-        return hv.Scatter(df, kdims=['x'], ydims=['y'] + self.df_cols,
+        return hv.Scatter(df, kdims=['x'], vdims=['y'] + self.df_cols,
                           group=title)
