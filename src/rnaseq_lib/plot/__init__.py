@@ -240,6 +240,22 @@ class Holoview:
 
         return (c1 * s1 + c2 * s2 + c3 * s3).cols(1)
 
+    def sample_counts(self):
+        """
+        Bargraph of tissues grouped by dataset
+
+        :return:
+        """
+        pass
+
+    def differential_expression_comparison(self):
+        """
+        Categorical scatterplot of concordance between tissues for gene differential expression
+
+        :return:
+        """
+        pass
+
     def trimap(self, genes, title, tissue_subset=None, num_neighbors=50):
         """
         Dimensionality reduction via Trimap
