@@ -13,12 +13,13 @@ setup(name='rnaseq-lib',
       install_requires=['pandas',
                         'numpy',
                         'seaborn',
-                        'requests',
-                        'sklearn',
-                        'progressbar',
-                        'holoviews',
-                        'bs4',
-                        'xmltodict',
-                        'mygene',
-                        'biopython',
-                        'synapseclient'])
+                        'holoviews'],
+      extras_require={
+          'web': [
+              'requests',
+              'mygene',
+              'bs4',
+              'biopython',
+              'synpaseclient',
+              'xmltodict']}
+      )
