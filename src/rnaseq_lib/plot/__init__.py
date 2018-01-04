@@ -51,6 +51,15 @@ class Holoview:
         df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
         return df[df.tissue == tissue]
 
+    def _subset_by_tissues(self, gene, tissue_subset):
+        # Subset dataframe by gene
+        df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
+
+        # Subset by tissues
+        if tissue_subset:
+            df = df[df.tissue.isin(tissue_subset)]
+        return df
+
     def _gene_cutoff(self, gene, tissue, percent):
         # Subset dataframe by tissue and gene
         df = self._subset(gene, tissue)
@@ -86,8 +95,9 @@ class Holoview:
         # Create KDE objects
         t = hv.Distribution(tumor[gene].apply(self.l2norm), kdims=[x], label='Tumor-{}'.format(tissue))
         g = hv.Distribution(gtex[gene].apply(self.l2norm), kdims=[x], label='GTEx-{}'.format(tissue))
+        n = hv.Distribution(normal[gene].apply(self.l2norm), kdims=[x], label='Normal-{}'.format(tissue))
 
-        return hv.Overlay([t, g], label='{} Expression'.format(gene))
+        return hv.Overlay([t, g, n], label='{} Expression'.format(gene)).opts(self.gene_kde_opts)
 
     def multiple_tissue_gene_kde(self, gene, *tissues):
         return hv.Overlay([self.gene_kde(gene, t) for t in tissues],
@@ -104,11 +114,7 @@ class Holoview:
         :rtype: hv.BoxWhisker
         """
         # Subset dataframe by gene
-        df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
-
-        # Subset by tissues
-        if tissue_subset:
-            df = df[df.tissue.isin(tissue_subset)]
+        df = self._subset_by_tissues(gene, tissue_subset)
 
         # Normalize gene expression
         df[gene] = df[gene].apply(lambda x: np.log2(x + 1))
