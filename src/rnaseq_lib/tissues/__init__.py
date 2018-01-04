@@ -25,7 +25,8 @@ dtype = {'id': object,
          'qc': float,
          'dataset': object,
          'tumor': object,
-         'type': object}
+         'type': object,
+         'label': object}
 
 
 def map_genes(genes, strict=True):
