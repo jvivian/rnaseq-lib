@@ -170,6 +170,43 @@ class Holoview:
         else:
             return hv.Scatter(plot, kdims=kdims, vdims=vdims)
 
+    def gene_de_kde(self, gene, tissue_subset=None, gtex=True):
+        """
+        KDE of L2FC values for the tumor as compared to the normal
+
+        :param str gene: Gene (ex: ERBB2) to select
+        :param list tissue_subset: List of tissues to subset by
+        :return:
+        """
+        # Subset dataframe by gene and tissue subset
+        df = self._subset_by_tissues(gene, tissue_subset)
+
+        # Subset by dataset
+        tumor, normal, gtex = subset_by_dataset(df)
+
+        # Create X dimension
+        x = hv.Dimension('Log2 Fold Change', unit='log2(a+1)/log2(b+1)')
+
+        dists = []
+        for tissue in df.tissue.unique():
+            # Calculate mean expression for normal
+            if gtex:
+                n = gtex[gtex.tissue == tissue][gene].median()
+                label = 'Tumor-GTEx-{}'.format(tissue)
+            else:
+                n = normal[normal.tissue == tissue][gene].median()
+                label = 'Tumor-Normal-{}'.format(tissue)
+
+            # Calculate l2fc for each tumor sample and save
+            l2fcs = []
+            for i, row in tumor.iterrows():
+                l2fcs.append(log2fc(row[gene], n))
+
+            # Create distribution
+            dists.append(hv.Distribution(l2fcs, kdims=[x], label=label))
+
+        return hv.Overlay(dists, label='{} Expression'.format(gene))
+
     def gene_curves(self, gene, tissue):
         """
         Returns set of 3 plots for tissue / gene given a dataframe of metadata and expression values
