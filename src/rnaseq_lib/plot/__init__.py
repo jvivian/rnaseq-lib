@@ -201,7 +201,7 @@ class Holoview:
         tumor, normal, gtex = subset_by_dataset(df)
 
         # Create X dimension
-        x = hv.Dimension('Log2 Fold Change', unit='log2(a+1)/log2(b+1)')
+        xdim = hv.Dimension('Log2 Fold Change', unit='log2(a+1)/log2(b+1)')
 
         dists = []
         for tissue in df.tissue.unique():
@@ -219,7 +219,7 @@ class Holoview:
                 l2fcs.append(log2fc(row[gene], n))
 
             # Create distribution
-            dists.append(hv.Distribution(l2fcs, kdims=[x], label=label))
+            dists.append(hv.Distribution(l2fcs, kdims=[xdim], label=label))
 
         return hv.Overlay(dists, label='{} Expression'.format(gene)).opts(self.gene_kde_opts)
 
@@ -240,7 +240,7 @@ class Holoview:
         tumor, normal, gtex = subset_by_dataset(df)
 
         # Create X dimension
-        x = hv.Dimension('Log2 Fold Change', unit='log2(a+1)/log2(b+1)')
+        xdim = hv.Dimension('Log2 Fold Change', unit='log2(a+1)/log2(b+1)')
 
         # Calculate % samples over a given l2fc
         curves = []
@@ -265,7 +265,7 @@ class Holoview:
                 percentages[l2fc] = len([x for x in l2fcs if x >= l2fc]) / len(l2fcs) * 100
 
             # Create line object
-            curves.append(hv.Curve(percentages, kdims=[x], label=label))
+            curves.append(hv.Curve(percentages, kdims=[xdim], label=label))
 
         return hv.Overlay(curves, label='{} Expression'.format(gene))
 
