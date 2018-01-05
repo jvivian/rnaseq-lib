@@ -241,6 +241,7 @@ class Holoview:
 
         # Create X dimension
         xdim = hv.Dimension('Log2 Fold Change', unit='log2(a+1)/log2(b+1)')
+        ydim = hv.Dimension('Samples With Greater L2FC', unit='%')
 
         # Calculate % samples over a given l2fc
         curves = []
@@ -265,7 +266,7 @@ class Holoview:
                 percentages[l2fc] = len([x for x in l2fcs if x >= l2fc]) / len(l2fcs) * 100
 
             # Create line object
-            curves.append(hv.Curve(percentages, kdims=[xdim], label=label))
+            curves.append(hv.Curve(percentages, kdims=[xdim], vdims=[ydim], label=label))
 
         return hv.Overlay(curves, label='{} Expression'.format(gene))
 
