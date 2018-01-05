@@ -49,7 +49,8 @@ def generate_triplets(X, kin=50, kout=10, kr=5, weight_adj=False, random_triplet
                     l += 1
                     cnt += 1
         if ((i + 1) % 10000) == 0:
-            print 'Genareted triplets %d out of %d' % (i + 1, n)
+            pass
+            #print 'Genareted triplets %d out of %d' % (i + 1, n)
     if random_triplets:
         kr = 5
         triplets_rand = np.zeros([n * kr, 3])
@@ -76,7 +77,8 @@ def generate_triplets(X, kin=50, kout=10, kr=5, weight_adj=False, random_triplet
                 weights_rand[i * kr + cnt] = p_sim / p_out
                 cnt += 1
             if ((i + 1) % 10000) == 0:
-                print 'Genareted random triplets %d out of %d' % (i + 1, n)
+                pass
+                #print 'Genareted random triplets %d out of %d' % (i + 1, n)
         triplets = np.vstack((triplets, triplets_rand))
         weights = np.hstack((weights, weights_rand))
     triplets = triplets[~np.isnan(weights), :]
@@ -151,7 +153,8 @@ def tete(X, num_dims=2, num_neighbs=50, num_out=10, num_rand=5, eta=1000.0, Yini
             eta = eta * 0.5
 
         if (itr + 1) % 100 == 0:
-            print 'Iteration: %4d, Loss: %3.3f, Violated triplets: %0.4f' % (itr + 1, C, float(num_viol) / num_triplets)
+            pass
+            #print 'Iteration: %4d, Loss: %3.3f, Violated triplets: %0.4f' % (itr + 1, C, float(num_viol) / num_triplets)
     return best_Y
 
 
