@@ -177,7 +177,9 @@ class Holoview:
 
         :param str gene: Gene (ex: ERBB2) to select
         :param list tissue_subset: List of tissues to subset by
-        :return:
+        :param bool tcga_normal: If True, use TCGA normal to for DE calc, otherwise use GTEx
+        :return: Collection of Distribution objects
+        :rtype: hv.Overlay
         """
         # Subset dataframe by gene and tissue subset
         df = self._subset_by_tissues(gene, tissue_subset)
@@ -200,7 +202,7 @@ class Holoview:
 
             # Calculate l2fc for each tumor sample and save
             l2fcs = []
-            for i, row in tumor.iterrows():
+            for i, row in tumor[tumor.tissue == tissue].iterrows():
                 l2fcs.append(log2fc(row[gene], n))
 
             # Create distribution
@@ -209,6 +211,15 @@ class Holoview:
         return hv.Overlay(dists, label='{} Expression'.format(gene)).opts(self.gene_kde_opts)
 
     def l2fc_by_perc_samples(self, gene, tissue_subset=None, tcga_normal=False):
+        """
+        Calculate the percentage of samples greater than a range of log2 fold change values
+
+        :param str gene: Gene (ex: ERBB2) to select
+        :param list tissue_subset: List of tissues to subset by
+        :param bool tcga_normal: If True, use TCGA normal to for DE calc, otherwise use GTEx
+        :return: Collection of Curve objects
+        :rtype: hv.Overlay
+        """
         # Subset dataframe by gene and tissue subset
         df = self._subset_by_tissues(gene, tissue_subset)
 
@@ -231,14 +242,14 @@ class Holoview:
 
             # Calculate l2fc for each tumor sample and save
             l2fcs = []
-            for i, row in tumor.iterrows():
+            for i, row in tumor[tumor.tissue == tissue].iterrows():
                 l2fcs.append(log2fc(row[gene], n))
 
             # Calculate percentage samples over l2fc
-            percentages = []
+            percentages = {}
             l2fc_range = [x * 0.1 for x in xrange(0, int(np.ceil(max(l2fcs) * 10)))]
             for l2fc in l2fc_range:
-                percentages.append(len([x for x in l2fcs if x >= l2fc]) / len(l2fcs) * 100)
+                percentages[l2fc] = len([x for x in l2fcs if x >= l2fc]) / len(l2fcs) * 100
 
             # Create line object
             curves.append(hv.Curve(percentages, kdims=[x], label=label))
