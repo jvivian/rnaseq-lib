@@ -236,7 +236,7 @@ class Holoview:
 
             # Calculate percentage samples over l2fc
             percentages = []
-            l2fc_range = [x * 0.1 for x in xrange(0, max(l2fcs) * 10)]
+            l2fc_range = [x * 0.1 for x in xrange(0, int(np.ceil(max(l2fcs) * 10)))]
             for l2fc in l2fc_range:
                 percentages.append(len([x for x in l2fcs if x >= l2fc]) / len(l2fcs) * 100)
 
