@@ -40,7 +40,7 @@ class Holoview:
         """
         return np.log2(x + 1)
 
-    def _subset(self, gene, tissue):
+    def _subset(self, gene, tissue=None):
         """
         Subset dataframe by gene and tissue with default columns `self.df_cols`
 
@@ -50,7 +50,10 @@ class Holoview:
         :rtype: pd.DataFrame
         """
         df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
-        return df[df.tissue == tissue]
+        if tissue:
+            return df[df.tissue == tissue]
+        else:
+            return df
 
     def _subset_by_tissues(self, gene, tissue_subset):
         # Subset dataframe by gene
