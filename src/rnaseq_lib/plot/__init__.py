@@ -171,7 +171,7 @@ class Holoview:
         else:
             return hv.Scatter(plot, kdims=kdims, vdims=vdims)
 
-    def gene_de_kde(self, gene, tissue_subset=None, gtex_as_normal=True):
+    def gene_de_kde(self, gene, tissue_subset=None, tcga_normal=False):
         """
         KDE of L2FC values for the tumor as compared to the normal
 
@@ -191,12 +191,12 @@ class Holoview:
         dists = []
         for tissue in df.tissue.unique():
             # Calculate mean expression for normal
-            if gtex_as_normal:
-                n = gtex[gtex.tissue == tissue][gene].median()
-                label = 'Tumor-GTEx-{}'.format(tissue)
-            else:
+            if tcga_normal:
                 n = normal[normal.tissue == tissue][gene].median()
                 label = 'Tumor-Normal-{}'.format(tissue)
+            else:
+                n = gtex[gtex.tissue == tissue][gene].median()
+                label = 'Tumor-GTEx-{}'.format(tissue)
 
             # Calculate l2fc for each tumor sample and save
             l2fcs = []
@@ -206,9 +206,9 @@ class Holoview:
             # Create distribution
             dists.append(hv.Distribution(l2fcs, kdims=[x], label=label))
 
-        return hv.Overlay(dists, label='{} Expression'.format(gene))
+        return hv.Overlay(dists, label='{} Expression'.format(gene)).opts(self.gene_kde_opts)
 
-    def l2fc_by_perc_samples(self, gene, tissue_subset=None, gtex_as_normal=True):
+    def l2fc_by_perc_samples(self, gene, tissue_subset=None, tcga_normal=False):
         # Subset dataframe by gene and tissue subset
         df = self._subset_by_tissues(gene, tissue_subset)
 
@@ -222,12 +222,12 @@ class Holoview:
         curves = []
         for tissue in df.tissue.unique():
             # Calculate mean expression for normal
-            if gtex_as_normal:
-                n = gtex[gtex.tissue == tissue][gene].median()
-                label = 'Tumor-GTEx-{}'.format(tissue)
-            else:
+            if tcga_normal:
                 n = normal[normal.tissue == tissue][gene].median()
                 label = 'Tumor-Normal-{}'.format(tissue)
+            else:
+                n = gtex[gtex.tissue == tissue][gene].median()
+                label = 'Tumor-GTEx-{}'.format(tissue)
 
             # Calculate l2fc for each tumor sample and save
             l2fcs = []
