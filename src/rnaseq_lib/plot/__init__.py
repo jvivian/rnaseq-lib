@@ -29,17 +29,6 @@ class Holoview:
         self.gene_distribution_opts = gene_distribution_opts
         self.gene_de_opts = gene_de_opts
 
-    @staticmethod
-    def l2norm(x):
-        """
-        Log2 noramlization function for gene counts
-
-        :param float x: Input value
-        :return: log2(x+1) normalized value
-        :rtype: float
-        """
-        return np.log2(x + 1)
-
     def _subset(self, gene, tissue=None):
         """
         Subset dataframe by gene and tissue with default columns `self.df_cols`
@@ -78,7 +67,19 @@ class Holoview:
         # Return mapping of dataset to cutoff
         return {x: y for x, y in zip(['tumor', 'normal', 'gtex'], cutoffs)}
 
-    def _return_iqr_bounds(ys):
+    @staticmethod
+    def l2norm(x):
+        """
+        Log2 noramlization function for gene counts
+
+        :param float x: Input value
+        :return: log2(x+1) normalized value
+        :rtype: float
+        """
+        return np.log2(x + 1)
+
+    @staticmethod
+    def iqr_bounds(ys):
         """
         Return upper and lower bound for an array of values
 
