@@ -244,7 +244,7 @@ class Holoview:
 
         # Create X dimension
         xdim = hv.Dimension('Log2 Fold Change', unit='log2(a+1)/log2(b+1)')
-        ydim = hv.Dimension('Samples With Greater L2FC', unit='%')
+        ydim = hv.Dimension('Tumor Samples With Greater L2FC', unit='%')
 
         # Calculate % samples over a given l2fc
         curves = []
