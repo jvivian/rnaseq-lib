@@ -127,8 +127,9 @@ def get_genes_from_pathway(pathway):
 
     genes = set()
     for gene in k.genes:
-        g = get_gene_names_from_label(gene)
-        genes = genes.union(g)
+        for x in gene.name.split():
+            g = get_gene_names_from_label(x)
+            genes.add(g)
 
     return genes
 
