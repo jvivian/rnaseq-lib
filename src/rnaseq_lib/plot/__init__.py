@@ -88,7 +88,8 @@ class Holoview:
         upper_bound = quartile_3 + (iqr * 1.5)
         return upper_bound, lower_bound
 
-    def gene_kde(self, gene, tissue):
+    # Gene Plots
+    def gene_kde(self, gene, tissue_subset, tumor=True, normal=True, gtex=True):
         """
         Returns KDE of gene expression (log2) for given tissue
 
@@ -98,20 +99,21 @@ class Holoview:
         :rtype: hv.Overlay
         """
         # Subset dataframe by tissue and gene
-        df = self._subset(gene, tissue)
+        df = self._subset_by_tissues(gene, tissue_subset)
 
         # Subset by dataset
-        tumor, normal, gtex = subset_by_dataset(df)
+        t, n, g = subset_by_dataset(df)
 
         # Define x dimension for labeling
         x = hv.Dimension('Gene Expression', unit='log2(x+1)')
 
-        # Create KDE objects
-        t = hv.Distribution(tumor[gene].apply(self.l2norm), kdims=[x], label='Tumor-{}'.format(tissue))
-        g = hv.Distribution(gtex[gene].apply(self.l2norm), kdims=[x], label='GTEx-{}'.format(tissue))
-        n = hv.Distribution(normal[gene].apply(self.l2norm), kdims=[x], label='Normal-{}'.format(tissue))
+        dists = []
+        for tissue in df.tissue.unique():
+            for label, dataset, flag in zip(['Tumor', 'GTEx', 'Normal'], [t, n, g], [tumor, normal, gtex]):
+                dists.append(hv.Distribution(dataset[dataset.tissue == tissue][gene].apply(self.l2norm),
+                                             kdims=[x], label='{}-{}'.format(label, tissue)))
 
-        return hv.Overlay([t, g, n], label='{} Expression'.format(gene)).opts(self.gene_kde_opts)
+        return hv.Overlay(dists, label='{} Expression'.format(gene)).opts(self.gene_kde_opts)
 
     def multiple_tissue_gene_kde(self, gene, *tissues):
         return hv.Overlay([self.gene_kde(gene, t) for t in tissues],
@@ -140,6 +142,7 @@ class Holoview:
         return hv.BoxWhisker((df.tissue, df.dataset, df[gene]), kdims=['tissue', 'dataset'],
                              vdims='gene', label='{} Expression'.format(gene))
 
+    # Differential Expression
     def gene_de(self, gene, extents=None):
         """
         Scatter plot of differential expression across all tissues
@@ -180,9 +183,9 @@ class Holoview:
         plot = pd.DataFrame.from_records(records, columns=kdims + vdims)
 
         if extents:
-            return hv.Scatter(plot, kdims=kdims, vdims=vdims, extents=extents)
+            return hv.Scatter(plot, kdims=kdims, vdims=vdims, extents=extents).opts(self.gene_de_opts)
         else:
-            return hv.Scatter(plot, kdims=kdims, vdims=vdims)
+            return hv.Scatter(plot, kdims=kdims, vdims=vdims).opts(self.gene_de_opts)
 
     def gene_de_kde(self, gene, tissue_subset=None, tcga_normal=False):
         """
@@ -245,14 +248,15 @@ class Holoview:
 
         # Calculate % samples over a given l2fc
         curves = []
+        label = ''
         for tissue in df.tissue.unique():
             # Calculate mean expression for normal
             if tcga_normal:
                 n = normal[normal.tissue == tissue][gene].median()
-                label = 'Tumor-Normal-{}'.format(tissue)
+                label = 'Tumor-Normal'
             else:
                 n = gtex[gtex.tissue == tissue][gene].median()
-                label = 'Tumor-GTEx-{}'.format(tissue)
+                label = 'Tumor-GTEx'
 
             # Calculate l2fc for each tumor sample and save
             l2fcs = []
@@ -266,10 +270,19 @@ class Holoview:
                 percentages[l2fc] = len([x for x in l2fcs if x >= l2fc]) / len(l2fcs) * 100
 
             # Create line object
-            curves.append(hv.Curve(percentages, kdims=[xdim], vdims=[ydim], label=label))
+            curves.append(hv.Curve(percentages, kdims=[xdim], vdims=[ydim], label=tissue))
 
-        return hv.Overlay(curves, label='{} Expression'.format(gene))
+        return hv.Overlay(curves, label='{} {} Expression'.format(label, gene))
 
+    def differential_expression_comparison(self):
+        """
+        Categorical scatterplot of concordance between tissues for gene differential expression
+
+        :return:
+        """
+        pass
+
+    # Misc
     def gene_curves(self, gene, tissue):
         """
         Returns set of 3 plots for tissue / gene given a dataframe of metadata and expression values
@@ -354,14 +367,7 @@ class Holoview:
         """
         pass
 
-    def differential_expression_comparison(self):
-        """
-        Categorical scatterplot of concordance between tissues for gene differential expression
-
-        :return:
-        """
-        pass
-
+    # Dimensionality Reduction
     def trimap(self, genes, title, tissue_subset=None, num_neighbors=50):
         """
         Dimensionality reduction via Trimap
