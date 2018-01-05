@@ -1,7 +1,8 @@
+from __future__ import division
+
 import holoviews as hv
 import numpy as np
 import pandas as pd
-
 from rnaseq_lib.diff_exp import log2fc
 from rnaseq_lib.dim_red import run_tsne, run_tete
 from rnaseq_lib.plot.opts import gene_curves_opts, gene_kde_opts, gene_distribution_opts, gene_de_opts
@@ -170,7 +171,7 @@ class Holoview:
         else:
             return hv.Scatter(plot, kdims=kdims, vdims=vdims)
 
-    def gene_de_kde(self, gene, tissue_subset=None, gtex=True):
+    def gene_de_kde(self, gene, tissue_subset=None, gtex_as_normal=True):
         """
         KDE of L2FC values for the tumor as compared to the normal
 
@@ -190,7 +191,7 @@ class Holoview:
         dists = []
         for tissue in df.tissue.unique():
             # Calculate mean expression for normal
-            if gtex:
+            if gtex_as_normal:
                 n = gtex[gtex.tissue == tissue][gene].median()
                 label = 'Tumor-GTEx-{}'.format(tissue)
             else:
@@ -206,6 +207,43 @@ class Holoview:
             dists.append(hv.Distribution(l2fcs, kdims=[x], label=label))
 
         return hv.Overlay(dists, label='{} Expression'.format(gene))
+
+    def l2fc_by_perc_samples(self, gene, tissue_subset=None, gtex_as_normal=True):
+        # Subset dataframe by gene and tissue subset
+        df = self._subset_by_tissues(gene, tissue_subset)
+
+        # Subset by dataset
+        tumor, normal, gtex = subset_by_dataset(df)
+
+        # Create X dimension
+        x = hv.Dimension('Log2 Fold Change', unit='log2(a+1)/log2(b+1)')
+
+        # Calculate % samples over a given l2fc
+        curves = []
+        for tissue in df.tissue.unique():
+            # Calculate mean expression for normal
+            if gtex_as_normal:
+                n = gtex[gtex.tissue == tissue][gene].median()
+                label = 'Tumor-GTEx-{}'.format(tissue)
+            else:
+                n = normal[normal.tissue == tissue][gene].median()
+                label = 'Tumor-Normal-{}'.format(tissue)
+
+            # Calculate l2fc for each tumor sample and save
+            l2fcs = []
+            for i, row in tumor.iterrows():
+                l2fcs.append(log2fc(row[gene], n))
+
+            # Calculate percentage samples over l2fc
+            percentages = []
+            l2fc_range = [x * 0.1 for x in xrange(0, max(l2fcs) * 10)]
+            for l2fc in l2fc_range:
+                percentages.append(len([x for x in l2fcs if x >= l2fc]) / len(l2fcs) * 100)
+
+            # Create line object
+            curves.append(hv.Curve(percentages, kdims=[x], label=label))
+
+        return hv.Overlay(curves, label='{} Expression'.format(gene))
 
     def gene_curves(self, gene, tissue):
         """
