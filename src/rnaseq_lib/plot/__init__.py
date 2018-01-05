@@ -92,7 +92,7 @@ class Holoview:
         return upper_bound, lower_bound
 
     # Gene Plots
-    def gene_kde(self, gene, tissue_subset, tumor=True, normal=True, gtex=True):
+    def gene_kde(self, gene, tissue_subset=None, tumor=True, normal=True, gtex=True):
         """
         Returns KDE of gene expression (log2) for given tissue
 
@@ -102,7 +102,10 @@ class Holoview:
         :rtype: hv.Overlay
         """
         # Subset dataframe by tissue and gene
-        df = self._subset_by_tissues(gene, tissue_subset)
+        if tissue_subset:
+            df = self._subset_by_tissues(gene, tissue_subset)
+        else:
+            df = self._subset(gene)
 
         # Subset by dataset
         t, n, g = subset_by_dataset(df)
