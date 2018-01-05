@@ -75,6 +75,19 @@ class Holoview:
         # Return mapping of dataset to cutoff
         return {x: y for x, y in zip(['tumor', 'normal', 'gtex'], cutoffs)}
 
+    def _return_iqr_bounds(ys):
+        """
+        Return upper and lower bound for an array of values
+
+        Lower bound: Q1 - (IQR * 1.5)
+        Upper bound: Q3 + (IQR * 1.5)
+        """
+        quartile_1, quartile_3 = np.percentile(ys, [25, 75])
+        iqr = quartile_3 - quartile_1
+        lower_bound = quartile_1 - (iqr * 1.5)
+        upper_bound = quartile_3 + (iqr * 1.5)
+        return upper_bound, lower_bound
+
     def gene_kde(self, gene, tissue):
         """
         Returns KDE of gene expression (log2) for given tissue
