@@ -98,7 +98,7 @@ class Holoview:
         Returns KDE of gene expression (log2) for given tissue
 
         :param str gene: Gene (ex: ERBB2) to select
-        :param str tissue: Tissue (ex: Breast) to select
+        :param list tissue_subset: List of tissues to subset by
         :return: Returns holoviews Overlay object of gene KDE
         :rtype: hv.Overlay
         """
@@ -371,7 +371,21 @@ class Holoview:
 
         :return:
         """
-        pass
+        # Subset by dataset
+        tumor, normal, gtex = subset_by_dataset(self.df)
+
+        # Count samples for each tissue
+        records = []
+        for tissue in sorted(self.df.tissue.unique()):
+            for df, label in zip([tumor, normal, gtex], ['Tumor', 'Normal', 'GTEx']):
+                count = len(df[df.tissue == tissue])
+                if count:
+                    records.append([tissue, label, count])
+
+        # Return Bars object of sample counts
+        return hv.Bars(pd.DataFrame.from_records(records, columns=['Tissue', 'Label', 'Count']),
+                       kdims=['Tissue', 'Label'], vdims=['Count'])
+
 
     # Dimensionality Reduction
     def trimap(self, genes, title, tissue_subset=None, num_neighbors=50):
