@@ -129,13 +129,12 @@ class Holoview:
         return hv.Overlay([self.gene_kde(gene, t) for t in tissues],
                           label='{} Expression'.format(gene))
 
-    def gene_distribution(self, gene, tissue_subset=None, extents=None):
+    def gene_distribution(self, gene, tissue_subset=None):
         """
         Box and Whisker expression distribution across tissues
 
         :param str gene: Gene (ex: ERBB2) to select
         :param list tissue_subset: List of tissues to subset by
-        :param tuple extents: xmin/ymin/xmax/ymax values
         :return: Returns holoviews BoxWhisker object
         :rtype: hv.BoxWhisker
         """
