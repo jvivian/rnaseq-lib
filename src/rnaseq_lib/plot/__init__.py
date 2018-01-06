@@ -145,11 +145,8 @@ class Holoview:
         # Normalize gene expression
         df[gene] = df[gene].apply(lambda x: np.log2(x + 1))
 
-        # Subset for Tumor and GTEx
-        df = df[((df.tumor == 'yes') | (df.dataset == 'gtex'))]
-
-        # return grouped box and whiskers:
-        return hv.BoxWhisker((df.tissue, df.dataset, df[gene]), kdims=['tissue', 'dataset'],
+        # Return grouped box and whiskers:
+        return hv.BoxWhisker((df.tissue, df.labels, df[gene]), kdims=['tissue', 'labels'],
                              vdims='gene', label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
 
     # Differential Expression
