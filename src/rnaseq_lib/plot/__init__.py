@@ -24,10 +24,10 @@ class Holoview:
         self.df_cols = ['id', 'tissue', 'dataset', 'tumor', 'type', 'labels']
 
         # Style attributes - used in conjunction with '.opts()'
-        self.gene_curves_opts = gene_curves_opts
-        self.gene_kde_opts = gene_kde_opts
-        self.gene_distribution_opts = gene_distribution_opts
-        self.gene_de_opts = gene_de_opts
+        self._gene_curves_opts = gene_curves_opts
+        self._gene_kde_opts = gene_kde_opts
+        self._gene_distribution_opts = gene_distribution_opts
+        self._gene_de_opts = gene_de_opts
 
     def _subset(self, gene, tissue=None):
         """
@@ -123,7 +123,7 @@ class Holoview:
                                                  kdims=[x], label='{}-{}'.format(label, tissue)))
 
         # Combine into Overlay object
-        return hv.Overlay(dists, label='{} Expression'.format(gene)).opts(self.gene_kde_opts)
+        return hv.Overlay(dists, label='{} Expression'.format(gene)).opts(self._gene_kde_opts)
 
     def multiple_tissue_gene_kde(self, gene, *tissues):
         return hv.Overlay([self.gene_kde(gene, t) for t in tissues],
@@ -150,7 +150,7 @@ class Holoview:
 
         # return grouped box and whiskers:
         return hv.BoxWhisker((df.tissue, df.dataset, df[gene]), kdims=['tissue', 'dataset'],
-                             vdims='gene', label='{} Expression'.format(gene))
+                             vdims='gene', label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
 
     # Differential Expression
     def gene_de(self, gene, extents=None):
@@ -193,9 +193,9 @@ class Holoview:
         plot = pd.DataFrame.from_records(records, columns=kdims + vdims)
 
         if extents:
-            return hv.Scatter(plot, kdims=kdims, vdims=vdims, extents=extents).opts(self.gene_de_opts)
+            return hv.Scatter(plot, kdims=kdims, vdims=vdims, extents=extents).opts(self._gene_de_opts)
         else:
-            return hv.Scatter(plot, kdims=kdims, vdims=vdims).opts(self.gene_de_opts)
+            return hv.Scatter(plot, kdims=kdims, vdims=vdims).opts(self._gene_de_opts)
 
     def gene_de_kde(self, gene, tissue_subset=None, tcga_normal=False):
         """
@@ -234,7 +234,7 @@ class Holoview:
             # Create distribution
             dists.append(hv.Distribution(l2fcs, kdims=[xdim], label=label))
 
-        return hv.Overlay(dists, label='{} Expression'.format(gene)).opts(self.gene_kde_opts)
+        return hv.Overlay(dists, label='{} Expression'.format(gene)).opts(self._gene_kde_opts)
 
     def l2fc_by_perc_samples(self, gene, tissue_subset=None, tcga_normal=False):
         """
