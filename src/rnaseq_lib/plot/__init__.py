@@ -261,7 +261,7 @@ class Holoview:
         # Calculate % samples over a given l2fc
         curves = []
         label = ''
-        for tissue in df.tissue.unique():
+        for tissue in sorted(df.tissue.unique()):
             # Calculate mean expression for normal
             if tcga_normal:
                 n = normal[normal.tissue == tissue][gene].median()
