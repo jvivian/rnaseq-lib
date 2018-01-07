@@ -5,7 +5,11 @@ import numpy as np
 import pandas as pd
 from rnaseq_lib.diff_exp import log2fc
 from rnaseq_lib.dim_red import run_tsne, run_tete
-from rnaseq_lib.plot.opts import gene_curves_opts, gene_kde_opts, gene_distribution_opts, gene_de_opts
+from rnaseq_lib.plot.opts import gene_curves_opts
+from rnaseq_lib.plot.opts import gene_de_opts
+from rnaseq_lib.plot.opts import gene_distribution_opts
+from rnaseq_lib.plot.opts import gene_kde_opts
+from rnaseq_lib.plot.opts import sample_count_opts
 from rnaseq_lib.tissues import subset_by_dataset
 
 
@@ -28,6 +32,7 @@ class Holoview:
         self._gene_kde_opts = gene_kde_opts
         self._gene_distribution_opts = gene_distribution_opts
         self._gene_de_opts = gene_de_opts
+        self._sample_count_opts = sample_count_opts
 
     def _subset(self, gene, tissue=None):
         """
@@ -377,7 +382,7 @@ class Holoview:
         # Count samples for each tissue
         records = []
         for tissue in sorted(self.df.tissue.unique()):
-            for df, label in zip([tumor, normal, gtex], ['Tumor', 'Normal', 'GTEx']):
+            for df, label in zip([tumor, normal, gtex], ['tcga-tumor', 'tcga-normal', 'gtex']):
                 count = len(df[df.tissue == tissue])
                 if count:
                     records.append([tissue, label, count])
@@ -385,7 +390,6 @@ class Holoview:
         # Return Bars object of sample counts
         return hv.Bars(pd.DataFrame.from_records(records, columns=['Tissue', 'Label', 'Count']),
                        kdims=['Tissue', 'Label'], vdims=['Count'])
-
 
     # Dimensionality Reduction
     def trimap(self, genes, title, tissue_subset=None, num_neighbors=50):
