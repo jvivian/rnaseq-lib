@@ -18,5 +18,5 @@ gene_de_opts = {
                 'style': dict(cmap='tab20', size=10, alpha=0.5)}}
 
 sample_count_opts = {
-    'Bars': {'plot': dict(width=875, xrotation=70, tools=['hover'])}
+    'Bars': {'plot': dict(width=875, xrotation=70, tools=['hover'], show_legend=False)}
 }
