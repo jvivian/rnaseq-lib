@@ -122,7 +122,7 @@ class Holoview:
         # Create KDE objects for each tissue and dataset
         dists = []
         for tissue in df.tissue.unique():
-            for label, dataset, flag in zip(['Tumor', 'GTEx', 'Normal'], [t, n, g], [tumor, normal, gtex]):
+            for label, dataset, flag in zip(['Tumor', 'GTEx', 'Normal'], [t, g, n], [tumor, gtex, normal]):
                 if flag:
                     dists.append(hv.Distribution(dataset[dataset.tissue == tissue][gene].apply(self.l2norm),
                                                  kdims=[x], label='{}-{}'.format(label, tissue)))
