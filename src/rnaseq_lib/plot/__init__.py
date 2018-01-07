@@ -388,7 +388,7 @@ class Holoview:
                     records.append([tissue, label, count])
 
         # Return Bars object of sample counts
-        return hv.Bars(pd.DataFrame.from_records(records, columns=['Tissue', 'Label', 'Count']),
+        return hv.Bars(pd.DataFrame.from_records(records, columns=['Tissue', 'Label', 'Count']).sort_values('Label'),
                        kdims=['Tissue', 'Label'], vdims=['Count']).opts(self._sample_count_opts)
 
     # Dimensionality Reduction
