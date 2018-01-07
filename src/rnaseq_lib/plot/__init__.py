@@ -152,7 +152,7 @@ class Holoview:
         # Dimensions
         tissue_dim = hv.Dimension('tissue', label='Tissue')
         label_dim = hv.Dimension('labels', label='Datset')
-        vdim = hv.Distribution('gene', 'Gene Expression', unit='log2(x+1)')
+        vdim = hv.Distribution(gene, 'Gene Expression', unit='log2(x+1)')
 
         # Return grouped box and whiskers:
         return hv.BoxWhisker((df.tissue, df['labels'], df[gene]), kdims=[tissue_dim, label_dim],
