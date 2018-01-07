@@ -389,7 +389,7 @@ class Holoview:
 
         # Return Bars object of sample counts
         return hv.Bars(pd.DataFrame.from_records(records, columns=['Tissue', 'Label', 'Count']),
-                       kdims=['Tissue', 'Label'], vdims=['Count'])
+                       kdims=['Tissue', 'Label'], vdims=['Count']).opts(self._sample_count_opts)
 
     # Dimensionality Reduction
     def trimap(self, genes, title, tissue_subset=None, num_neighbors=50):
