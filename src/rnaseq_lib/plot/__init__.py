@@ -156,7 +156,7 @@ class Holoview:
 
         # Return grouped box and whiskers:
         return hv.BoxWhisker((df.tissue, df['labels'], df[gene]), kdims=[tissue_dim, label_dim],
-                             vdims=vdim, label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
+                             vdims=[vdim], label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
 
     # Differential Expression
     def gene_de(self, gene, extents=None):
