@@ -185,7 +185,7 @@ class Holoview:
             records.append((exp, l2fc, tissue))
 
         # Define dimensions of plot
-        kdims = ['Expression']
+        kdims = [hv.Dimension('Expression', label='Gene Expression', unit='log2(x+1)')]
         vdims = ['L2FC', 'Tissue']
 
         # Create dataframe
