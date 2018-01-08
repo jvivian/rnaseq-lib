@@ -25,7 +25,7 @@ gene_de_opts = {
                 'style': dict(cmap='tab20', size=10, alpha=0.5)}}
 
 gene_de_heatmap_opts = {
-    'Heatmap': {'plot': dict(colorbar=True)}
+    'HeatMap': {'plot': dict(colorbar=True)}
 }
 
 sample_count_opts = {
