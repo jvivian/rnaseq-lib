@@ -1,3 +1,10 @@
+import holoviews as hv
+
+color_sequence = ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c',
+                  '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5',
+                  '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f',
+                  '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
+
 gene_curves_opts = {
     'Curve': {'plot': dict(height=120, width=600, tools=['hover'], invert_xaxis=True, yrotation=45, yaxis='left'),
               'style': dict(line_width=1.5)},
@@ -22,7 +29,8 @@ sample_count_opts = {
 }
 
 l2fc_by_perc_samples_opts = {
-    'Curve': {'plot': dict(tools=['hover'])},
+    'Curve': {'plot': dict(tools=['hover']),
+              'style': dict(color=hv.Cycle(values=color_sequence))},
     'Overlay': {'plot': dict(legend_position='left', width=500)},
     'Spikes': {'plot': dict(spike_length=100),
                'style': dict(line_alpha=0.4, line_width=5)}
