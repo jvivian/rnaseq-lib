@@ -443,7 +443,7 @@ class Holoview:
         :rtype: hv.Scatter
         """
         # Subset dataframe by genes (keeping some metadata)
-        df = self.df[self.df_cols + genes]
+        df = self.df[self.df_cols + genes].sort_values('tissue')
 
         # Subset by tissues
         if tissue_subset:
@@ -472,7 +472,7 @@ class Holoview:
         :rtype: hv.Scatter
         """
         # Subset dataframe by genes (keeping some metadata)
-        df = self.df[self.df_cols + genes]
+        df = self.df[self.df_cols + genes].sort_values('tissue')
 
         # Subset by tissues
         if tissue_subset:
