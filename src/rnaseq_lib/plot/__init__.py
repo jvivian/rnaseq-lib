@@ -101,6 +101,9 @@ class Holoview:
 
         :param str gene: Gene (ex: ERBB2) to select
         :param list tissue_subset: List of tissues to subset by
+        :param bool tumor: If True, include tumor samples
+        :param bool normal: If True, include normal samples
+        :param bool gtex: If True, include gtex samples
         :return: Returns holoviews Overlay object of gene KDE
         :rtype: hv.Overlay
         """
@@ -242,6 +245,7 @@ class Holoview:
         :param str gene: Gene (ex: ERBB2) to select
         :param list tissue_subset: List of tissues to subset by
         :param bool tcga_normal: If True, use TCGA normal to for DE calc, otherwise use GTEx
+        :param float l2fc_cutoff: Specifies the L2FC cutoff to draw a Spike object
         :return: Collection of Curve objects
         :rtype: hv.Overlay
         """
@@ -399,7 +403,9 @@ class Holoview:
         Dimensionality reduction via Trimap
 
         :param list(str) genes: List of genes to subset by
+        :param str title: Title of plot
         :param list(str) tissue_subset: List of tissues to subset by
+        :param int num_neighbors: Hyperparameter for trimap
         :return: Scatterplot of dimensionality reduction
         :rtype: hv.Scatter
         """
@@ -425,7 +431,10 @@ class Holoview:
         Dimensionality reduction via t-SNE
 
         :param list(str) genes: List of genes to subset by
+        :param str title: Title of plot
         :param list(str) tissue_subset: List of tissues to subset by
+        :param int perplexity: Hyperparamter for t-SNE
+        :param int learning_rate: Hyperparamter for t-SNE
         :return: Scatterplot of dimensionality reduction
         :rtype: hv.Scatter
         """
