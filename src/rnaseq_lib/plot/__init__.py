@@ -328,7 +328,7 @@ class Holoview:
         # Create dataframe and define dimensions
         df = pd.DataFrame.from_records(records, columns=['Tissue', 'Gene', 'L2FC'])
 
-        return hv.HeatMap(df, kdims=['Tissue', 'Gene'], vdims=['L2FC']).opts(self._gene_de_heatmap_opts)
+        return hv.HeatMap(df, kdims=['Gene', 'Tissue'], vdims=['L2FC']).opts(self._gene_de_heatmap_opts)
 
     # Misc
     def gene_curves(self, gene, tissue):
