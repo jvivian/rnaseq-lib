@@ -5,11 +5,7 @@ import numpy as np
 import pandas as pd
 from rnaseq_lib.diff_exp import log2fc
 from rnaseq_lib.dim_red import run_tsne, run_tete
-from rnaseq_lib.plot.opts import gene_curves_opts
-from rnaseq_lib.plot.opts import gene_de_opts
-from rnaseq_lib.plot.opts import gene_distribution_opts
-from rnaseq_lib.plot.opts import gene_kde_opts
-from rnaseq_lib.plot.opts import sample_count_opts
+from rnaseq_lib.plot.opts import *
 from rnaseq_lib.tissues import subset_by_dataset
 
 
@@ -33,6 +29,7 @@ class Holoview:
         self._gene_distribution_opts = gene_distribution_opts
         self._gene_de_opts = gene_de_opts
         self._sample_count_opts = sample_count_opts
+        self._l2fc_by_perc_samples_opts = l2fc_by_perc_samples_opts
 
     def _subset(self, gene, tissue=None):
         """
@@ -238,7 +235,7 @@ class Holoview:
 
         return hv.Overlay(dists, label='{} Expression'.format(gene)).opts(self._gene_kde_opts)
 
-    def l2fc_by_perc_samples(self, gene, tissue_subset=None, tcga_normal=False):
+    def l2fc_by_perc_samples(self, gene, tissue_subset=None, tcga_normal=False, l2fc_cutoff=2):
         """
         Calculate the percentage of samples greater than a range of log2 fold change values
 
@@ -284,7 +281,9 @@ class Holoview:
             # Create line object
             curves.append(hv.Curve(percentages, kdims=[xdim], vdims=[ydim], label=tissue))
 
-        return hv.Overlay(curves, label='{} {} Expression'.format(label, gene))
+        # Return curves along with a Spikes object at the l2fc cutoff
+        overlay = hv.Overlay(curves + [hv.Spikes([l2fc_cutoff])], label='{} {} Expression'.format(label, gene))
+        return overlay.opts(self._l2fc_by_perc_samples_opts)
 
     def differential_expression_comparison(self):
         """

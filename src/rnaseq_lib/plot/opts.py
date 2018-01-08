@@ -20,3 +20,10 @@ gene_de_opts = {
 sample_count_opts = {
     'Bars': {'plot': dict(width=875, xrotation=70, tools=['hover'], show_legend=False)}
 }
+
+l2fc_by_perc_samples_opts = {
+    'Curve': {'plot': dict(tools=['hover'])},
+    'Overlay': {'plot': dict(legend_position='left', width=500)},
+    'Spikes': {'plot': dict(spike_length=100),
+               'style': dict(line_alpha=0.4, line_width=5)}
+}
