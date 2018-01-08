@@ -186,7 +186,7 @@ class Holoview:
 
         # Define dimensions of plot
         kdims = [hv.Dimension('Expression', label='Gene Expression', unit='log2(x+1)')]
-        vdims = ['L2FC', 'Tissue']
+        vdims = [hv.Dimension('L2FC', label='Fold Change', unit='log2(FC)'), 'Tissue']
 
         # Create dataframe
         plot = pd.DataFrame.from_records(records, columns=kdims + vdims)
