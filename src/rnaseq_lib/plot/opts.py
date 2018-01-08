@@ -24,6 +24,10 @@ gene_de_opts = {
     'Scatter': {'plot': dict(color_index='Tissue', legend_position='left', width=700, height=500, tools=['hover']),
                 'style': dict(cmap='tab20', size=10, alpha=0.5)}}
 
+gene_de_heatmap_opts = {
+    'Heatmap': {'plot': dict(colorbar=True)}
+}
+
 sample_count_opts = {
     'Bars': {'plot': dict(width=875, xrotation=70, tools=['hover'], show_legend=False)}
 }

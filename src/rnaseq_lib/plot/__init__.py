@@ -30,6 +30,7 @@ class Holoview:
         self._gene_de_opts = gene_de_opts
         self._sample_count_opts = sample_count_opts
         self._l2fc_by_perc_samples_opts = l2fc_by_perc_samples_opts
+        self._gene_de_heatmap_opts = gene_de_heatmap_opts
 
     def _subset(self, gene, tissue=None):
         """
@@ -296,6 +297,38 @@ class Holoview:
         :return:
         """
         pass
+
+    def gene_de_heatmap(self, genes, tissue_subset=None, tcga_normal=False):
+        # Subset dataframe by genes
+        df = self.df[self.df_cols + genes]
+
+        # Subset by tissues
+        if tissue_subset:
+            df = df[df.tissue.isin(tissue_subset)]
+
+        # Subset by dataset
+        tumor, normal, gtex = subset_by_dataset(df)
+
+        # For each tissue/gene, calculate L2FC
+        records = []
+        for tissue in sorted(df.tissue.unique()):
+            for gene in genes:
+                # Calculate mean expression for normal
+                if tcga_normal:
+                    n = normal[normal.tissue == tissue][gene].median()
+                else:
+                    n = gtex[gtex.tissue == tissue][gene].median()
+
+                # Calculate expression for tumor and compute l2fc
+                t = tumor[tumor.tissue == tissue][gene].median()
+                l2fc = log2fc(t, n)
+
+                records.append([tissue, gene, l2fc])
+
+        # Create dataframe and define dimensions
+        df = pd.DataFrame.from_records(records, columns=['Tissue', 'Gene', 'L2FC'])
+
+        return hv.HeatMap(df, kdims=['Tissue', 'Gene'], vdims=['L2FC']).opts(self._gene_de_heatmap_opts)
 
     # Misc
     def gene_curves(self, gene, tissue):
