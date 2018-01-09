@@ -331,6 +331,41 @@ class Holoview:
         return hv.HeatMap(df, kdims=['Gene', 'Tissue'], vdims=['L2FC']).opts(self._gene_de_heatmap_opts)
 
     # Misc
+    def perc_tumor_overexpressed(self, gene, tissue_subset=None):
+        """
+        Calculate the percent of tumor samples that overexpress a gene relative to the combined normal
+        distribution of all samples (in tissue_subset) as well as compared to normals in the same tissue
+
+        :param str gene: Gene (ex: ERBB2) to select
+        :param list tissue_subset: List of tissues to subset by
+        :return: Table of tissues and corresponding percentages pertaining to upper bound cutoff
+        :rtype: pd.DataFrame
+        """
+
+        # Subset by gene and tissue
+        df = self._subset_by_tissues(gene, tissue_subset)
+
+        # Calculate upper and lower bounds across all tissues
+        upper, lower = self.iqr_bounds(df[df.tumor == 'no'][gene].apply(self.l2norm))
+
+        records = []
+        for tissue in sorted(df.tissue.unique()):
+            # Calclulate upper/lower bound for normal
+            normals = df[(df.tumor == 'no') & (df.tissue == tissue)][gene].apply(self.l2norm)
+            n_upper, n_lower = self.iqr_bounds(normals)
+
+            # Calculate expression for tumor
+            exp = df[(df.tissue == tissue) & (df.tumor == 'yes')][gene].apply(self.l2norm)
+
+            # Calculate percentage cut offs and print
+            perc = len([x for x in exp if x > upper]) / len(exp)
+            n_perc = len([x for x in exp if x > n_upper]) / len(exp)
+            records.append([tissue, perc, n_perc])
+
+        # Save, sort, and return output dataframe
+        df = pd.DataFrame.from_records(records, columns=['Tissue', 'Upper', 'T_Upper'])
+        return df.sort_values('T_Upper', ascending=False)
+
     def gene_curves(self, gene, tissue):
         """
         Returns set of 3 plots for tissue / gene given a dataframe of metadata and expression values
