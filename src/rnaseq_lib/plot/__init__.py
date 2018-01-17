@@ -3,6 +3,8 @@ from __future__ import division
 import holoviews as hv
 import numpy as np
 import pandas as pd
+from scipy.stats import pearsonr
+
 from rnaseq_lib.diff_exp import log2fc
 from rnaseq_lib.dim_red import run_tsne, run_tete
 from rnaseq_lib.plot.opts import *
@@ -290,14 +292,6 @@ class Holoview:
         overlay = hv.Overlay(curves + [hv.Spikes([l2fc_cutoff])], label='{} {} Expression'.format(label, gene))
         return overlay.opts(self._l2fc_by_perc_samples_opts)
 
-    def differential_expression_comparison(self):
-        """
-        Categorical scatterplot of concordance between tissues for gene differential expression
-
-        :return:
-        """
-        pass
-
     def gene_de_heatmap(self, genes, tissue_subset=None, tcga_normal=False):
         # Subset dataframe by genes
         df = self.df[self.df_cols + genes]
@@ -326,7 +320,7 @@ class Holoview:
                 records.append([tissue, gene, l2fc])
 
         # Create dataframe and define dimensions
-        df = pd.DataFrame.from_records(records, columns=['Tissue', 'Gene', 'L2FC'])
+        df = pd.DataFrame.from_records(records, columns=['Tissue', 'Gene', 'L2FC']).sort_values('Tissue')
 
         return hv.HeatMap(df, kdims=['Gene', 'Tissue'], vdims=['L2FC']).opts(self._gene_de_heatmap_opts)
 
@@ -357,7 +351,7 @@ class Holoview:
             # Calculate expression for tumor
             exp = df[(df.tissue == tissue) & (df.tumor == 'yes')][gene].apply(self.l2norm)
 
-            # Calculate percentage cut offs and print
+            # Calculate percentage cut offs
             perc = len([x for x in exp if x > upper]) / len(exp)
             n_perc = len([x for x in exp if x > n_upper]) / len(exp)
             records.append([tissue, perc, n_perc])
@@ -464,6 +458,55 @@ class Holoview:
 
         # Return Bars object of sample counts
         return hv.Bars(df, kdims=['Tissue', 'Label'], vdims=['Count']).opts(self._sample_count_opts)
+
+    def differential_expression_tissue_concordance(self):
+        """
+        Categorical scatterplot of concordance between tissues for gene differential expression
+
+        :return: Heatmap of differential expression comparison across tissue
+        :rtype: hv.HeatMap
+        """
+        # Store indices (tissues with both
+        indices, records = [], []
+        for tissue1 in sorted(self.df.tissues.unique()):
+
+            # Subset by tissue then break apart by dataset
+            t, g, n = subset_by_dataset(self.df[self.df.tissue == tissue1])
+
+            # If there are both normal and gtex samples
+            if len(g) > 0 and len(n) > 0:
+                indices.append(tissue1)
+
+                # Calculate gene expression average for tumor samples
+                i = self.df.columns.tolist().index('OR4F5')  # Hacky, but OR4F5 is the first gene in the dataframe
+                tmed = t[t.columns[i:]].median()
+                nmed = n[n.columns[i:]].median()
+                master_tn = log2fc(tmed, nmed)
+
+                # Iterate over all other tissues to get PearsonR of L2FC
+                for tissue2 in sorted(self.df.tissues.unique()):
+
+                    # Subset by second tissue
+                    _, g, n = subset_by_dataset(self.df[self.df.tissue == tissue2])
+
+                    # If there are GTEx samples, calculate PearsonR to master_tn
+                    if len(g) > 0:
+                        gmed = g[g.columns[i:]].median()
+                        tg = log2fc(tmed, gmed)
+                        records.append((tissue1, '{}-gtex'.format(tissue2), round(pearsonr(master_tn, tg)[0], 2)))
+
+                    # If there are normal samples, calculate PearsonR to master_tn
+                    if len(n) > 0:
+                        nmed = n[n.columns[i:]].median()
+                        tn = log2fc(tmed, nmed)
+                        records.append((tissue1, '{}-normal'.format(tissue2), round(pearsonr(master_tn, tn)[0], 2)))
+
+        # Construct dataframe
+        df = pd.DataFrame.from_records(records, columns=['Tissue-Tumor', 'Tissue-Normal', 'PearsonR'])
+        df.index = indices
+
+        # Return HeatMap object
+        return hv.HeatMap(df, kdims=['Tissue-Tumor', 'Tissue-Normal'], vdims=['PearsonR'])
 
     # Dimensionality Reduction
     def trimap(self, genes, title, tissue_subset=None, num_neighbors=50):
