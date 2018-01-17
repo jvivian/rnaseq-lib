@@ -468,7 +468,7 @@ class Holoview:
         """
         # Store indices (tissues with both
         indices, records = [], []
-        for tissue1 in sorted(self.df.tissues.unique()):
+        for tissue1 in sorted(self.df.tissue.unique()):
 
             # Subset by tissue then break apart by dataset
             t, g, n = subset_by_dataset(self.df[self.df.tissue == tissue1])
@@ -484,7 +484,7 @@ class Holoview:
                 master_tn = log2fc(tmed, nmed)
 
                 # Iterate over all other tissues to get PearsonR of L2FC
-                for tissue2 in sorted(self.df.tissues.unique()):
+                for tissue2 in sorted(self.df.tissue.unique()):
 
                     # Subset by second tissue
                     _, g, n = subset_by_dataset(self.df[self.df.tissue == tissue2])
