@@ -466,8 +466,7 @@ class Holoview:
         :return: Heatmap of differential expression comparison across tissue
         :rtype: hv.HeatMap
         """
-        # Store indices (tissues with both
-        indices, records = [], []
+        records = []
         for tissue1 in sorted(self.df.tissue.unique()):
 
             # Subset by tissue then break apart by dataset
@@ -475,7 +474,6 @@ class Holoview:
 
             # If there are both normal and gtex samples
             if len(g) > 0 and len(n) > 0:
-                indices.append(tissue1)
 
                 # Calculate gene expression average for tumor samples
                 i = self.df.columns.tolist().index('OR4F5')  # Hacky, but OR4F5 is the first gene in the dataframe
@@ -503,7 +501,6 @@ class Holoview:
 
         # Construct dataframe
         df = pd.DataFrame.from_records(records, columns=['Tissue-Tumor', 'Tissue-Normal', 'PearsonR'])
-        df.index = indices
 
         # Return HeatMap object
         return hv.HeatMap(df, kdims=['Tissue-Tumor', 'Tissue-Normal'], vdims=['PearsonR'])
