@@ -341,7 +341,7 @@ class Holoview:
         path = [(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax), (xmin, ymin)]
         return hv.Path([path])
 
-    def highlight_points(self, xs, ys, size, color=None):
+    def highlight_points(self, xs, ys, size=0.25, color=None):
         """
         Returns a rectangular Path object for a set of points
 
@@ -353,7 +353,7 @@ class Holoview:
         :rtype: hv.Path
         """
         # If a set of single points
-        if not isinstance(xs, iter) and not isinstance(ys, iter):
+        if isinstance(xs, (int, float)) and isinstance(ys, (int, float)):
             xs, ys = [xs], [ys]
 
         # Collect mins nad maxes from all points
@@ -362,7 +362,7 @@ class Holoview:
         # Add margins
         xmin, xmax, ymin, ymax = xmin - size, xmax + size, ymin - size, ymax + size
 
-        # Return
+        # Return Path object
         if color:
             return self.path_box(xmin, xmax, ymin, ymax).opts(dict(Path=dict(style=dict(color=color))))
         else:
