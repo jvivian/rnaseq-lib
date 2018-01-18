@@ -325,7 +325,12 @@ class Holoview:
 
         return hv.HeatMap(df, kdims=['Gene', 'Tissue'], vdims=['L2FC']).opts(self._gene_de_heatmap_opts)
 
-    # Misc
+    # Misc plots
+    @staticmethod
+    def path_box(xmin, xmax, ymin, ymax):
+        path = [(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax), (xmin, ymin)]
+        return hv.Path([path])
+
     def perc_tumor_overexpressed(self, gene, tissue_subset=None):
         """
         Calculate the percent of tumor samples that overexpress a gene relative to the combined normal
