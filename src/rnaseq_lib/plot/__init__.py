@@ -328,8 +328,45 @@ class Holoview:
     # Misc plots
     @staticmethod
     def path_box(xmin, xmax, ymin, ymax):
+        """
+        Returns rectangular Path object for a given set of x/y coordinates
+
+        :param float xmin: xmin of box
+        :param float xmax: xmax of box
+        :param float ymin: ymin of box
+        :param float ymax: ymax of box
+        :return: Rectangular path object
+        :rtype: hv.Path
+        """
         path = [(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax), (xmin, ymin)]
         return hv.Path([path])
+
+    def highlight_points(self, xs, ys, size, color=None):
+        """
+        Returns a rectangular Path object for a set of points
+
+        :param list|float xs: List of x coordinates or a single x coord
+        :param list|float ys: List of y coordinates or a single y coord
+        :param float size: Margin around xmin,xmax,ymin,ymax of points
+        :param str color: Set the color of the Path object
+        :return: Rectangular Path object
+        :rtype: hv.Path
+        """
+        # If a set of single points
+        if not isinstance(xs, iter) and not isinstance(ys, iter):
+            xs, ys = [xs], [ys]
+
+        # Collect mins nad maxes from all points
+        xmin, xmax, ymin, ymax = min(xs), max(xs), min(ys), max(ys)
+
+        # Add margins
+        xmin, xmax, ymin, ymax = xmin - size, xmax + size, ymin - size, ymax + size
+
+        # Return
+        if color:
+            return self.path_box(xmin, xmax, ymin, ymax).opts(dict(Path=dict(style=dict(color=color))))
+        else:
+            return self.path_box(xmin, xmax, ymin, ymax)
 
     def perc_tumor_overexpressed(self, gene, tissue_subset=None):
         """
