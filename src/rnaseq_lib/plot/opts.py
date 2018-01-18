@@ -33,8 +33,9 @@ sample_count_opts = {
 }
 
 l2fc_by_perc_samples_opts = {
-    'Curve': {'plot': dict(tools=['hover']),
-              'style': dict(color=hv.Cycle(values=color_sequence))},
+    #'Curve': {'plot': dict(tools=['hover']),
+    #         'style': dict(color=hv.Cycle(values=color_sequence))},
+    'Area': {'style': dict(alpha=0.25)},
     'Overlay': {'plot': dict(legend_position='left', width=500)},
     'Spikes': {'plot': dict(spike_length=100),
                'style': dict(line_alpha=0.4, line_width=5)}

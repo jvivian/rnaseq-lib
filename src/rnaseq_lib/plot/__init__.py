@@ -287,7 +287,7 @@ class Holoview:
                 percentages[l2fc] = len([x for x in l2fcs if x >= l2fc]) / len(l2fcs) * 100
 
             # Create line object
-            curves.append(hv.Curve(percentages, kdims=[xdim], vdims=[ydim], label=tissue))
+            curves.append(hv.Area(percentages, kdims=[xdim], vdims=[ydim], label=tissue))
 
         # Return curves along with a Spikes object at the l2fc cutoff
         overlay = hv.Overlay(curves + [hv.Spikes([l2fc_cutoff])], label='{} {} Expression'.format(label, gene))
