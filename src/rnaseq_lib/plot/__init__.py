@@ -33,6 +33,7 @@ class Holoview:
         self._sample_count_opts = sample_count_opts
         self._l2fc_by_perc_samples_opts = l2fc_by_perc_samples_opts
         self._gene_de_heatmap_opts = gene_de_heatmap_opts
+        self._de_concordance_opts = de_concordance_opts
 
     def _subset(self, gene, tissue=None):
         """
@@ -504,7 +505,7 @@ class Holoview:
 
         # Return HeatMap object
         return hv.HeatMap(df, kdims=['Tissue-Tumor/Normal', 'Tissue-Normal'], vdims=['PearsonR'],
-                          label='Differential Expression Gene Concordance')
+                          label='Differential Expression Gene Concordance').opts(self._de_concordance_opts)
 
     # Dimensionality Reduction
     def trimap(self, genes, title, tissue_subset=None, num_neighbors=50):

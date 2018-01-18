@@ -39,3 +39,7 @@ l2fc_by_perc_samples_opts = {
     'Spikes': {'plot': dict(spike_length=100),
                'style': dict(line_alpha=0.4, line_width=5)}
 }
+
+de_concordance_opts = {
+    'HeatMap': {'plot': dict(width=700, height=500, xrotation=45, colorbar=True, toolbar='above', tools=['hover'])}
+}
