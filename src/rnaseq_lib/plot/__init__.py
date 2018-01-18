@@ -491,19 +491,20 @@ class Holoview:
                     if len(g) > 0:
                         gmed = g[g.columns[i:]].median()
                         tg = log2fc(tmed, gmed)
-                        records.append((tissue1, '{}-gtex'.format(tissue2), round(pearsonr(master_tn, tg)[0], 2)))
+                        records.append((tissue1, '{}-GTEx'.format(tissue2), round(pearsonr(master_tn, tg)[0], 2)))
 
                     # If there are normal samples, calculate PearsonR to master_tn
                     if len(n) > 0:
                         nmed = n[n.columns[i:]].median()
                         tn = log2fc(tmed, nmed)
-                        records.append((tissue1, '{}-normal'.format(tissue2), round(pearsonr(master_tn, tn)[0], 2)))
+                        records.append((tissue1, '{}-tcga'.format(tissue2), round(pearsonr(master_tn, tn)[0], 2)))
 
         # Construct dataframe
-        df = pd.DataFrame.from_records(records, columns=['Tissue-Tumor', 'Tissue-Normal', 'PearsonR'])
+        df = pd.DataFrame.from_records(records, columns=['Tissue-Tumor/Normal', 'Tissue-Normal', 'PearsonR'])
 
         # Return HeatMap object
-        return hv.HeatMap(df, kdims=['Tissue-Tumor', 'Tissue-Normal'], vdims=['PearsonR'])
+        return hv.HeatMap(df, kdims=['Tissue-Tumor/Normal', 'Tissue-Normal'], vdims=['PearsonR'],
+                          label='Differential Expression Gene Concordance')
 
     # Dimensionality Reduction
     def trimap(self, genes, title, tissue_subset=None, num_neighbors=50):
