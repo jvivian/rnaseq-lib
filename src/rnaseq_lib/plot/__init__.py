@@ -178,16 +178,15 @@ class Holoview:
         for tissue in sorted(df.tissue.unique()):
             # Subset by dataset
             tumor, normal, gtex = subset_by_dataset(df[df.tissue == tissue])
-            t_med, n_med, g_med = tumor[gene].median(), normal[gene].median(), gtex[gene].median()
 
             # Calculate tumor and normal expression and L2FC
             if tcga_normal:
-                l2fc = log2fc(t_med, n_med)
-                exp = pd.concat([t_med, n_med], axis=0).apply(self.l2norm).median()
+                l2fc = log2fc(tumor[gene].median(), normal[gene].median())
+                exp = pd.concat([tumor[gene], normal[gene]], axis=0).apply(self.l2norm).median()
                 unit = 'log2(Tumor/Normal)'
             else:
-                l2fc = log2fc(t_med, g_med)
-                exp = pd.concat([t_med, g_med], axis=0).apply(self.l2norm).median()
+                l2fc = log2fc(tumor[gene].median(), gtex[gene].median())
+                exp = pd.concat([tumor[gene], gtex[gene]], axis=0).apply(self.l2norm).median()
                 unit = 'log2(Tumor/GTEx)'
 
             # Store as record
