@@ -328,7 +328,7 @@ class Holoview:
 
     # Misc plots
     @staticmethod
-    def path_box(xmin, xmax, ymin, ymax):
+    def path_box(xmin, xmax, ymin, ymax, color=None):
         """
         Returns rectangular Path object for a given set of x/y coordinates
 
@@ -336,13 +336,17 @@ class Holoview:
         :param float xmax: xmax of box
         :param float ymin: ymin of box
         :param float ymax: ymax of box
+        :param str color: Set the color of the Path object
         :return: Rectangular path object
         :rtype: hv.Path
         """
         path = [(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax), (xmin, ymin)]
-        return hv.Path([path])
+        if color:
+            return hv.Path([path]).opts(dict(Path=dict(style=dict(color=color))))
+        else:
+            return hv.Path([path])
 
-    def highlight_points(self, xs, ys, size=0.1, color=None):
+    def highlight_points(self, xs, ys, size=0.1, color=None, hidden_buffer_box=True):
         """
         Returns a rectangular Path object for a set of points
 
@@ -350,6 +354,7 @@ class Holoview:
         :param list|float ys: List of y coordinates or a single y coord
         :param float size: Margin around xmin,xmax,ymin,ymax of points
         :param str color: Set the color of the Path object
+        :param bool hidden_buffer_box: Adds a transparent larger frame around the Path object to improve plot margins
         :return: Rectangular Path object
         :rtype: hv.Path
         """
@@ -363,11 +368,16 @@ class Holoview:
         # Add margins
         xmin, xmax, ymin, ymax = xmin - size, xmax + size, ymin - size, ymax + size
 
-        # Return Path object
-        if color:
-            return self.path_box(xmin, xmax, ymin, ymax).opts(dict(Path=dict(style=dict(color=color))))
+        # Create Path object
+        plot = self.path_box(xmin, xmax, ymin, ymax, color=color)
+
+        # If hidden_buffer_box is enabled
+        if hidden_buffer_box:
+            xmin, xmax, ymin, ymax = xmin - size, xmax + size, ymin - size, ymax + size
+            hbb = self.path_box(xmin, xmax, ymin, ymax).opts(dict(Path=dict(style=dict(alpha=0))))
+            return plot * hbb
         else:
-            return self.path_box(xmin, xmax, ymin, ymax)
+            return plot
 
     def perc_tumor_overexpressed(self, gene, tissue_subset=None):
         """
