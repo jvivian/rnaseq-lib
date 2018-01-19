@@ -341,7 +341,7 @@ class Holoview:
         path = [(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax), (xmin, ymin)]
         return hv.Path([path])
 
-    def highlight_points(self, xs, ys, size=0.25, color=None):
+    def highlight_points(self, xs, ys, size=0.1, color=None):
         """
         Returns a rectangular Path object for a set of points
 
