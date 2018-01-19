@@ -159,18 +159,19 @@ class Holoview:
                              label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
 
     # Differential Expression
-    def gene_de(self, gene, extents=None, tcga_normal=False):
+    def gene_de(self, gene, tissue_subset=None, extents=None, tcga_normal=False):
         """
         Scatter plot of differential expression across all tissues
 
         :param str gene: Gene (ex: ERBB2) to select
         :param tuple extents: xmin/ymin/xmax/ymax values
+        :param list tissue_subset: List of tissues to subset by
         :param bool tcga_normal: If True, will use TCGA normal for differential expression comparison
         :return: Scatterplot of values
         :rtype: hv.Scatter
         """
-        # Subset dataframe by gene
-        df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
+        # Subset dataframe by gene and tissue subset
+        df = self._subset_by_tissues(gene, tissue_subset)
 
         # For each tissue, calculate L2FC and mean expression
         records = []
