@@ -159,12 +159,13 @@ class Holoview:
                              label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
 
     # Differential Expression
-    def gene_de(self, gene, extents=None):
+    def gene_de(self, gene, extents=None, tcga_normal=False):
         """
         Scatter plot of differential expression across all tissues
 
         :param str gene: Gene (ex: ERBB2) to select
         :param tuple extents: xmin/ymin/xmax/ymax values
+        :param bool tcga_normal: If True, will use TCGA normal for differential expression comparison
         :return: Scatterplot of values
         :rtype: hv.Scatter
         """
@@ -177,23 +178,27 @@ class Holoview:
         # For each tissue, calculate L2FC and mean expression
         records = []
         for tissue in sorted(df.tissue.unique()):
-            # Calculate mean expression for TCGA tumor and GTEx
-            exp = df[(df.tissue == tissue) & ((df.tumor == 'yes') | (df.dataset == 'gtex'))][gene].apply(
-                self.l2norm).median()
 
             # Calculate tumor and normal expression
             t = tumor[tumor.tissue == tissue][gene].median()
-            g = gtex[gtex.tissue == tissue][gene].median()
+            if tcga_normal:
+                n = normal[normal.tissue == tissue][gene].median()
+                exp = pd.concat([tumor, normal], axis=0)[gene].apply(self.l2norm).median()
+                unit = 'log2(Tumor/Normal)'
+            else:
+                n = gtex[gtex.tissue == tissue][gene].median()
+                exp = pd.concat([tumor, gtex], axis=0)[gene].apply(self.l2norm).median()
+                unit = 'log2(Tumor/GTEx)'
 
             # Calculate log2 fold change
-            l2fc = log2fc(t, g)
+            l2fc = log2fc(t, n)
 
             # Store as record
             records.append((exp, l2fc, tissue))
 
         # Define dimensions of plot
         kdims = [hv.Dimension('Expression', label='Gene Expression', unit='log2(x+1)')]
-        vdims = [hv.Dimension('L2FC', label='Fold Change', unit='log2(FC)'), 'Tissue']
+        vdims = [hv.Dimension('L2FC', label='Fold Change', unit=unit), 'Tissue']
 
         # Create dataframe
         plot = pd.DataFrame.from_records(records, columns=kdims + vdims)
