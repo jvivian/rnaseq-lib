@@ -172,26 +172,24 @@ class Holoview:
         # Subset dataframe by gene
         df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
 
-        # Subset by dataset
-        tumor, normal, gtex = subset_by_dataset(df)
-
         # For each tissue, calculate L2FC and mean expression
         records = []
         for tissue in sorted(df.tissue.unique()):
+            # Subset by dataset
+            tumor, normal, gtex = subset_by_dataset(df[df.tissue == tissue])
 
             # Calculate tumor and normal expression
-            t = tumor[tumor.tissue == tissue][gene].median()
             if tcga_normal:
-                n = normal[normal.tissue == tissue][gene].median()
+                n = normal
                 exp = pd.concat([tumor, normal], axis=0)[gene].apply(self.l2norm).median()
                 unit = 'log2(Tumor/Normal)'
             else:
-                n = gtex[gtex.tissue == tissue][gene].median()
+                n = gtex
                 exp = pd.concat([tumor, gtex], axis=0)[gene].apply(self.l2norm).median()
                 unit = 'log2(Tumor/GTEx)'
 
             # Calculate log2 fold change
-            l2fc = log2fc(t, n)
+            l2fc = log2fc(tumor.median(), n.median())
 
             # Store as record
             records.append((exp, l2fc, tissue))
