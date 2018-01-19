@@ -180,16 +180,16 @@ class Holoview:
 
             # Calculate tumor and normal expression
             if tcga_normal:
-                n = normal
+                n = normal.median()
                 exp = pd.concat([tumor, normal], axis=0)[gene].apply(self.l2norm).median()
                 unit = 'log2(Tumor/Normal)'
             else:
-                n = gtex
+                n = gtex.median()
                 exp = pd.concat([tumor, gtex], axis=0)[gene].apply(self.l2norm).median()
                 unit = 'log2(Tumor/GTEx)'
 
             # Calculate log2 fold change
-            l2fc = log2fc(tumor.median(), n.median())
+            l2fc = log2fc(tumor.median(), n)
 
             # Store as record
             records.append((exp, l2fc, tissue))
@@ -199,7 +199,7 @@ class Holoview:
         vdims = [hv.Dimension('L2FC', label='Fold Change', unit=unit), 'Tissue']
 
         # Create dataframe
-        plot = pd.DataFrame.from_records(records, columns=kdims + vdims)
+        plot = pd.DataFrame.from_records(records, columns=['Expression', 'L2FC', 'Tissue'])
 
         if extents:
             return hv.Scatter(plot, kdims=kdims, vdims=vdims, extents=extents).opts(self._gene_de_opts)
