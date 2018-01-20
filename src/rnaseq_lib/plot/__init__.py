@@ -35,6 +35,7 @@ class Holoview:
         self._gene_de_heatmap_opts = gene_de_heatmap_opts
         self._de_concordance_opts = de_concordance_opts
 
+    # Internal methods
     def _subset(self, gene, tissue=None):
         """
         Subset dataframe by gene and tissue with default columns `self.df_cols`
@@ -73,6 +74,7 @@ class Holoview:
         # Return mapping of dataset to cutoff
         return {x: y for x, y in zip(['tumor', 'normal', 'gtex'], cutoffs)}
 
+    # Convenience methods
     @staticmethod
     def l2norm(x):
         """
@@ -97,6 +99,41 @@ class Holoview:
         lower_bound = quartile_1 - (iqr * 1.5)
         upper_bound = quartile_3 + (iqr * 1.5)
         return upper_bound, lower_bound
+
+    def perc_tumor_overexpressed(self, gene, tissue_subset=None):
+        """
+        Calculate the percent of tumor samples that overexpress a gene relative to the combined normal
+        distribution of all samples (in tissue_subset) as well as compared to normals in the same tissue
+
+        :param str gene: Gene (ex: ERBB2) to select
+        :param list tissue_subset: List of tissues to subset by
+        :return: Table of tissues and corresponding percentages pertaining to upper bound cutoff
+        :rtype: pd.DataFrame
+        """
+
+        # Subset by gene and tissue
+        df = self._subset_by_tissues(gene, tissue_subset)
+
+        # Calculate upper and lower bounds across all tissues
+        upper, lower = self.iqr_bounds(df[df.tumor == 'no'][gene].apply(self.l2norm))
+
+        records = []
+        for tissue in sorted(df.tissue.unique()):
+            # Calclulate upper/lower bound for normal
+            normals = df[(df.tumor == 'no') & (df.tissue == tissue)][gene].apply(self.l2norm)
+            n_upper, n_lower = self.iqr_bounds(normals)
+
+            # Calculate expression for tumor
+            exp = df[(df.tissue == tissue) & (df.tumor == 'yes')][gene].apply(self.l2norm)
+
+            # Calculate percentage cut offs
+            perc = len([x for x in exp if x > upper]) / len(exp)
+            n_perc = len([x for x in exp if x > n_upper]) / len(exp)
+            records.append([tissue, perc, n_perc])
+
+        # Save, sort, and return output dataframe
+        df = pd.DataFrame.from_records(records, columns=['Tissue', 'Upper', 'T_Upper'])
+        return df.sort_values('T_Upper', ascending=False)
 
     # Gene Plots
     def gene_kde(self, gene, tissue_subset=None, tumor=True, normal=True, gtex=True):
@@ -133,10 +170,6 @@ class Holoview:
 
         # Combine into Overlay object
         return hv.Overlay(dists, label='{} Expression'.format(gene)).opts(self._gene_kde_opts)
-
-    def multiple_tissue_gene_kde(self, gene, *tissues):
-        return hv.Overlay([self.gene_kde(gene, t) for t in tissues],
-                          label='{} Expression'.format(gene))
 
     def gene_distribution(self, gene, tissue_subset=None):
         """
@@ -378,41 +411,6 @@ class Holoview:
             return plot * hbb
         else:
             return plot
-
-    def perc_tumor_overexpressed(self, gene, tissue_subset=None):
-        """
-        Calculate the percent of tumor samples that overexpress a gene relative to the combined normal
-        distribution of all samples (in tissue_subset) as well as compared to normals in the same tissue
-
-        :param str gene: Gene (ex: ERBB2) to select
-        :param list tissue_subset: List of tissues to subset by
-        :return: Table of tissues and corresponding percentages pertaining to upper bound cutoff
-        :rtype: pd.DataFrame
-        """
-
-        # Subset by gene and tissue
-        df = self._subset_by_tissues(gene, tissue_subset)
-
-        # Calculate upper and lower bounds across all tissues
-        upper, lower = self.iqr_bounds(df[df.tumor == 'no'][gene].apply(self.l2norm))
-
-        records = []
-        for tissue in sorted(df.tissue.unique()):
-            # Calclulate upper/lower bound for normal
-            normals = df[(df.tumor == 'no') & (df.tissue == tissue)][gene].apply(self.l2norm)
-            n_upper, n_lower = self.iqr_bounds(normals)
-
-            # Calculate expression for tumor
-            exp = df[(df.tissue == tissue) & (df.tumor == 'yes')][gene].apply(self.l2norm)
-
-            # Calculate percentage cut offs
-            perc = len([x for x in exp if x > upper]) / len(exp)
-            n_perc = len([x for x in exp if x > n_upper]) / len(exp)
-            records.append([tissue, perc, n_perc])
-
-        # Save, sort, and return output dataframe
-        df = pd.DataFrame.from_records(records, columns=['Tissue', 'Upper', 'T_Upper'])
-        return df.sort_values('T_Upper', ascending=False)
 
     def gene_curves(self, gene, tissue):
         """
