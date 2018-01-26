@@ -3,7 +3,7 @@ import os
 
 from rnaseq_lib.utils.expando import Expando
 
-_iter_types = (list, tuple, set, frozenset)
+_iter_types = (list, tuple, set)
 
 
 def mkdir_p(path):
