@@ -74,6 +74,27 @@ class Holoview:
         # Return mapping of dataset to cutoff
         return {x: y for x, y in zip(['tumor', 'normal', 'gtex'], cutoffs)}
 
+    def _sample_counts_df(self):
+        """
+        Compute sample counts and returns dataframe
+
+        :return: Sample counts for tissues and datasets
+        :rtype: pd.DataFrame
+        """
+        # Subset by dataset
+        tumor, normal, gtex = subset_by_dataset(self.df)
+
+        # Count samples for each tissue
+        records = []
+        for tissue in sorted(self.df.tissue.unique()):
+            for df, label in zip([tumor, normal, gtex], ['tcga-tumor', 'tcga-normal', 'gtex']):
+                count = len(df[df.tissue == tissue])
+                if count:
+                    records.append([tissue, label, count])
+
+        # Create dataframe
+        return pd.DataFrame.from_records(records, columns=['Tissue', 'Label', 'Count']).sort_values(['Tissue', 'Label'])
+
     # Convenience methods
     @staticmethod
     def l2norm(x):
@@ -494,19 +515,7 @@ class Holoview:
 
         :return:
         """
-        # Subset by dataset
-        tumor, normal, gtex = subset_by_dataset(self.df)
-
-        # Count samples for each tissue
-        records = []
-        for tissue in sorted(self.df.tissue.unique()):
-            for df, label in zip([tumor, normal, gtex], ['tcga-tumor', 'tcga-normal', 'gtex']):
-                count = len(df[df.tissue == tissue])
-                if count:
-                    records.append([tissue, label, count])
-
-        # Create dataframe
-        df = pd.DataFrame.from_records(records, columns=['Tissue', 'Label', 'Count']).sort_values(['Tissue', 'Label'])
+        df = self._sample_counts_df()
 
         # Return Bars object of sample counts
         return hv.Bars(df, kdims=['Tissue', 'Label'], vdims=['Count']).opts(self._sample_count_opts)
