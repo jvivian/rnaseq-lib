@@ -80,3 +80,13 @@ def load_civic_genes():
     """
     path = os.path.join(_cwd, 'data/civic-genes.txt')
     return sorted([x.strip() for x in open(path, 'r').readlines()])
+
+
+def load_cosmic_dataframe():
+    """
+    Returns cosmic dataframe
+
+    :return: Dataframe of COSMIC genes
+    :rtype: pd.DataFrame
+    """
+    return pd.read_csv(os.path.join(_cwd, 'data/census_all_1-26-2018.tsv'))
