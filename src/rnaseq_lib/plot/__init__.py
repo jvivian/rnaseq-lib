@@ -400,9 +400,9 @@ class Holoview:
         upper, lower = self.iqr_bounds(ys)
 
         # Return dist with spikes
-        return hv.Overlay(hv.Distribution(ys, kdims=[kdim]),
-                          hv.Spikes([q25, q75]),
-                          hv.Spikes[lower, upper]).opts(self._dist_with_iqr_bounds_opts)
+        return hv.Overlay([hv.Distribution(ys, kdims=[kdim]),
+                           hv.Spikes([q25, q75]),
+                           hv.Spikes([lower, upper])]).opts(self._dist_with_iqr_bounds_opts)
 
     @staticmethod
     def path_box(xmin, xmax, ymin, ymax, color=None):
