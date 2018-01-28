@@ -48,3 +48,8 @@ de_concordance_opts = {
 dist_with_iqr_bounds_opts = {
     'Spikes': {'style': dict(line_color=hv.Cycle(), line_width=5, line_alpha=0.5)}
 }
+
+dr_opts = {
+    'Scatter': {'plot': dict(width=800, height=500, legend_position='left', tools=['hover']),
+                'style': dict(cmap=color_sequence)}
+}
