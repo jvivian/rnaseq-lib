@@ -46,7 +46,8 @@ de_concordance_opts = {
 }
 
 dist_with_iqr_bounds_opts = {
-    'Spikes': {'style': dict(line_color=hv.Cycle(), line_width=5, line_alpha=0.5)}
+    'Spikes': {'style': dict(line_color=hv.Cycle(), line_width=5, line_alpha=0.5),
+               'plot': dict(tools=['hover'])}
 }
 
 dr_opts = {
