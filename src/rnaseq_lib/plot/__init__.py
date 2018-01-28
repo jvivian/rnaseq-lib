@@ -3,12 +3,11 @@ from __future__ import division
 import holoviews as hv
 import numpy as np
 import pandas as pd
-from scipy.stats import pearsonr
-
 from rnaseq_lib.diff_exp import log2fc
 from rnaseq_lib.dim_red import run_tsne, run_tete
 from rnaseq_lib.plot.opts import *
 from rnaseq_lib.tissues import subset_by_dataset
+from scipy.stats import pearsonr
 
 
 class Holoview:
@@ -34,6 +33,8 @@ class Holoview:
         self._l2fc_by_perc_samples_opts = l2fc_by_perc_samples_opts
         self._gene_de_heatmap_opts = gene_de_heatmap_opts
         self._de_concordance_opts = de_concordance_opts
+        self._dist_with_iqr_bounds_opts = dist_with_iqr_bounds_opts
+        self._dr_opts = dr_opts
 
     # Internal methods
     def _subset(self, gene, tissue=None):
@@ -114,6 +115,10 @@ class Holoview:
 
         Lower bound: Q1 - (IQR * 1.5)
         Upper bound: Q3 + (IQR * 1.5)
+
+        :param list ys: List of values to calculate IQR
+        :return: Upper and lower bound
+        :rtype: tuple(float, float)
         """
         quartile_1, quartile_3 = np.percentile(ys, [25, 75])
         iqr = quartile_3 - quartile_1
@@ -381,6 +386,24 @@ class Holoview:
         return hv.HeatMap(df, kdims=['Gene', 'Tissue'], vdims=['L2FC']).opts(self._gene_de_heatmap_opts)
 
     # Misc plots
+    def dist_with_iqr_bounds(self, ys, kdim):
+        """
+        Creates distribution object with IQR bounds
+
+        :param list ys: List of values to calculate IQR and bounds
+        :param str kdims: K-dimension label for distribution
+        :return: Distribution with IQR bounds
+        :rtype: hv.Overlay
+        """
+        # Calculate IQR and outlier bounds
+        q25, q75 = np.percentile(ys, [25, 75])
+        upper, lower = self.iqr_bounds(ys)
+
+        # Return dist with spikes
+        return hv.Overlay(hv.Distribution(ys, kdims=[kdim]),
+                          hv.Spikes([q25, q75]),
+                          hv.Spikes[lower, upper]).opts(self._dist_with_iqr_bounds_opts)
+
     @staticmethod
     def path_box(xmin, xmax, ymin, ymax, color=None):
         """

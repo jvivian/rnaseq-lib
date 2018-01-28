@@ -33,7 +33,7 @@ sample_count_opts = {
 }
 
 l2fc_by_perc_samples_opts = {
-    #'Curve': {'plot': dict(tools=['hover']),
+    # 'Curve': {'plot': dict(tools=['hover']),
     #         'style': dict(color=hv.Cycle(values=color_sequence))},
     'Area': {'style': dict(alpha=0.25)},
     'Overlay': {'plot': dict(legend_position='left', width=500)},
@@ -43,4 +43,8 @@ l2fc_by_perc_samples_opts = {
 
 de_concordance_opts = {
     'HeatMap': {'plot': dict(width=700, height=500, xrotation=45, colorbar=True, toolbar='above', tools=['hover'])}
+}
+
+dist_with_iqr_bounds_opts = {
+    'Spikes': {'style': dict(line_color=hv.Cycle(), line_width=5, line_alpha=0.5)}
 }
