@@ -11,6 +11,7 @@ import rnaseq_lib.jupyter
 
 import rnaseq_lib.plot
 import rnaseq_lib.plot.opts
+import rnaseq_lib.plot.sankey
 
 import rnaseq_lib.tissues
 
