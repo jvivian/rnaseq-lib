@@ -9,13 +9,13 @@ import holoviews as hv
 import numpy as np
 import param
 from holoviews import Operation
-
-hv.extension('bokeh')
-
-from collections import defaultdict
-
 from holoviews.core.util import basestring, max_range
 from holoviews.element.graphs import Graph, Nodes, EdgePaths, Dataset, redim_graph
+from holoviews.plotting.bokeh import GraphPlot
+from bokeh.models import Patches
+
+
+# hv.extension('bokeh')
 
 
 class Sankey(Graph):
@@ -55,10 +55,6 @@ class Sankey(Graph):
             self._sankey = None
         self._validate()
         self.redim = redim_graph(self, mode='dataset')
-
-
-from holoviews.plotting.bokeh import GraphPlot
-from bokeh.models import Patches
 
 
 class SankeyPlot(GraphPlot):
@@ -142,15 +138,15 @@ class SankeyPlot(GraphPlot):
         super(SankeyPlot, self)._postprocess_hover(renderer, source)
 
 
-hv.Store.register({Sankey: SankeyPlot}, 'bokeh')
-
-options = hv.Store.options('bokeh')
-
-options.Sankey = hv.Options('plot', xaxis=None, yaxis=None, inspection_policy='edges',
-                            selection_policy='nodes', width=1000, height=600, show_frame=False)
-options.Sankey = hv.Options('style', node_line_alpha=0, node_nonselection_alpha=0.2, node_size=10,
-                            edge_nonselection_alpha=0.2, edge_line_alpha=0, edge_fill_alpha=0.8,
-                            label_text_font_size='8pt')
+# hv.Store.register({Sankey: SankeyPlot}, 'bokeh')
+#
+# options = hv.Store.options('bokeh')
+#
+# options.Sankey = hv.Options('plot', xaxis=None, yaxis=None, inspection_policy='edges',
+#                             selection_policy='nodes', width=1000, height=600, show_frame=False)
+# options.Sankey = hv.Options('style', node_line_alpha=0, node_nonselection_alpha=0.2, node_size=10,
+#                             edge_nonselection_alpha=0.2, edge_line_alpha=0, edge_fill_alpha=0.8,
+#                             label_text_font_size='8pt')
 
 
 def weightedSource(link):
