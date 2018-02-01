@@ -591,12 +591,11 @@ class Holoview:
                           label='Differential Expression Gene Concordance').opts(self._de_concordance_opts)
 
     # Dimensionality Reduction
-    def trimap(self, genes, title, tissue_subset=None, num_neighbors=50):
+    def trimap(self, genes, tissue_subset=None, num_neighbors=50):
         """
         Dimensionality reduction via Trimap
 
         :param list(str) genes: List of genes to subset by
-        :param str title: Title of plot
         :param list(str) tissue_subset: List of tissues to subset by
         :param int num_neighbors: Hyperparameter for trimap
         :return: Scatterplot of dimensionality reduction
@@ -616,15 +615,13 @@ class Holoview:
         df['x'] = z[:, 0]
         df['y'] = z[:, 1]
 
-        return hv.Scatter(df, kdims=['x'], vdims=['y'] + self.df_cols,
-                          group=title).opts(self._dr_opts)
+        return hv.Scatter(df, kdims=['x'], vdims=['y'] + self.df_cols).opts(self._dr_opts)
 
-    def tsne(self, genes, title, tissue_subset=None, perplexity=50, learning_rate=1000):
+    def tsne(self, genes, tissue_subset=None, perplexity=50, learning_rate=1000):
         """
         Dimensionality reduction via t-SNE
 
         :param list(str) genes: List of genes to subset by
-        :param str title: Title of plot
         :param list(str) tissue_subset: List of tissues to subset by
         :param int perplexity: Hyperparamter for t-SNE
         :param int learning_rate: Hyperparamter for t-SNE
@@ -645,5 +642,4 @@ class Holoview:
         df['x'] = z[:, 0]
         df['y'] = z[:, 1]
 
-        return hv.Scatter(df, kdims=['x'], vdims=['y'] + self.df_cols,
-                          group=title).opts(self._dr_opts)
+        return hv.Scatter(df, kdims=['x'], vdims=['y'] + self.df_cols).opts(self._dr_opts)
