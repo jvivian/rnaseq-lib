@@ -536,12 +536,14 @@ class Holoview:
         """
         Bargraph of tissues grouped by dataset
 
-        :return:
+        :return: Bargraph of sample counts
+        :rtype: hv.Bars
         """
         df = self._sample_counts_df()
 
         # Return Bars object of sample counts
-        return hv.Bars(df, kdims=['Tissue', 'Label'], vdims=['Count']).opts(self._sample_count_opts)
+        return hv.Bars(df, kdims=['Tissue', 'Label'], vdims=['Count'],
+                       title='Sample Counts for TCGA and GTEx').opts(self._sample_count_opts)
 
     def differential_expression_tissue_concordance(self):
         """
@@ -581,14 +583,14 @@ class Holoview:
                     if len(n) > 0:
                         nmed = n[n.columns[i:]].median()
                         tn = log2fc(tmed, nmed)
-                        records.append((tissue1, '{}-tcga'.format(tissue2), round(pearsonr(master_tn, tn)[0], 2)))
+                        records.append((tissue1, '{}-TCGA'.format(tissue2), round(pearsonr(master_tn, tn)[0], 2)))
 
         # Construct dataframe
         df = pd.DataFrame.from_records(records, columns=['Tissue-Tumor/Normal', 'Tissue-Normal', 'PearsonR'])
 
         # Return HeatMap object
         return hv.HeatMap(df, kdims=['Tissue-Tumor/Normal', 'Tissue-Normal'], vdims=['PearsonR'],
-                          label='Differential Expression Gene Concordance').opts(self._de_concordance_opts)
+                          label='Differential Expression Gene Concordance (PearsonR)').opts(self._de_concordance_opts)
 
     # Dimensionality Reduction
     def trimap(self, genes, tissue_subset=None, num_neighbors=50):
