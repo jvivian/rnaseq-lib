@@ -37,24 +37,9 @@ class Holoview:
         self._dr_opts = dr_opts
 
     # Internal methods
-    def _subset(self, gene, tissue=None):
-        """
-        Subset dataframe by gene and tissue with default columns `self.df_cols`
-
-        :param str gene: Gene (ex: ERBB2) to select
-        :param str tissue: Tissue (ex: Breast) to select
-        :return: Subset dataframe
-        :rtype: pd.DataFrame
-        """
-        df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
-        if tissue:
-            return df[df.tissue == tissue]
-        else:
-            return df
-
-    def _subset_by_tissues(self, gene, tissue_subset):
+    def _subset(self, genes, tissue_subset=None):
         # Subset dataframe by gene
-        df = self.df[self.df_cols + [gene]].sort_values(gene, ascending=False)
+        df = self.df[self.df_cols + genes]
 
         # Subset by tissues
         if tissue_subset:
@@ -63,7 +48,7 @@ class Holoview:
 
     def _gene_cutoff(self, gene, tissue, percent):
         # Subset dataframe by tissue and gene
-        df = self._subset(gene, tissue)
+        df = self._subset([gene], [tissue])
 
         # Subset by dataset
         tumor, normal, gtex = subset_by_dataset(df)
@@ -138,7 +123,7 @@ class Holoview:
         """
 
         # Subset by gene and tissue
-        df = self._subset_by_tissues(gene, tissue_subset)
+        df = self._subset(gene, tissue_subset)
 
         # Calculate upper and lower bounds across all tissues
         upper, lower = self.iqr_bounds(df[df.tumor == 'no'][gene].apply(self.l2norm))
@@ -175,10 +160,7 @@ class Holoview:
         :rtype: hv.Overlay
         """
         # Subset dataframe by tissue and gene
-        if tissue_subset:
-            df = self._subset_by_tissues(gene, tissue_subset)
-        else:
-            df = self._subset(gene)
+        df = self._subset([gene], tissue_subset)
 
         # Subset by dataset
         t, n, g = subset_by_dataset(df)
@@ -207,7 +189,7 @@ class Holoview:
         :rtype: hv.BoxWhisker
         """
         # Subset dataframe by gene
-        df = self._subset_by_tissues(gene, tissue_subset)
+        df = self._subset([gene], tissue_subset)
 
         # Normalize gene expression
         df[gene] = df[gene].apply(lambda x: np.log2(x + 1))
@@ -218,6 +200,15 @@ class Holoview:
                              label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
 
     # Differential Expression
+    def tissue_de(self, tissue, tgca_normal):
+        """
+
+        :param tissue:
+        :param tgca_normal:
+        :return:
+        """
+        df =
+
     def gene_de(self, gene, tissue_subset=None, extents=None, tcga_normal=False):
         """
         Scatter plot of differential expression across all tissues
@@ -230,7 +221,7 @@ class Holoview:
         :rtype: hv.Scatter
         """
         # Subset dataframe by gene and tissue subset
-        df = self._subset_by_tissues(gene, tissue_subset)
+        df = self._subset([gene], tissue_subset)
 
         # For each tissue, calculate L2FC and mean expression
         records = []
@@ -274,7 +265,7 @@ class Holoview:
         :rtype: hv.Overlay
         """
         # Subset dataframe by gene and tissue subset
-        df = self._subset_by_tissues(gene, tissue_subset)
+        df = self._subset([gene], tissue_subset)
 
         # Subset by dataset
         tumor, normal, gtex = subset_by_dataset(df)
@@ -314,7 +305,7 @@ class Holoview:
         :rtype: hv.Overlay
         """
         # Subset dataframe by gene and tissue subset
-        df = self._subset_by_tissues(gene, tissue_subset)
+        df = self._subset([gene], tissue_subset)
 
         # Subset by dataset
         tumor, normal, gtex = subset_by_dataset(df)
@@ -466,7 +457,7 @@ class Holoview:
         :rtype: hv.Layout
         """
         # Subset dataframe for gene and tissue
-        df = self._subset(gene, tissue)
+        df = self._subset([gene], [tissue])
 
         # Logscale gene for calculations
         df[gene] = df[gene].apply(lambda x: np.log2(x + 1))
