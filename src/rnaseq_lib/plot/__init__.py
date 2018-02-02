@@ -35,11 +35,19 @@ class Holoview:
         self._de_concordance_opts = de_concordance_opts
         self._dist_with_iqr_bounds_opts = dist_with_iqr_bounds_opts
         self._dr_opts = dr_opts
+        # Hacky, but OR4F5 is the first gene in the dataframe
+        try:
+            self._gene_start = self.df.columns.tolist().index('OR4F5')
+        except ValueError:
+            pass
 
     # Internal methods
-    def _subset(self, genes, tissue_subset=None):
+    def _subset(self, genes=None, tissue_subset=None):
         # Subset dataframe by gene
-        df = self.df[self.df_cols + genes]
+        if genes:
+            df = self.df[self.df_cols + genes]
+        else:
+            df = self.df
 
         # Subset by tissues
         if tissue_subset:
@@ -200,14 +208,43 @@ class Holoview:
                              label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
 
     # Differential Expression
-    def tissue_de(self, tissue, tgca_normal):
+    def tissue_de(self, tissue, tcga_normal):
         """
+        Differential expression for a given tissue
 
-        :param tissue:
-        :param tgca_normal:
-        :return:
+        :param str tissue: Tissue to subset by
+        :param bool tgca_normal: If True, uses TCGA normal for DE comparison
+        :return: Scatterplot of DE
+        :rtype: hv.Scatter
         """
-        df =
+        # Subset by tissue
+        df = self._subset(genes=None, tissue_subset=[tissue])
+
+        # Subset by dataset
+        tumor, normal, gtex = subset_by_dataset(df)
+
+        # Subset by genes
+        t_genes = tumor[tumor.columns[self._gene_start:]]
+
+        if tcga_normal:
+            n_genes = normal[normal.columns[self._gene_start:]]
+            label = 'Normal'
+        else:
+            n_genes = gtex[gtex.columns[self._gene_start:]]
+            label = 'GTEx'
+
+        # Calculate total expression
+        exp = pd.concat([t_genes, n_genes]).apply(self.l2norm).median()
+
+        # Calculate L2FC
+        l2fc = log2fc(t_genes.median(), n_genes.median())
+
+        plot = pd.DataFrame()
+        plot['exp'] = exp
+        plot['l2fc'] = l2fc
+        plot.index = exp.index
+        return hv.Scatter(plot, kdims=[hv.Dimension('exp', label='Gene Expression', unit='log2(x+1)')],
+                          vdims=[hv.Dimension('l2fc', label='Log2 Fold Change', unit='log2(Tumor/{})'.format(label))])
 
     def gene_de(self, gene, tissue_subset=None, extents=None, tcga_normal=False):
         """
