@@ -7,6 +7,7 @@ from functools import cmp_to_key
 
 import holoviews as hv
 import numpy as np
+import pandas as pd
 import param
 from bokeh.models import Patches
 from holoviews import Operation
@@ -133,17 +134,6 @@ class SankeyPlot(GraphPlot):
             if isinstance(renderer.glyph, Patches):
                 return
         super(SankeyPlot, self)._postprocess_hover(renderer, source)
-
-
-# hv.Store.register({Sankey: SankeyPlot}, 'bokeh')
-#
-# options = hv.Store.options('bokeh')
-#
-# options.Sankey = hv.Options('plot', xaxis=None, yaxis=None, inspection_policy='edges',
-#                             selection_policy='nodes', width=1000, height=600, show_frame=False)
-# options.Sankey = hv.Options('style', node_line_alpha=0, node_nonselection_alpha=0.2, node_size=10,
-#                             edge_nonselection_alpha=0.2, edge_line_alpha=0, edge_fill_alpha=0.8,
-#                             label_text_font_size='8pt')
 
 
 def weightedSource(link):
@@ -417,3 +407,45 @@ class layout_sankey(Operation):
 
 # Register Sankey with holoviews
 hv.Store.register({Sankey: SankeyPlot}, 'bokeh')
+
+# Convenience function for adding links
+def make_links(df, groups):
+    """
+    Makes links given a set of groups and a dataframe
+
+    :param pd.DataFrame df: Input dataframe containing groups
+    :param list groups: List of groups to link
+    :return: DataFrame of links
+    :rtype: pd.DataFrame
+    """
+    links = []
+    for i in xrange(len(groups) - 1):
+        links.extend(_add_links(df.groupby(groups[i])[groups[i + 1]].value_counts().iteritems()))
+    return pd.DataFrame(links)
+
+def _add_links(iteritems):
+    links = []
+    type_count = 0
+    current_type = None
+
+    for pair, count in iteritems:
+        source, target = pair
+
+        # Track type by grouping samples by "source"
+        if source != current_type:
+            current_type = source
+            type_count += 1
+        links.append({'source': source, 'target': target, 'value': count})#, 'type': type_count})
+    return links
+
+def sankey_tissue(df, tissues, groups):
+    """Sankey Diagram subset by tissue"""
+    sub = df[df.Tissue.isin(tissues)]
+    links = make_links(sub, groups)
+    return Sankey((pd.DataFrame(links))).redim(source='Source', target='Target', value='Count')
+
+def sankey_drugs(df, drugs, groups):
+    """Sankey Diagram subset by drugs"""
+    sub = df[df.Name.isin(drugs)]
+    links = make_links(sub, groups)
+    return Sankey((pd.DataFrame(links))).redim(source='Source', target='Target', value='Count')
