@@ -8,14 +8,11 @@ from functools import cmp_to_key
 import holoviews as hv
 import numpy as np
 import param
+from bokeh.models import Patches
 from holoviews import Operation
 from holoviews.core.util import basestring, max_range
 from holoviews.element.graphs import Graph, Nodes, EdgePaths, Dataset, redim_graph
 from holoviews.plotting.bokeh import GraphPlot
-from bokeh.models import Patches
-
-
-# hv.extension('bokeh')
 
 
 class Sankey(Graph):
@@ -416,3 +413,7 @@ class layout_sankey(Operation):
             for link in node['targetLinks']:
                 link['y1'] = y1
                 y1 += link['width']
+
+
+# Register Sankey with holoviews
+hv.Store.register({Sankey: SankeyPlot}, 'bokeh')
