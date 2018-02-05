@@ -60,11 +60,13 @@ class SankeyPlot(GraphPlot):
                                       allow_None=True, doc="""
         Index of the dimension from which the node labels will be drawn""")
 
+    filled = True
+
     _style_groups = dict(GraphPlot._style_groups, quad='nodes', text='label')
 
     _draw_order = ['patches', 'multi_line', 'text', 'quad']
 
-    style_opts = GraphPlot.style_opts + ['edge_fill_alpha', 'nodes_line_color', 'label_text_font_size']
+    style_opts = GraphPlot.style_opts + ['edge_fill_alpha', 'nodes_line_color', 'label_text_font_size', 'filled']
 
     def _init_glyphs(self, plot, element, ranges, source):
         ret = super(SankeyPlot, self)._init_glyphs(plot, element, ranges, source)
