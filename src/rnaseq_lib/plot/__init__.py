@@ -44,10 +44,7 @@ class Holoview:
     # Internal methods
     def _subset(self, genes=None, tissue_subset=None):
         # Subset dataframe by gene
-        if genes:
-            df = self.df[self.df_cols + genes]
-        else:
-            df = self.df
+        df = self.df[self.df_cols + genes] if genes else self.df
 
         # Subset by tissues
         if tissue_subset:
@@ -208,6 +205,7 @@ class Holoview:
                              label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
 
     # Differential Expression
+    # TODO: Add highlighting for gene-sets (dict?  label: [genes])
     def tissue_de(self, tissue, tcga_normal):
         """
         Differential expression for a given tissue
@@ -571,35 +569,38 @@ class Holoview:
 
         # Return Bars object of sample counts
         return hv.Bars(df, kdims=['Tissue', 'Label'], vdims=['Count'],
-                       title='Sample Counts for TCGA and GTEx').opts(self._sample_count_opts)
+                       label='Sample Counts for TCGA and GTEx').opts(self._sample_count_opts)
 
-    def differential_expression_tissue_concordance(self):
+    def differential_expression_tissue_concordance(self, tissue_subset=None):
         """
         Categorical scatterplot of concordance between tissues for gene differential expression
 
+        :param list tissue_subset: List of tissues to subset by
         :return: Heatmap of differential expression comparison across tissue
         :rtype: hv.HeatMap
         """
+
+        df = self._subset(genes=None, tissue_subset=tissue_subset)
         records = []
-        for tissue1 in sorted(self.df.tissue.unique()):
+        for tissue1 in sorted(df.tissue.unique()):
 
             # Subset by tissue then break apart by dataset
-            t, g, n = subset_by_dataset(self.df[self.df.tissue == tissue1])
+            t, g, n = subset_by_dataset(df[df.tissue == tissue1])
 
             # If there are both normal and gtex samples
             if len(g) > 0 and len(n) > 0:
 
                 # Calculate gene expression average for tumor samples
-                i = self.df.columns.tolist().index('OR4F5')  # Hacky, but OR4F5 is the first gene in the dataframe
+                i = df.columns.tolist().index('OR4F5')  # Hacky, but OR4F5 is the first gene in the dataframe
                 tmed = t[t.columns[i:]].median()
                 nmed = n[n.columns[i:]].median()
                 master_tn = log2fc(tmed, nmed)
 
                 # Iterate over all other tissues to get PearsonR of L2FC
-                for tissue2 in sorted(self.df.tissue.unique()):
+                for tissue2 in sorted(df.tissue.unique()):
 
                     # Subset by second tissue
-                    _, g, n = subset_by_dataset(self.df[self.df.tissue == tissue2])
+                    _, g, n = subset_by_dataset(df[df.tissue == tissue2])
 
                     # If there are GTEx samples, calculate PearsonR to master_tn
                     if len(g) > 0:
