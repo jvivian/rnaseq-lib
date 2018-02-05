@@ -571,7 +571,7 @@ class Holoview:
         return hv.Bars(df, kdims=['Tissue', 'Label'], vdims=['Count'],
                        label='Sample Counts for TCGA and GTEx').opts(self._sample_count_opts)
 
-    def differential_expression_tissue_concordance(self, tissue_subset=None):
+    def differential_expression_tissue_concordance(self, tissue_subset=None, tcga=True, gtex=True):
         """
         Categorical scatterplot of concordance between tissues for gene differential expression
 
@@ -603,13 +603,13 @@ class Holoview:
                     _, g, n = subset_by_dataset(df[df.tissue == tissue2])
 
                     # If there are GTEx samples, calculate PearsonR to master_tn
-                    if len(g) > 0:
+                    if gtex and len(g) > 0:
                         gmed = g[g.columns[i:]].median()
                         tg = log2fc(tmed, gmed)
                         records.append((tissue1, '{}-GTEx'.format(tissue2), round(pearsonr(master_tn, tg)[0], 2)))
 
                     # If there are normal samples, calculate PearsonR to master_tn
-                    if len(n) > 0:
+                    if tcga and len(n) > 0:
                         nmed = n[n.columns[i:]].median()
                         tn = log2fc(tmed, nmed)
                         records.append((tissue1, '{}-TCGA'.format(tissue2), round(pearsonr(master_tn, tn)[0], 2)))
