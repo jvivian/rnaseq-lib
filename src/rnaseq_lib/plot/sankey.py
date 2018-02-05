@@ -60,7 +60,7 @@ class SankeyPlot(GraphPlot):
                                       allow_None=True, doc="""
         Index of the dimension from which the node labels will be drawn""")
 
-    filled = True
+    #filled = True
 
     _style_groups = dict(GraphPlot._style_groups, quad='nodes', text='label')
 
