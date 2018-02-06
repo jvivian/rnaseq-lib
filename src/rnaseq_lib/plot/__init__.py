@@ -250,12 +250,15 @@ class Holoview:
         # Apply label column
         if gene_labels:
             label_vector = ['Other' for _ in plot.index]
+            size_vector = [0 for _ in plot.index]
             for k, v in gene_labels.iteritems():
                 for i in xrange(len(plot.index)):
                     if plot.index[i] in v:
                         label_vector[i] = k
+                        size_vector[i] = 5
             plot['label'] = label_vector
-            vdims = [vdim] + ['label']
+            plot['size'] = size_vector
+            vdims = [vdim] + ['label', 'size']
         else:
             vdims = [vdim]
 
