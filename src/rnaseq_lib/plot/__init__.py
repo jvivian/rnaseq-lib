@@ -609,11 +609,10 @@ class Holoview:
                         records.append((tissue1, '{}-GTEx'.format(tissue2), round(pearsonr(master_tn, tg)[0], 2)))
 
                     # If there are normal samples, calculate PearsonR to master_tn
-                    if tcga or tissue2 == tissue1:
-                        if len(n) > 0:
-                            nmed = n[n.columns[i:]].median()
-                            tn = log2fc(tmed, nmed)
-                            records.append((tissue1, '{}-TCGA'.format(tissue2), round(pearsonr(master_tn, tn)[0], 2)))
+                    if tcga and len(n) > 0:
+                        nmed = n[n.columns[i:]].median()
+                        tn = log2fc(tmed, nmed)
+                        records.append((tissue1, '{}-TCGA'.format(tissue2), round(pearsonr(master_tn, tn)[0], 2)))
 
 
         # Construct dataframe
