@@ -245,6 +245,7 @@ class Holoview:
         plot = pd.DataFrame()
         plot['exp'] = exp
         plot['l2fc'] = l2fc
+        plot['gene'] = exp.index
         plot.index = exp.index
 
         # Apply label column
@@ -258,9 +259,9 @@ class Holoview:
                         size_vector[i] = 5
             plot['label'] = label_vector
             plot['size'] = size_vector
-            vdims = [vdim] + ['label', 'size']
+            vdims = [vdim] + ['gene', 'label', 'size']
         else:
-            vdims = [vdim]
+            vdims = [vdim, 'gene']
 
         return hv.Scatter(plot, kdims=kdims, vdims=vdims).opts(self._tissue_de_opts)
 
