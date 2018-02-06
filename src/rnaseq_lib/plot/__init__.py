@@ -259,7 +259,7 @@ class Holoview:
         else:
             vdims = [vdim]
 
-        return hv.Scatter(plot, kdims=kdims, vdims=vdims).self._tissue_de_opts
+        return hv.Scatter(plot, kdims=kdims, vdims=vdims).opts(self._tissue_de_opts)
 
     def gene_de(self, gene, tissue_subset=None, extents=None, tcga_normal=False):
         """
