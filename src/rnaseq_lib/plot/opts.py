@@ -54,3 +54,7 @@ dr_opts = {
     'Scatter': {'plot': dict(width=800, height=500, legend_position='left', tools=['hover']),
                 'style': dict(cmap=color_sequence)}
 }
+
+tissue_de_opts = {
+    'Scatter': {'plot': dict(width=800, height=500, legend_position='left', tools=['hover'])}
+}

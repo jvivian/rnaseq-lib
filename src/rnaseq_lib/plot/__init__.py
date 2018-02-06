@@ -35,6 +35,7 @@ class Holoview:
         self._de_concordance_opts = de_concordance_opts
         self._dist_with_iqr_bounds_opts = dist_with_iqr_bounds_opts
         self._dr_opts = dr_opts
+        self._tissue_de_opts = tissue_de_opts
         # Hacky, but OR4F5 is the first gene in the dataframe
         try:
             self._gene_start = self.df.columns.tolist().index('OR4F5')
@@ -206,7 +207,7 @@ class Holoview:
 
     # Differential Expression
     # TODO: Add highlighting for gene-sets (dict?  label: [genes])
-    def tissue_de(self, tissue, tcga_normal):
+    def tissue_de(self, tissue, tcga_normal=None, gene_labels=None):
         """
         Differential expression for a given tissue
 
@@ -237,12 +238,28 @@ class Holoview:
         # Calculate L2FC
         l2fc = log2fc(t_genes.median(), n_genes.median())
 
+        # Define dimensions
+        kdims = [hv.Dimension('exp', label='Gene Expression', unit='log2(x+1)')]
+        vdim = hv.Dimension('l2fc', label='Log2 Fold Change', unit='log2(Tumor/{})'.format(label))
+
         plot = pd.DataFrame()
         plot['exp'] = exp
         plot['l2fc'] = l2fc
         plot.index = exp.index
-        return hv.Scatter(plot, kdims=[hv.Dimension('exp', label='Gene Expression', unit='log2(x+1)')],
-                          vdims=[hv.Dimension('l2fc', label='Log2 Fold Change', unit='log2(Tumor/{})'.format(label))])
+
+        # Apply label column
+        if gene_labels:
+            label_vector = [np.nan for _ in plot.index]
+            for k, v in gene_labels.iteritems():
+                for i in xrange(len(plot.index)):
+                    if plot.index[i] in v:
+                        label_vector[i] = k
+            plot['label'] = label_vector
+            vdims = [vdim] + ['label']
+        else:
+            vdims = [vdim]
+
+        return hv.Scatter(plot, kdims=kdims, vdims=vdims).self._tissue_de_opts
 
     def gene_de(self, gene, tissue_subset=None, extents=None, tcga_normal=False):
         """
