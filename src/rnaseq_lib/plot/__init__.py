@@ -249,7 +249,7 @@ class Holoview:
 
         # Apply label column
         if gene_labels:
-            label_vector = [np.nan for _ in plot.index]
+            label_vector = ['Other' for _ in plot.index]
             for k, v in gene_labels.iteritems():
                 for i in xrange(len(plot.index)):
                     if plot.index[i] in v:
