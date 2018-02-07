@@ -198,7 +198,7 @@ class Holoview:
         df = self._subset([gene], tissue_subset)
 
         # Normalize gene expression
-        df[gene] = df[gene].apply(lambda x: np.log2(x + 1))
+        df[gene] = df[gene].apply(self.l2norm)
 
         # Return grouped box and whiskers:
         return hv.BoxWhisker((df.tissue, df['labels'], df[gene]), kdims=['Tissue', 'Dataset'],
@@ -207,11 +207,12 @@ class Holoview:
 
     # Differential Expression
     # TODO: Add highlighting for gene-sets (dict?  label: [genes])
-    def tissue_de(self, tissue, tcga_normal=None, gene_labels=None):
+    def tissue_de(self, tissue, extents=None, tcga_normal=None, gene_labels=None):
         """
         Differential expression for a given tissue
 
         :param str tissue: Tissue to subset by
+        :param tuple extents: xmin/ymin/xmax/ymax values
         :param bool tgca_normal: If True, uses TCGA normal for DE comparison
         :return: Scatterplot of DE
         :rtype: hv.Scatter
@@ -263,7 +264,11 @@ class Holoview:
         else:
             vdims = [vdim, 'gene']
 
-        return hv.Scatter(plot, kdims=kdims, vdims=vdims).opts(self._tissue_de_opts)
+        if extents:
+            return hv.Scatter(plot, kdims=kdims, vdims=vdims, extents=extents).opts(self._tissue_de_opts)
+        else:
+            return hv.Scatter(plot, kdims=kdims, vdims=vdims).opts(self._tissue_de_opts)
+
 
     def gene_de(self, gene, tissue_subset=None, extents=None, tcga_normal=False):
         """
