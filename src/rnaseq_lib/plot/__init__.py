@@ -185,12 +185,13 @@ class Holoview:
         # Combine into Overlay object
         return hv.Overlay(dists, label='{} Expression'.format(gene)).opts(self._gene_kde_opts)
 
-    def gene_distribution(self, gene, tissue_subset=None):
+    def gene_distribution(self, gene, tissue_subset=None, types=None):
         """
         Box and Whisker expression distribution across tissues
 
         :param str gene: Gene (ex: ERBB2) to select
         :param list tissue_subset: List of tissues to subset by
+        :param bool types: If True, uses tissue/cancer subtype instead of Tissue label
         :return: Returns holoviews BoxWhisker object
         :rtype: hv.BoxWhisker
         """
@@ -200,13 +201,15 @@ class Holoview:
         # Normalize gene expression
         df[gene] = df[gene].apply(self.l2norm)
 
+        # Subgroup labeling
+        subgroup = df['type'] if types else df.tissue
+
         # Return grouped box and whiskers:
-        return hv.BoxWhisker((df.tissue, df['labels'], df[gene]), kdims=['Tissue', 'Dataset'],
+        return hv.BoxWhisker((subgroup, df['labels'], df[gene]), kdims=['Tissue', 'Dataset'],
                              vdims=[hv.Dimension('Gene Expression', unit='log2(x+1)')],
                              label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
 
     # Differential Expression
-    # TODO: Add highlighting for gene-sets (dict?  label: [genes])
     def tissue_de(self, tissue, extents=None, tcga_normal=None, gene_labels=None):
         """
         Differential expression for a given tissue
@@ -521,7 +524,7 @@ class Holoview:
         df = self._subset([gene], [tissue])
 
         # Logscale gene for calculations
-        df[gene] = df[gene].apply(lambda x: np.log2(x + 1))
+        df[gene] = df[gene].apply(self.l2norm)
 
         # Subset by dataset
         tumor, normal, gtex = subset_by_dataset(df)
