@@ -199,13 +199,13 @@ class Holoview:
         df = self._subset([gene], tissue_subset)
 
         # Normalize gene expression
-        df[gene] = df[gene].apply(self.l2norm)
+        norm_exp = df[gene].apply(self.l2norm)
 
         # Subgroup labeling
         subgroup = df['type'] if types else df.tissue
 
         # Return grouped box and whiskers:
-        return hv.BoxWhisker((subgroup, df['labels'], df[gene]), kdims=['Tissue', 'Dataset'],
+        return hv.BoxWhisker((subgroup, df['labels'], norm_exp), kdims=['Tissue', 'Dataset'],
                              vdims=[hv.Dimension('Gene Expression', unit='log2(x+1)')],
                              label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
 
