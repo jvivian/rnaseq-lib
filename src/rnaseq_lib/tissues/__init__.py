@@ -1,5 +1,6 @@
 import os
 import re
+from collections import defaultdict
 
 import pandas as pd
 
@@ -8,7 +9,6 @@ from rnaseq_lib.gtf import get_protein_coding_genes
 from rnaseq_lib.utils import flatten
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-
 
 # dtype for metadata-expression dataframe
 dtype = {'id': object,
@@ -230,3 +230,29 @@ def subset_protein_coding_genes(df, gtf_path):
     """
     genes = get_protein_coding_genes(gtf_path)
     return df.loc[genes]
+
+
+def parse_pathway(filepath):
+    """
+    Parses source -> targets TSV and returns mapping dictionaries
+
+    :param str filepath: File path to pathway TSV
+    :return:  Source and Target mappings
+    :rtype: tuple(dict(str, list), dict(str, list))
+    """
+    source_targets = {}
+    target_sources = defaultdict(list)
+
+    # Parse pathway file to generate first dict
+    with open(filepath, 'r') as f:
+        f.readline()
+        for line in f:
+            line = line.split()
+            tf, targets = line[0], line[1:]
+            source_targets[tf] = targets
+
+    for tf, targets in source_targets.iteritems():
+        for target in targets:
+            target_sources[target].append(tf)
+
+    return source_targets, target_sources
