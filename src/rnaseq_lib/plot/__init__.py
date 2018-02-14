@@ -409,6 +409,15 @@ class Holoview:
         return overlay.opts(self._l2fc_by_perc_samples_opts)
 
     def gene_de_heatmap(self, genes, tissue_subset=None, tcga_normal=False):
+        """
+        Heatmap of gene log2 fold change
+
+        :param str gene: Gene (ex: ERBB2) to select
+        :param list tissue_subset: List of tissues to subset by
+        :param bool tcga_normal: If True, use TCGA normal to for DE calc, otherwise use GTEx
+        :return: DE Heatmap of genes for tissue subset
+        :rtype: hv.HeatMap
+        """
         # Subset dataframe by genes
         df = self.df[self.df_cols + genes]
 
