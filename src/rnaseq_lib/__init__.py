@@ -13,6 +13,8 @@ import rnaseq_lib.plot
 import rnaseq_lib.plot.opts
 # import rnaseq_lib.plot.sankey  # Causing import issues, import manually where needed
 
+import rnaseq_lib.ml
+
 import rnaseq_lib.tissues
 
 import rnaseq_lib.utils
