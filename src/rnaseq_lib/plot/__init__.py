@@ -66,20 +66,24 @@ class Holoview:
         # Return mapping of dataset to cutoff
         return {x: y for x, y in zip(['tumor', 'normal', 'gtex'], cutoffs)}
 
-    def _sample_counts_df(self):
+    def _sample_counts_df(self, include_gtex=True):
         """
         Compute sample counts and returns dataframe
 
+        :param bool include_gtex: If True, includes GTEx in returned sample counts
         :return: Sample counts for tissues and datasets
         :rtype: pd.DataFrame
         """
         # Subset by dataset
         tumor, normal, gtex = subset_by_dataset(self.df)
 
+        dfs = [tumor, normal, gtex] if include_gtex else [tumor, normal]
+        labels = ['tcga-tumor', 'tcga-normal', 'gtex'] if include_gtex else ['tcga-tumor', 'tcga-normal']
+
         # Count samples for each tissue
         records = []
         for tissue in sorted(self.df.tissue.unique()):
-            for df, label in zip([tumor, normal, gtex], ['tcga-tumor', 'tcga-normal', 'gtex']):
+            for df, label in zip(dfs, labels):
                 count = len(df[df.tissue == tissue])
                 if count:
                     records.append([tissue, label, count])
@@ -596,14 +600,15 @@ class Holoview:
 
         return (c1 * s1 + c2 * s2 + c3 * s3).cols(1)
 
-    def sample_counts(self):
+    def sample_counts(self, include_gtex=True):
         """
         Bargraph of tissues grouped by dataset
 
+        :param bool include_gtex: If True, GTEx is included in sample counts
         :return: Bargraph of sample counts
         :rtype: hv.Bars
         """
-        df = self._sample_counts_df()
+        df = self._sample_counts_df(include_gtex=include_gtex)
 
         # Return Bars object of sample counts
         return hv.Bars(df, kdims=['Tissue', 'Label'], vdims=['Count'],
