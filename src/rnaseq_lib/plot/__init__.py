@@ -722,3 +722,5 @@ class Holoview:
 
 def disable_logo(plot, element):
     plot.state.toolbar.logo = None
+
+hv.plotting.bokeh.ElementPlot.finalize_hooks.append(disable_logo)
