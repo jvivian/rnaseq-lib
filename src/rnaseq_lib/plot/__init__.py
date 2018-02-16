@@ -608,7 +608,7 @@ class Holoview:
         :return: Bargraph of sample counts
         :rtype: hv.Bars
         """
-        df = self._sample_counts_df(include_gtex=include_gtex)
+        df = self._sample_counts_df(include_gtex=include_gtex).sort_values('Label', ascending=False)
 
         # Return Bars object of sample counts
         return hv.Bars(df, kdims=['Tissue', 'Label'], vdims=['Count'],
