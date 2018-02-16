@@ -85,8 +85,7 @@ class Holoview:
         for tissue in sorted(self.df.tissue.unique()):
             for df, label in zip(dfs, labels):
                 count = len(df[df.tissue == tissue])
-                if count:
-                    records.append([tissue, label, count])
+                records.append([tissue, label, count])
 
         # Create dataframe
         return pd.DataFrame.from_records(records, columns=['Tissue', 'Label', 'Count']).sort_values(['Tissue', 'Label'])
