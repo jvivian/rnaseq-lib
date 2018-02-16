@@ -3,11 +3,12 @@ from __future__ import division
 import holoviews as hv
 import numpy as np
 import pandas as pd
+from scipy.stats import pearsonr
+
 from rnaseq_lib.diff_exp import log2fc
 from rnaseq_lib.dim_red import run_tsne, run_tete
 from rnaseq_lib.plot.opts import *
 from rnaseq_lib.tissues import subset_by_dataset
-from scipy.stats import pearsonr
 
 
 class Holoview:
@@ -717,3 +718,7 @@ class Holoview:
         df['y'] = z[:, 1]
 
         return hv.Scatter(df, kdims=['x'], vdims=['y'] + self.df_cols).opts(self._dr_opts)
+
+
+def disable_logo(plot, element):
+    plot.state.toolbar.logo = None
