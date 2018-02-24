@@ -163,7 +163,7 @@ def deseq2_normalize(df_path,
                      map_gene_names=True,
                      clean_workdir=True,
                      normalize_fn=None,
-                     suffix='deseq2-normalized.tsv'):
+                     suffix='.deseq2-normalized.tsv'):
     """
     Accepts a gene by sample expression matrix normalized values with DESeq2
     Output filename: <INPUT>.deseq2-normalized.tsv
