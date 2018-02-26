@@ -457,6 +457,27 @@ class Holoview:
 
         return hv.HeatMap(df, kdims=['Gene', 'Tissue'], vdims=['L2FC']).opts(self._gene_de_heatmap_opts)
 
+    def tissue_top_de_genes(self, tissue):
+        # Create DE objects to get data
+        gtex = self.tissue_de(tissue).data
+        tcga = self.tissue_de(tissue, tcga_normal=True).data
+
+        intervals = [10, 100, 500, 1000, 5000, 10000, max(self.genes)]
+
+        # Top DE genes with high expression
+        hmaps = {}
+        for i in intervals:
+            x = gtex[gtex.exp > gtex.exp.median()].sort_values('l2fc', ascending=False).l2fc.tolist()[:i]
+            y = tcga[tcga.exp > tcga.exp.median()].sort_values('l2fc', ascending=False).l2fc.tolist()[:i]
+
+            scatter = hv.Scatter((x, y), kdims=['GTEx L2FC'], vdims=['TCGA L2FC'])
+            reg_line = hv.Curve(self.regression_line(x, y))
+            pearson_r = round(pearsonr(x, y)[0], 2)
+
+            title = 'R: {}'.format(pearson_r)
+            hmaps[i] = hv.Layout([scatter, reg_line]).relabel(title)
+        return hv.HoloMap(hmaps, kdims='Num_Genes').relabel('Top DE Gene L2FC in {}'.format(tissue))
+
     # Misc plots
     def dist_with_iqr_bounds(self, ys, kdim):
         """
@@ -475,6 +496,20 @@ class Holoview:
         return hv.Overlay([hv.Distribution(ys, kdims=[kdim]),
                            hv.Spikes([q25, q75]),
                            hv.Spikes([lower, upper])]).opts(self._dist_with_iqr_bounds_opts)
+
+    @staticmethod
+    def regression_line(x, y):
+        """
+        Returns x/y vectors of a regression line for 2D input
+
+        :param np.array x: Vector of x values
+        :param np.array y: Vector of y values
+        :return: Regression line vectors
+        :rtype: tuple(np.array, np.array)
+        """
+        m, b = np.polyfit(x, y, 1)
+        reg_x = np.arange(min(x), max(x))
+        return reg_x, m * reg_x + b
 
     @staticmethod
     def path_box(xmin, xmax, ymin, ymax, color=None):
