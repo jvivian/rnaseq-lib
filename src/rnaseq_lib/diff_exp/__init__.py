@@ -184,7 +184,7 @@ def deseq2_normalize(df_path,
 
     # Write out pseudo-vector
     # Tested that results are the same regardless of vector grouping
-    samples = [x.strip() for x in open(df_path, 'r').readline().split()[1:]]
+    samples = [x.strip() for x in open(df_path, 'r').readline().split()]
     tissue_vector = os.path.join(work_dir, 'tissue.vector')
     with open(tissue_vector, 'w') as f:
         f.write('\n'.join(samples))
