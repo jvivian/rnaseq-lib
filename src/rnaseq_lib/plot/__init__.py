@@ -464,6 +464,9 @@ class Holoview:
 
         intervals = [10, 100, 500, 1000, 5000, 10000, len(self.genes)]
 
+        # Calculate maximum arange for plot
+        reg_line_arange = gtex[gtex.exp > gtex.exp.median()].sort_values('l2fc', ascending=False).l2fc.tolist()
+
         # Top DE genes with high expression
         hmaps = {}
         for i in intervals:
@@ -471,7 +474,7 @@ class Holoview:
             y = tcga[tcga.exp > tcga.exp.median()].sort_values('l2fc', ascending=False).l2fc.tolist()[:i]
 
             scatter = hv.Scatter((x, y), kdims=['GTEx L2FC'], vdims=['TCGA L2FC'])
-            reg_line = hv.Curve(self.regression_line(x, y))
+            reg_line = hv.Curve(self.regression_line(x, y, arange=reg_line_arange))
             pearson_r = round(pearsonr(x, y)[0], 2)
 
             title = 'R: {}'.format(pearson_r)
@@ -498,17 +501,18 @@ class Holoview:
                            hv.Spikes([lower, upper])]).opts(self._dist_with_iqr_bounds_opts)
 
     @staticmethod
-    def regression_line(x, y):
+    def regression_line(x, y, arange=None):
         """
         Returns x/y vectors of a regression line for 2D input
 
         :param np.array x: Vector of x values
         :param np.array y: Vector of y values
+        :param np.array arange: Provide a custom arange to generate regression line
         :return: Regression line vectors
         :rtype: tuple(np.array, np.array)
         """
         m, b = np.polyfit(x, y, 1)
-        reg_x = np.arange(min(x), max(x))
+        reg_x = np.arange(min(arange), max(arange)) if arange else np.arange(min(x), max(x))
         return reg_x, m * reg_x + b
 
     @staticmethod
