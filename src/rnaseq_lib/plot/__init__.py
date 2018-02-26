@@ -276,7 +276,6 @@ class Holoview:
         else:
             return hv.Scatter(plot, kdims=kdims, vdims=vdims).opts(self._tissue_de_opts)
 
-
     def gene_de(self, gene, tissue_subset=None, extents=None, tcga_normal=False):
         """
         Scatter plot of differential expression across all tissues
@@ -723,4 +722,4 @@ class Holoview:
 def disable_logo(plot, element):
     plot.state.toolbar.logo = None
 
-hv.plotting.bokeh.ElementPlot.finalize_hooks.append(disable_logo)
+#hv.plotting.bokeh.ElementPlot.finalize_hooks.append(disable_logo)
