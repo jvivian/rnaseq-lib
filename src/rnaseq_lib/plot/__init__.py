@@ -462,7 +462,7 @@ class Holoview:
         gtex = self.tissue_de(tissue).data
         tcga = self.tissue_de(tissue, tcga_normal=True).data
 
-        intervals = [10, 100, 500, 1000, 5000, 10000, max(self.genes)]
+        intervals = [10, 100, 500, 1000, 5000, 10000, len(self.genes)]
 
         # Top DE genes with high expression
         hmaps = {}
