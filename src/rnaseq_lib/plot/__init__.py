@@ -42,6 +42,7 @@ class Holoview:
         try:
             self._gene_start = self.df.columns.tolist().index('OR4F5')
             self.genes = self.df.columns[self._gene_start:].tolist()
+            self.meta_cols = self.df.columns[:self._gene_start]
         except ValueError:
             self._gene_start = None
             self.genes = None
