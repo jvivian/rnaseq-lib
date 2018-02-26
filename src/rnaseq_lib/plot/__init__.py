@@ -475,7 +475,7 @@ class Holoview:
             pearson_r = round(pearsonr(x, y)[0], 2)
 
             title = 'R: {}'.format(pearson_r)
-            hmaps[i] = hv.Layout([scatter, reg_line]).relabel(title)
+            hmaps[i] = hv.Overlay([scatter, reg_line]).relabel(title)
         return hv.HoloMap(hmaps, kdims='Num_Genes').relabel('Top DE Gene L2FC in {}'.format(tissue))
 
     # Misc plots
