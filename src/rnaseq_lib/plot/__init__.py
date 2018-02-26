@@ -38,10 +38,13 @@ class Holoview:
         self._dr_opts = dr_opts
         self._tissue_de_opts = tissue_de_opts
         # Hacky, but OR4F5 is the first gene in the dataframe
+        self.samples = self.df.index.tolist()
         try:
             self._gene_start = self.df.columns.tolist().index('OR4F5')
+            self.genes = self.df.columns[self._gene_start:].tolist()
         except ValueError:
-            pass
+            self._gene_start = None
+            self.genes = None
 
     # Internal methods
     def _subset(self, genes=None, tissue_subset=None):
