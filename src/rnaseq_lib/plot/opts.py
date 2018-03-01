@@ -59,3 +59,7 @@ tissue_de_opts = {
     'Scatter': {'plot': dict(width=800, height=500, legend_position='left', tools=['hover']),
                 'style': dict(cmap=color_sequence, line_alpha=0, alpha=0.5, size=5)}
 }
+
+#tissue_top_de_genes_opts = {
+#    'Scatter': {'plot': }
+#}

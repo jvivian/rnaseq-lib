@@ -43,10 +43,12 @@ class Holoview:
             self._gene_start = self.df.columns.tolist().index('OR4F5')
             self.genes = self.df.columns[self._gene_start:].tolist()
             self.meta_cols = self.df.columns[:self._gene_start]
+            self.samples = self.df.index.tolist()
         except ValueError:
             self._gene_start = None
             self.genes = None
             self.meta_cols = None
+            self.samples = None
 
         # Internal methods
     def _subset(self, genes=None, tissue_subset=None):
