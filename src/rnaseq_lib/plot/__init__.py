@@ -44,7 +44,7 @@ class Holoview:
             self.genes = self.df.columns[self._gene_start:].tolist()
             self.meta_cols = self.df.columns[:self._gene_start]
             self.samples = self.df.index.tolist()
-            self.tissues = self.df.tissue.unique().tolist()
+            self.tissues = sorted(self.df.tissue.unique().tolist())
         except ValueError:
             self._gene_start = None
             self.genes = None
