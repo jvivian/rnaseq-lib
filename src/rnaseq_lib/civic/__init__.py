@@ -1,9 +1,5 @@
 import pandas as pd
-import progressbar
 import requests
-
-bar = progressbar.ProgressBar()
-
 
 def create_civic_drug_disease_dataframe():
     """
@@ -20,7 +16,7 @@ def create_civic_drug_disease_dataframe():
 
     # Create records in the format:  Cancer, Gene, Drugs, Variant-Name, Aliases, Description
     info = []
-    for record in bar(records):
+    for record in records:
         gene = record['name']
         description = record['description']
         aliases = ','.join(record['aliases'])

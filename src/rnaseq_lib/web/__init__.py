@@ -4,9 +4,6 @@ import mygene
 import requests
 import xmltodict
 from bs4 import BeautifulSoup
-from progressbar import ProgressBar
-
-bar = ProgressBar()
 
 
 def get_drug_target_from_wiki(drug):

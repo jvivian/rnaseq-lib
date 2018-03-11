@@ -2,7 +2,6 @@ import time
 from collections import defaultdict
 
 import pandas as pd
-from progressbar import ProgressBar
 from rnaseq_lib.utils import rexpando
 from rnaseq_lib.web import _rget
 from rnaseq_lib.tissues import grep_cancer_terms
@@ -56,9 +55,8 @@ def drugs_by_query(query, limit=100, field='indications_and_usage'):
                  for x in r['results']]
 
         # Collect results in batches
-        bar = ProgressBar()
         skip = limit
-        for _ in bar(xrange(int(total_terms) / limit)):
+        for _ in xrange(int(total_terms) / limit):
             time.sleep(1)
             print 'Collecting samples {} - {}'.format(skip, skip + limit)
             r = _rget(url + '&skip={}'.format(skip))
@@ -83,8 +81,7 @@ def drugs_to_dataframe(drugs):
     info = defaultdict(list)
 
     # For each drug, query openFDA
-    bar = ProgressBar()
-    for drug in bar(drugs):
+    for drug in drugs:
         drug = drug.lower()
         r = query_drug(drug)
         if r:

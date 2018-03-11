@@ -46,7 +46,7 @@ class Holoview:
             self.samples = self.df.index.tolist()
             self.tissues = sorted(self.df.tissue.unique().tolist())
         except (ValueError, AttributeError) as e:
-            print e.message
+            print 'Missing attributes: \n{}'.format(e.message)
             self._gene_start = None
             self.genes = None
             self.meta_cols = None
