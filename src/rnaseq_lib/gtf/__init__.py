@@ -138,10 +138,10 @@ def get_protein_coding_genes(filename):
     genes = []
     with open(filename, 'r') as f:
         for line in f:
-            if line.startswith('#'):
-                continue
-            line = parse(line)
-            if line['feature'] == 'gene':
-                if line['gene_type'] == 'protein_coding':
-                    genes.append(line['gene_id'])
+            line = line.split('"')
+            try:
+                if line[3] == 'protein_coding':
+                    genes.append(line[1])
+            except IndexError:
+                pass
     return genes
