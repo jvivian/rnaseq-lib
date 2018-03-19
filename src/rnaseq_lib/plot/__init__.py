@@ -652,7 +652,7 @@ class Holoview:
         # Define dimensions
         tissue_dim = hv.Dimension('tissue', label='Tissue')
         label_dim = hv.Dimension('label', label='Label')
-        count_dim = hv.Dimension('count', label='Count')
+        count_dim = hv.Dimension('counts', label='Count')
 
         # Return Bars object of sample counts
         return hv.Bars(df, kdims=[tissue_dim, label_dim], vdims=[count_dim],
