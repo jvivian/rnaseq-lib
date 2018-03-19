@@ -123,9 +123,9 @@ def subset_by_dataset(df):
     :return: One dataframe per dataset
     :rtype: tuple(pd.Dataframe, pd.Dataframe, pd.Dataframe)
     """
-    tumor = df[(df.dataset == 'tcga') & (df.tumor == 'yes')]
-    normal = df[(df.dataset == 'tcga') & (df.tumor == 'no')]
-    gtex = df[(df.dataset == 'gtex')]
+    tumor = df[df.label == 'tcga-tumor']
+    normal = df[df.label == 'tcga-normal']
+    gtex = df[(df.label == 'gtex')]
     return tumor, normal, gtex
 
 

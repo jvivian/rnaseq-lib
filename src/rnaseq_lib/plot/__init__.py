@@ -23,7 +23,7 @@ class Holoview:
         :param pd.DataFrame df: Dataframe containing metadata / expression values (Synapse.org: syn11515015)
         """
         self.df = df
-        self.df_cols = ['id', 'tissue', 'dataset', 'tumor', 'type', 'labels']
+        self.df_cols = ['tissue', 'tumor', 'type', 'labels']
 
         # Style attributes - used in conjunction with '.opts()'
         self._gene_curves_opts = gene_curves_opts
@@ -37,10 +37,10 @@ class Holoview:
         self._dist_with_iqr_bounds_opts = dist_with_iqr_bounds_opts
         self._dr_opts = dr_opts
         self._tissue_de_opts = tissue_de_opts
-        # Hacky, but OR4F5 is the first gene in the dataframe
+        # Hacky, but 5S_rRNA is the first gene in the annotation set
         self.samples = self.df.index.tolist()
         try:
-            self._gene_start = self.df.columns.tolist().index('OR4F5')
+            self._gene_start = self.df.columns.tolist().index('5S_rRNA')
             self.genes = self.df.columns[self._gene_start:].tolist()
             self.meta_cols = self.df.columns[:self._gene_start]
             self.samples = self.df.index.tolist()
