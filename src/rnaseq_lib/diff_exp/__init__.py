@@ -47,7 +47,7 @@ def de_pearson_dataframe(df, genes, pair_by='type'):
     normal = df[df.tumor == 'no']
 
     # Identify tumor types with paired tcga-normal
-    tum_types = [x[:15] for x in sorted(tumor[pair_by].unique())
+    tum_types = [x for x in sorted(tumor[pair_by].unique())
                  if x in sorted(df[df.label == 'tcga-normal'][pair_by].unique())]
     norm_types = []
 
@@ -71,7 +71,7 @@ def de_pearson_dataframe(df, genes, pair_by='type'):
 
             # Calculate PearsonR Save l2fc and comparison tissue/type
             pearson_r = round(pearsonr(prior_l2fc, l2fc)[0], 2)
-            pearson_l2fc[tum_type].append(pearson_r)
+            pearson_l2fc[tum_type[:15]].append(pearson_r)
             norm_types.append('{}_{}'.format(label, norm_type[:15]))
 
     return pd.DataFrame(pearson_l2fc, index=norm_types)
