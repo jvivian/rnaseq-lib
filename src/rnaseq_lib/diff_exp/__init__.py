@@ -1,6 +1,7 @@
 import os
 import shutil
 import textwrap
+from collections import defaultdict
 from multiprocessing import cpu_count
 from subprocess import call, Popen, PIPE
 
@@ -23,6 +24,51 @@ def log2fc(a, b):
     :rtype: (int/float/np.array)
     """
     return np.log2(a + 1) - np.log2(b + 1)
+
+
+def de_dataframe(df, genes, pair_by='type'):
+    """
+    Return differential expression l2fc dataframe
+    For TCGA tumor samples with a paired normal "pair_by"
+
+    tumor types with Tumor/(GTEx|Normal) for all types
+
+    :param pd.DataFrame df: Exp/TPM dataframe containing "type"/"tissue/tumor/label" metadata columns
+    :param list genes: Genes to use in differential expression calculation
+    :param str pair_by: How to pair tumors/normals. Either by "type" or "tissue"
+    :return:
+    """
+    # Subset by Tumor/Normal
+    tumor = df[df.label == 'tcga-tumor']
+    normal = df[df.tumor == 'no']
+
+    # Identify tumor types with paired tcga-normal
+    tum_types = [x[:15] for x in sorted(tumor[pair_by].unique())
+                 if x in sorted(df[df.label == 'tcga-normal'][pair_by].unique())]
+    norm_types = []
+
+    # For all paired tumor_types, calculate l2fc, then PearsonR of l2fc to all normal tumor types
+    l2fcs = defaultdict(list)
+    for tum_type in tum_types:
+
+        # First calculate TCGA tumor/normal prior for comparison
+        t = tumor[tumor[pair_by] == tum_type]
+        n = normal[normal[pair_by] == tum_type]
+        prior_l2fc = log2fc(t[genes].median(), n[genes].median())
+
+        # For every normal type, calculate pearsonR correlation
+        for (norm_type, label), _ in normal.groupby(pair_by).label.iteritems():
+            if tum_type == norm_type:
+                l2fc = 1.0
+            else:
+                n = normal[normal[pair_by] == norm_type]
+                l2fc = log2fc(prior_l2fc, n[genes].median())
+
+            # Save l2fc and comparison tissue/type
+            l2fcs[tum_type].append(l2fc)
+            norm_types.append('{}_{}'.format(label, norm_type[:15]))
+
+    return pd.DataFrame(l2fcs, index=norm_types)
 
 
 def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):

@@ -678,6 +678,7 @@ class Holoview:
             if len(g) > 0 and len(n) > 0:
 
                 # Calculate gene expression average for tumor samples
+                ## TODO: Fix this mess
                 i = df.columns.tolist().index('OR4F5')  # Hacky, but OR4F5 is the first gene in the dataframe
                 tmed = t[t.columns[i:]].median()
                 nmed = n[n.columns[i:]].median()
