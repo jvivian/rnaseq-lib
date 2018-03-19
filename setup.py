@@ -13,7 +13,8 @@ setup(name='rnaseq-lib',
       install_requires=['pandas',
                         'numpy',
                         'seaborn',
-                        'holoviews'],
+                        'holoviews',
+                        'scipy'],
       extras_require={
           'web': [
               'requests',

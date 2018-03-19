@@ -7,6 +7,7 @@ from subprocess import call, Popen, PIPE
 
 import numpy as np
 import pandas as pd
+from scipy.stats import pearsonr
 
 from rnaseq_lib.docker import fix_directory_ownership, base_docker_call
 from rnaseq_lib.tissues import get_tumor_samples, get_gtex_samples, get_normal_samples, map_genes
@@ -26,17 +27,19 @@ def log2fc(a, b):
     return np.log2(a + 1) - np.log2(b + 1)
 
 
-def de_dataframe(df, genes, pair_by='type'):
+def de_pearson_dataframe(df, genes, pair_by='type'):
     """
-    Return differential expression l2fc dataframe
-    For TCGA tumor samples with a paired normal "pair_by"
+    PearsonR scores of gene differential expression between tumor and normal types.
 
-    tumor types with Tumor/(GTEx|Normal) for all types
+    1. Calculate log2FC of genes for TCGA tumor samples with matching TCGA normal types
+    2. Compare log2fc to tumor type compared to all other normal types
+    3. Calculate PearsonR and save
 
     :param pd.DataFrame df: Exp/TPM dataframe containing "type"/"tissue/tumor/label" metadata columns
     :param list genes: Genes to use in differential expression calculation
     :param str pair_by: How to pair tumors/normals. Either by "type" or "tissue"
-    :return:
+    :return: PearsonR dataframe
+    :rtype: pd.DataFrame
     """
     # Subset by Tumor/Normal
     tumor = df[df.label == 'tcga-tumor']
@@ -48,27 +51,29 @@ def de_dataframe(df, genes, pair_by='type'):
     norm_types = []
 
     # For all paired tumor_types, calculate l2fc, then PearsonR of l2fc to all normal tumor types
-    l2fcs = defaultdict(list)
+    pearson_l2fc = defaultdict(list)
     for tum_type in tum_types:
 
         # First calculate TCGA tumor/normal prior for comparison
         t = tumor[tumor[pair_by] == tum_type]
+        t_med = t[genes].median()
         n = normal[normal[pair_by] == tum_type]
-        prior_l2fc = log2fc(t[genes].median(), n[genes].median())
+        prior_l2fc = log2fc(t_med, n[genes].median())
 
         # For every normal type, calculate pearsonR correlation
         for (norm_type, label), _ in normal.groupby(pair_by).label.value_counts().iteritems():
             if tum_type == norm_type:
-                l2fc = 1.0
+                l2fc = prior_l2fc
             else:
                 n = normal[normal[pair_by] == norm_type]
-                l2fc = log2fc(prior_l2fc, n[genes].median())
+                l2fc = log2fc(t_med, n[genes].median())
 
-            # Save l2fc and comparison tissue/type
-            l2fcs[tum_type].append(l2fc)
+            # Calculate PearsonR Save l2fc and comparison tissue/type
+            pearson_r = round(pearsonr(prior_l2fc, l2fc)[0], 2)
+            pearson_l2fc[tum_type].append(pearson_r)
             norm_types.append('{}_{}'.format(label, norm_type[:15]))
 
-    return pd.DataFrame(l2fcs, index=norm_types)
+    return pd.DataFrame(pearson_l2fc, index=norm_types)
 
 
 def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
