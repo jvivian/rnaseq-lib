@@ -85,21 +85,12 @@ class Holoview:
         :return: Sample counts for tissues and datasets
         :rtype: pd.DataFrame
         """
-        # Subset by dataset
-        tumor, normal, gtex = subset_by_dataset(self.df)
-
-        dfs = [tumor, normal, gtex] if include_gtex else [tumor, normal]
-        labels = ['tcga-tumor', 'tcga-normal', 'gtex'] if include_gtex else ['tcga-tumor', 'tcga-normal']
-
-        # Count samples for each tissue
-        records = []
-        for tissue in sorted(self.df.tissue.unique()):
-            for df, label in zip(dfs, labels):
-                count = len(df[df.tissue == tissue])
-                records.append([tissue, label, count])
-
-        # Create dataframe
-        return pd.DataFrame.from_records(records, columns=['Tissue', 'Label', 'Count']).sort_values(['Tissue', 'Label'])
+        # Cast value_counts as dataframe
+        vc = pd.DataFrame(self.df.groupby('tissue').label.value_counts())
+        # Relabel column and reset_index to cast multi-index as columns
+        vc.columns = ['counts']
+        vc.reset_index(inplace=True)
+        return vc.sort_values(['tissue', 'label'])
 
     # Convenience methods
     @staticmethod
