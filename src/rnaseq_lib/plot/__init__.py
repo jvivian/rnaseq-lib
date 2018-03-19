@@ -647,10 +647,14 @@ class Holoview:
         :return: Bargraph of sample counts
         :rtype: hv.Bars
         """
-        df = self._sample_counts_df(include_gtex=include_gtex).sort_values(['Tissue', 'Label'], ascending=[True, False])
+        df = self._sample_counts_df(include_gtex=include_gtex)
+
+        tissue_dim = hv.Dimension('tissue', label='Tissue')
+        label_dim = hv.Dimension('label', label='Label')
+        count_dim = hv.Dimension('count', label='Count')
 
         # Return Bars object of sample counts
-        return hv.Bars(df, kdims=['Tissue', 'Label'], vdims=['Count'],
+        return hv.Bars(df, kdims=[tissue_dim, label_dim], vdims=[count_dim],
                        label='Sample Counts for TCGA and GTEx').opts(self._sample_count_opts)
 
     def differential_expression_tissue_concordance(self, tissue_subset=None, tcga=True, gtex=True):
