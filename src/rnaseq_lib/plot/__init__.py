@@ -650,7 +650,7 @@ class Holoview:
         df = self._sample_counts_df(groupby=groupby, include_gtex=include_gtex)
 
         # Define dimensions
-        tissue_dim = hv.Dimension('tissue', label='Tissue')
+        tissue_dim = hv.Dimension(groupby, label=groupby.capitalize())
         label_dim = hv.Dimension('label', label='Label')
         count_dim = hv.Dimension('counts', label='Count')
 
