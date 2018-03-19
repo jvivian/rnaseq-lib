@@ -29,7 +29,8 @@ gene_de_heatmap_opts = {
 }
 
 sample_count_opts = {
-    'Bars': {'plot': dict(width=875, height=400, xrotation=70, tools=['hover'], show_legend=True, toolbar='above')}
+    'Bars': {'plot': dict(width=875, height=400, xrotation=70, tools=['hover'],
+                          show_legend=True, toolbar='above', stack_index=True)}
 }
 
 l2fc_by_perc_samples_opts = {
