@@ -658,7 +658,7 @@ class Holoview:
         return hv.Bars(df, kdims=[tissue_dim, label_dim], vdims=[count_dim],
                        label='Sample Counts for TCGA and GTEx').opts(self._sample_count_opts)
 
-    def differential_expression_tissue_concordance(self, tissue_subset=None, pair_by='type'):
+    def de_concordance(self, tissue_subset=None, pair_by='type', normalize=True):
         """
         Categorical scatterplot of concordance between tissues for gene differential expression
 
@@ -673,6 +673,10 @@ class Holoview:
         # Convert  matrix into 3-column
         de = de.stack().reset_index()
         de.columns = ['Tissue-Normal', 'Tissue-Tumor/Normal', 'PearsonR']
+
+        # If normalize, normalize columns 0 to 1
+        if normalize:
+            de = (de - de.min()) / (de.max() - de.min())
 
         # Return HeatMap object
         return hv.HeatMap(de, kdims=['Tissue-Tumor/Normal', 'Tissue-Normal'], vdims=['PearsonR'],
