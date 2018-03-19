@@ -77,7 +77,7 @@ class Holoview:
         # Return mapping of dataset to cutoff
         return {x: y for x, y in zip(['tumor', 'normal', 'gtex'], cutoffs)}
 
-    def _sample_counts_df(self, include_gtex=True):
+    def _sample_counts_df(self, groupby='tissue', include_gtex=True):
         """
         Compute sample counts and returns dataframe
 
@@ -86,11 +86,11 @@ class Holoview:
         :rtype: pd.DataFrame
         """
         # Cast value_counts as dataframe
-        vc = pd.DataFrame(self.df.groupby('tissue').label.value_counts())
+        vc = pd.DataFrame(self.df.groupby(groupby).label.value_counts())
         # Relabel column and reset_index to cast multi-index as columns
         vc.columns = ['counts']
         vc.reset_index(inplace=True)
-        return vc.sort_values(['tissue', 'label'])
+        return vc.sort_values([groupby, 'label'])
 
     # Convenience methods
     @staticmethod
