@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import pearsonr
 
-from rnaseq_lib.diff_exp import log2fc
+from rnaseq_lib.diff_exp import log2fc, de_pearson_dataframe
 from rnaseq_lib.dim_red import run_tsne, run_tete
 from rnaseq_lib.plot.opts import *
 from rnaseq_lib.tissues import subset_by_dataset
@@ -658,7 +658,7 @@ class Holoview:
         return hv.Bars(df, kdims=[tissue_dim, label_dim], vdims=[count_dim],
                        label='Sample Counts for TCGA and GTEx').opts(self._sample_count_opts)
 
-    def differential_expression_tissue_concordance(self, tissue_subset=None, tcga=True, gtex=True):
+    def differential_expression_tissue_concordance(self, tissue_subset=None, pair_by='type'):
         """
         Categorical scatterplot of concordance between tissues for gene differential expression
 
@@ -668,46 +668,14 @@ class Holoview:
         """
 
         df = self._subset(genes=None, tissue_subset=tissue_subset)
-        records = []
-        for tissue1 in sorted(df.tissue.unique()):
-
-            # Subset by tissue then break apart by dataset
-            t, g, n = subset_by_dataset(df[df.tissue == tissue1])
-
-            # If there are both normal and gtex samples
-            if len(g) > 0 and len(n) > 0:
-
-                # Calculate gene expression average for tumor samples
-                ## TODO: Fix this mess
-                i = df.columns.tolist().index('OR4F5')  # Hacky, but OR4F5 is the first gene in the dataframe
-                tmed = t[t.columns[i:]].median()
-                nmed = n[n.columns[i:]].median()
-                master_tn = log2fc(tmed, nmed)
-
-                # Iterate over all other tissues to get PearsonR of L2FC
-                for tissue2 in sorted(df.tissue.unique()):
-
-                    # Subset by second tissue
-                    _, g, n = subset_by_dataset(df[df.tissue == tissue2])
-
-                    # If there are GTEx samples, calculate PearsonR to master_tn
-                    if gtex and len(g) > 0:
-                        gmed = g[g.columns[i:]].median()
-                        tg = log2fc(tmed, gmed)
-                        records.append((tissue1, '{}-GTEx'.format(tissue2), round(pearsonr(master_tn, tg)[0], 2)))
-
-                    # If there are normal samples, calculate PearsonR to master_tn
-                    if tcga and len(n) > 0:
-                        nmed = n[n.columns[i:]].median()
-                        tn = log2fc(tmed, nmed)
-                        records.append((tissue1, '{}-TCGA'.format(tissue2), round(pearsonr(master_tn, tn)[0], 2)))
-
-
-        # Construct dataframe
-        df = pd.DataFrame.from_records(records, columns=['Tissue-Tumor/Normal', 'Tissue-Normal', 'PearsonR'])
+        # Get differential expression pearsonR values
+        de = de_pearson_dataframe(df, genes=self.genes, pair_by=pair_by)
+        # Convert  matrix into 3-column
+        de = de.stack().reset_index()
+        de.columns = ['Tissue-Normal', 'Tissue-Tumor/Normal', 'PearsonR']
 
         # Return HeatMap object
-        return hv.HeatMap(df, kdims=['Tissue-Tumor/Normal', 'Tissue-Normal'], vdims=['PearsonR'],
+        return hv.HeatMap(de, kdims=['Tissue-Tumor/Normal', 'Tissue-Normal'], vdims=['PearsonR'],
                           label='Differential Expression Gene Concordance (PearsonR)').opts(self._de_concordance_opts)
 
     # Dimensionality Reduction
