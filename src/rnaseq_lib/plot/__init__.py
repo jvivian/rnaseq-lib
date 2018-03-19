@@ -23,7 +23,7 @@ class Holoview:
         :param pd.DataFrame df: Dataframe containing metadata / expression values (Synapse.org: syn11515015)
         """
         self.df = df
-        self.df_cols = ['tissue', 'tumor', 'type', 'labels']
+        self.df_cols = ['tissue', 'tumor', 'type', 'label']
 
         # Style attributes - used in conjunction with '.opts()'
         self._gene_curves_opts = gene_curves_opts
@@ -210,7 +210,7 @@ class Holoview:
         subgroup = df['type'] if types else df.tissue
 
         # Return grouped box and whiskers:
-        return hv.BoxWhisker((subgroup, df['labels'], norm_exp), kdims=['Tissue', 'Dataset'],
+        return hv.BoxWhisker((subgroup, df['label'], norm_exp), kdims=['Tissue', 'Dataset'],
                              vdims=[hv.Dimension('Gene Expression', unit='log2(x+1)')],
                              label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
 
