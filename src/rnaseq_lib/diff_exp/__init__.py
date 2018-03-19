@@ -57,7 +57,7 @@ def de_dataframe(df, genes, pair_by='type'):
         prior_l2fc = log2fc(t[genes].median(), n[genes].median())
 
         # For every normal type, calculate pearsonR correlation
-        for (norm_type, label), _ in normal.groupby(pair_by).label.iteritems():
+        for (norm_type, label), _ in normal.groupby(pair_by).label.value_counts().iteritems():
             if tum_type == norm_type:
                 l2fc = 1.0
             else:
