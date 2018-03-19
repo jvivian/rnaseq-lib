@@ -649,6 +649,7 @@ class Holoview:
         """
         df = self._sample_counts_df(include_gtex=include_gtex)
 
+        # Define dimensions
         tissue_dim = hv.Dimension('tissue', label='Tissue')
         label_dim = hv.Dimension('label', label='Label')
         count_dim = hv.Dimension('count', label='Count')
