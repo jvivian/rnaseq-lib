@@ -14,17 +14,18 @@ from rnaseq_lib.tissues import get_tumor_samples, get_gtex_samples, get_normal_s
 from rnaseq_lib.utils import mkdir_p
 
 
-def log2fc(a, b):
+def log2fc(a, b, pad=0.001):
     """
     Calculate the log2 Fold Change between two arrays, floats, or integers
     a and b cannot be, nor contain, values less than 0
 
-    :param (int/float/np.array) a: Value or array
-    :param (int/float/np.array) b: Value or array
+    :param int|float|np.array a: Value or array
+    :param int|float|np.array b: Value or array
+    :param int|float pad: Buffer to add to value before log2 calculation
     :return: L2FC array or value
-    :rtype: (int/float/np.array)
+    :rtype: int|float|np.array
     """
-    return np.log2(a + 1) - np.log2(b + 1)
+    return np.log2(a + pad) - np.log2(b + pad)
 
 
 def de_pearson_dataframe(df, genes, pair_by='type'):
