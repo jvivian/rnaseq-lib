@@ -52,7 +52,7 @@ dist_with_iqr_bounds_opts = {
 }
 
 dr_opts = {
-    'Scatter': {'plot': dict(width=800, height=500, legend_position='left', tools=['hover']),
+    'Scatter': {'plot': dict(width=700, height=400, legend_position='left', tools=['hover']),
                 'style': dict(cmap=color_sequence)}
 }
 

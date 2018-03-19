@@ -760,8 +760,9 @@ class Holoview:
         # Add results to dataframe
         df['x'] = z[:, 0]
         df['y'] = z[:, 1]
+        df['sample'] = df.index
 
-        return hv.Scatter(df, kdims=['x'], vdims=['y'] + self.df_cols).opts(self._dr_opts)
+        return hv.Scatter(df, kdims=['x'], vdims=['y', 'sample'] + self.df_cols).opts(self._dr_opts)
 
 
 def disable_logo(plot, element):
