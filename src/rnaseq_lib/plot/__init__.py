@@ -146,16 +146,13 @@ class Holoview:
         # Subset by dataset
         t, n, g = subset_by_dataset(df)
 
-        # Define x dimension for labeling
-        x = hv.Dimension('Gene Expression', unit='log2(x+1)')
-
         # Create KDE objects for each tissue and dataset
         dists = []
         for tissue in df.tissue.unique():
             for label, dataset, flag in zip(['Tumor', 'GTEx', 'Normal'], [t, g, n], [tumor, gtex, normal]):
                 if flag:
                     dists.append(hv.Distribution(dataset[dataset.tissue == tissue][gene].apply(self.l2norm),
-                                                 kdims=[x], label='{}-{}'.format(label, tissue)))
+                                                 label='{}-{}'.format(label, tissue)))
 
         # Combine into Overlay object
         return hv.Overlay(dists, label='{} Expression'.format(gene)).opts(self._gene_kde_opts)
