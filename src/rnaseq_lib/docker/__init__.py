@@ -127,6 +127,17 @@ def _fix_permissions(base_docker_call, tool, work_dir):
     subprocess.check_call(command)
 
 
+def docker_path(path):
+    """
+    Converts a path to a file to a "docker path" which replaces the dirname with '/data'
+
+    :param str path: Path to file
+    :return: Path for use in Docker parameters
+    :rtype: str
+    """
+    return os.path.join('/data', os.path.basename(path))
+
+
 class panic(object):
     """
     The Python idiom for reraising a primary exception fails when the except block raises a
