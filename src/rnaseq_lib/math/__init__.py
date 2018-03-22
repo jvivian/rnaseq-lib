@@ -1,5 +1,6 @@
 import numpy as np
 
+
 # Outlier
 def iqr_bounds(ys):
     """
@@ -17,6 +18,7 @@ def iqr_bounds(ys):
     lower_bound = quartile_1 - (iqr * 1.5)
     upper_bound = quartile_3 + (iqr * 1.5)
     return upper_bound, lower_bound
+
 
 # Normalization
 def min_max_normalize(df):

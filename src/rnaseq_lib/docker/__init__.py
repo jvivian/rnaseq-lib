@@ -7,6 +7,19 @@ import sys
 _log = logging.getLogger(__name__)
 
 
+def get_base_call(mount_path):
+    """
+    Return base docker call with mounted path
+
+    :param mount_path:
+    :return: Base Docker command
+    :rtype: list(str)
+    """
+    return ['docker', 'run',
+            '--log-driver=none',
+            '-v', '{}:/data'.format(os.path.abspath(mount_path))]
+
+
 def mock_mode():
     """
     Checks whether the ADAM_GATK_MOCK_MODE environment variable is set.
@@ -76,9 +89,8 @@ def docker_call(tool,
                 assert os.path.exists(file_path)
         return
 
-    base_docker_call = ['docker', 'run',
-                        '--log-driver=none',
-                        '-v', '{}:/data'.format(os.path.abspath(work_dir))]
+    base_docker_call = get_base_call(os.path.abspath(work_dir))
+
     if rm:
         base_docker_call.append('--rm')
     if env:
@@ -103,9 +115,9 @@ def docker_call(tool,
     except:
         # Panic avoids hiding the exception raised in the try block
         with panic():
-            _fix_permissions(base_docker_call, tool, work_dir)
+            fix_permissions(base_docker_call, tool, work_dir)
     else:
-        _fix_permissions(base_docker_call, tool, work_dir)
+        fix_permissions(base_docker_call, tool, work_dir)
 
     for filename in outputs.keys():
         if not os.path.isabs(filename):
@@ -113,7 +125,7 @@ def docker_call(tool,
         assert (os.path.isfile(filename))
 
 
-def _fix_permissions(base_docker_call, tool, work_dir):
+def fix_permissions(tool, work_dir):
     """
     Fix permission of a mounted Docker directory by reusing the tool
 
@@ -121,7 +133,8 @@ def _fix_permissions(base_docker_call, tool, work_dir):
     :param str tool: Name of tool
     :param str work_dir: Path of work directory to recursively chown
     """
-    base_docker_call.append('--entrypoint=chown')
+    base_docker_call = get_base_call(work_dir)
+    get_base_call.append('--entrypoint=chown')
     stat = os.stat(work_dir)
     command = base_docker_call + [tool] + ['-R', '{}:{}'.format(stat.st_uid, stat.st_gid), '/data']
     subprocess.check_call(command)

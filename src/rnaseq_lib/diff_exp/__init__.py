@@ -7,11 +7,10 @@ from subprocess import call, Popen, PIPE
 
 import numpy as np
 import pandas as pd
-from scipy.stats import pearsonr
-
-from rnaseq_lib.docker import fix_directory_ownership, base_docker_call
+from rnaseq_lib.docker import fix_permissions, get_base_call
 from rnaseq_lib.tissues import get_tumor_samples, get_gtex_samples, get_normal_samples, map_genes
 from rnaseq_lib.utils import mkdir_p
+from scipy.stats import pearsonr
 
 
 def log2fc(a, b, pad=0.001):
@@ -200,7 +199,7 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
         print err
 
     # Fix output of files
-    fix_directory_ownership(output_dir=output_dir, tool='jvivian/deseq2')
+    fix_permissions(tool='jvivian/deseq2', work_dir=output_dir)
 
     # Add gene names to output
     output_tsv = os.path.join(output_dir, '{}.tsv'.format(tissue))
@@ -288,7 +287,7 @@ def deseq2_normalize(df_path,
             """.format(df_path=os.path.basename(df_path), output_name=os.path.basename(output_path))))
 
     # Call Docker
-    base_params = base_docker_call(os.path.dirname(output_path))
+    base_params = get_base_call(os.path.dirname(output_path))
     parameters = base_params + ['-v', '{}:/df'.format(os.path.abspath(os.path.dirname(df_path))),
                                 'jvivian/deseq2',
                                 '/data/work_dir/deseq2.R']
@@ -297,7 +296,7 @@ def deseq2_normalize(df_path,
     call(parameters)
 
     # Fix output of files
-    fix_directory_ownership(output_dir=output_dir, tool='jvivian/deseq2')
+    fix_permissions(tool='jvivian/deseq2', work_dir=output_dir)
 
     # Map gene IDs to gene names
     if map_gene_names:
