@@ -3,12 +3,12 @@ from __future__ import division
 import holoviews as hv
 import numpy as np
 import pandas as pd
-from scipy.stats import pearsonr
-
 from rnaseq_lib.diff_exp import log2fc, de_pearson_dataframe
 from rnaseq_lib.dim_red import run_tsne, run_tete
+from rnaseq_lib.math import l2norm, iqr_bounds
 from rnaseq_lib.plot.opts import *
 from rnaseq_lib.tissues import subset_by_dataset
+from scipy.stats import pearsonr
 
 
 class Holoview:
@@ -71,17 +71,16 @@ class Holoview:
         tumor, normal, gtex = subset_by_dataset(df)
 
         # Calculate gene expression cutoffs for each dataset
-        cutoffs = [x[gene].apply(self.l2norm).sort_values(ascending=False).iloc[int(len(x) * percent) - 1]
+        cutoffs = [x[gene].apply(l2norm).sort_values(ascending=False).iloc[int(len(x) * percent) - 1]
                    for x in [tumor, normal, gtex]]
 
         # Return mapping of dataset to cutoff
         return {x: y for x, y in zip(['tumor', 'normal', 'gtex'], cutoffs)}
 
-    def _sample_counts_df(self, groupby='tissue', include_gtex=True):
+    def _sample_counts_df(self, groupby='tissue'):
         """
         Compute sample counts and returns dataframe
 
-        :param bool include_gtex: If True, includes GTEx in returned sample counts
         :return: Sample counts for tissues and datasets
         :rtype: pd.DataFrame
         """
@@ -107,16 +106,16 @@ class Holoview:
         df = self._subset(gene, tissue_subset)
 
         # Calculate upper and lower bounds across all tissues
-        upper, lower = self.iqr_bounds(df[df.tumor == 'no'][gene].apply(self.l2norm))
+        upper, lower = iqr_bounds(df[df.tumor == 'no'][gene].apply(l2norm))
 
         records = []
         for tissue in sorted(df.tissue.unique()):
             # Calclulate upper/lower bound for normal
-            normals = df[(df.tumor == 'no') & (df.tissue == tissue)][gene].apply(self.l2norm)
-            n_upper, n_lower = self.iqr_bounds(normals)
+            normals = df[(df.tumor == 'no') & (df.tissue == tissue)][gene].apply(l2norm)
+            n_upper, n_lower = iqr_bounds(normals)
 
             # Calculate expression for tumor
-            exp = df[(df.tissue == tissue) & (df.tumor == 'yes')][gene].apply(self.l2norm)
+            exp = df[(df.tissue == tissue) & (df.tumor == 'yes')][gene].apply(l2norm)
 
             # Calculate percentage cut offs
             perc = len([x for x in exp if x > upper]) / len(exp)
@@ -151,7 +150,7 @@ class Holoview:
         for tissue in df.tissue.unique():
             for label, dataset, flag in zip(['Tumor', 'GTEx', 'Normal'], [t, g, n], [tumor, gtex, normal]):
                 if flag:
-                    dists.append(hv.Distribution(dataset[dataset.tissue == tissue][gene].apply(self.l2norm),
+                    dists.append(hv.Distribution(dataset[dataset.tissue == tissue][gene].apply(l2norm),
                                                  label='{}-{}'.format(label, tissue)))
 
         # Combine into Overlay object
@@ -171,7 +170,7 @@ class Holoview:
         df = self._subset([gene], tissue_subset)
 
         # Normalize gene expression
-        norm_exp = df[gene].apply(self.l2norm)
+        norm_exp = df[gene].apply(l2norm)
 
         # Subgroup labeling
         subgroup = df['type'] if types else df.tissue
@@ -209,7 +208,7 @@ class Holoview:
             label = 'GTEx'
 
         # Calculate total expression
-        exp = pd.concat([t_genes, n_genes]).apply(self.l2norm).median()
+        exp = pd.concat([t_genes, n_genes]).apply(l2norm).median()
 
         # Calculate L2FC
         l2fc = log2fc(t_genes.median(), n_genes.median())
@@ -267,11 +266,11 @@ class Holoview:
             # Calculate tumor and normal expression and L2FC
             if tcga_normal:
                 l2fc = log2fc(tumor[gene].median(), normal[gene].median())
-                exp = pd.concat([tumor[gene], normal[gene]], axis=0).apply(self.l2norm).median()
+                exp = pd.concat([tumor[gene], normal[gene]], axis=0).apply(l2norm).median()
                 unit = 'log2(Tumor/Normal)'
             else:
                 l2fc = log2fc(tumor[gene].median(), gtex[gene].median())
-                exp = pd.concat([tumor[gene], gtex[gene]], axis=0).apply(self.l2norm).median()
+                exp = pd.concat([tumor[gene], gtex[gene]], axis=0).apply(l2norm).median()
                 unit = 'log2(Tumor/GTEx)'
 
             # Store as record
@@ -383,7 +382,7 @@ class Holoview:
         """
         Heatmap of gene log2 fold change
 
-        :param str gene: Gene (ex: ERBB2) to select
+        :param list(str) genes: Gene (ex: ERBB2) to select
         :param list tissue_subset: List of tissues to subset by
         :param bool tcga_normal: If True, use TCGA normal to for DE calc, otherwise use GTEx
         :return: DE Heatmap of genes for tissue subset
@@ -450,13 +449,13 @@ class Holoview:
         Creates distribution object with IQR bounds
 
         :param list ys: List of values to calculate IQR and bounds
-        :param str kdims: K-dimension label for distribution
+        :param str kdim: K-dimension label for distribution
         :return: Distribution with IQR bounds
         :rtype: hv.Overlay
         """
         # Calculate IQR and outlier bounds
         q25, q75 = np.percentile(ys, [25, 75])
-        upper, lower = self.iqr_bounds(ys)
+        upper, lower = iqr_bounds(ys)
 
         # Return dist with spikes
         return hv.Overlay([hv.Distribution(ys, kdims=[kdim]),
@@ -543,7 +542,7 @@ class Holoview:
         df = self._subset([gene], [tissue])
 
         # Logscale gene for calculations
-        df[gene] = df[gene].apply(self.l2norm)
+        df[gene] = df[gene].apply(l2norm)
 
         # Subset by dataset
         tumor, normal, gtex = subset_by_dataset(df)
@@ -708,4 +707,4 @@ class Holoview:
 def disable_logo(plot, element):
     plot.state.toolbar.logo = None
 
-#hv.plotting.bokeh.ElementPlot.finalize_hooks.append(disable_logo)
+    # hv.plotting.bokeh.ElementPlot.finalize_hooks.append(disable_logo)
