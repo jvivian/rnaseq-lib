@@ -127,7 +127,7 @@ class Holoview:
         return df.sort_values('T_Upper', ascending=False)
 
     # Gene Plots
-    def gene_kde(self, gene, tissue_subset=None, tumor=True, normal=True, gtex=True, normalize=True):
+    def gene_kde(self, gene, tissue_subset=None, tumor=True, normal=True, gtex=True, normalize=True, unit='TPM'):
         """
         Returns KDE of gene expression (log2) for given tissue
 
@@ -145,6 +145,9 @@ class Holoview:
         # Subset by dataset
         t, n, g = subset_by_dataset(df)
 
+        # Gene dim
+        kdim = hv.Dimension(gene, label='{} {}'.format(gene, unit), unit='log2(x + 0.001)')
+
         # Create KDE objects for each tissue and dataset
         dists = []
         for tissue in df.tissue.unique():
@@ -154,7 +157,7 @@ class Holoview:
                         if normalize else dataset[dataset.tissue == tissue][gene]
 
                     # Add dists
-                    dists.append(hv.Distribution(gene_vals, label='{}-{}'.format(label, tissue)))
+                    dists.append(hv.Distribution(gene_vals, label='{}-{}'.format(label, tissue), kdims=kdim))
 
         # Combine into Overlay object
         return hv.Overlay(dists, label='{} Expression'.format(gene)).opts(self._gene_kde_opts)
