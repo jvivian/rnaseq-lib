@@ -643,13 +643,14 @@ class Holoview:
         df = self._subset(genes=None, tissue_subset=tissue_subset)
         # Get differential expression pearsonR values
         de = de_pearson_dataframe(df, genes=self.genes, pair_by=pair_by)
-        # Convert  matrix into 3-column
-        de = de.stack().reset_index()
-        de.columns = ['Tissue-Normal', 'Tissue-Tumor/Normal', 'PearsonR']
 
         # If normalize, normalize columns 0 to 1
         if normalize:
             de = (de - de.min()) / (de.max() - de.min())
+
+        # Convert  matrix into 3-column
+        de = de.stack().reset_index()
+        de.columns = ['Tissue-Normal', 'Tissue-Tumor/Normal', 'PearsonR']
 
         # Return HeatMap object
         return hv.HeatMap(de, kdims=['Tissue-Tumor/Normal', 'Tissue-Normal'], vdims=['PearsonR'],
