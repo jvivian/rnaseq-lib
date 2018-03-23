@@ -127,7 +127,8 @@ class Holoview:
         return df.sort_values('T_Upper', ascending=False)
 
     # Gene Plots
-    def gene_kde(self, gene, tissue_subset=None, tumor=True, normal=True, gtex=True, normalize=True, unit='TPM'):
+    def gene_kde(self, gene, tissue_subset=None, tumor=True, normal=True, gtex=True,
+                 normalize=True, unit='Transcripts Per Million'):
         """
         Returns KDE of gene expression (log2) for given tissue
 
