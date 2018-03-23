@@ -612,15 +612,14 @@ class Holoview:
 
         return (c1 * s1 + c2 * s2 + c3 * s3).cols(1)
 
-    def sample_counts(self, groupby='tissue', include_gtex=True):
+    def sample_counts(self, groupby='tissue'):
         """
         Bargraph of tissues grouped by dataset
 
-        :param bool include_gtex: If True, GTEx is included in sample counts
         :return: Bargraph of sample counts
         :rtype: hv.Bars
         """
-        df = self._sample_counts_df(groupby=groupby, include_gtex=include_gtex)
+        df = self._sample_counts_df(groupby=groupby)
 
         # Define dimensions
         tissue_dim = hv.Dimension(groupby, label=groupby.capitalize())
