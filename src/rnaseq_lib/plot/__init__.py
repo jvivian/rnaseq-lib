@@ -630,18 +630,20 @@ class Holoview:
         return hv.Bars(df, kdims=[tissue_dim, label_dim], vdims=[count_dim],
                        label='Sample Counts for TCGA and GTEx').opts(self._sample_count_opts)
 
-    def de_concordance(self, tissue_subset=None, pair_by='type', normalize=True):
+    def de_concordance(self, tissue_subset=None, pair_by='type', normalize=True, gtex=True, tcga=True):
         """
         Categorical scatterplot of concordance between tissues for gene differential expression
 
         :param list tissue_subset: List of tissues to subset by
+        :param bool gtex: If True, includes GTEx in normal set
+        :param bool tcga: if True, includes TCGA in normal set
         :return: Heatmap of differential expression comparison across tissue
         :rtype: hv.HeatMap
         """
 
         df = self._subset(genes=None, tissue_subset=tissue_subset)
         # Get differential expression pearsonR values
-        de = de_pearson_dataframe(df, genes=self.genes, pair_by=pair_by)
+        de = de_pearson_dataframe(df, genes=self.genes, pair_by=pair_by, gtex=gtex, tcga=tcga)
 
         # If normalize, normalize columns 0 to 1
         if normalize:

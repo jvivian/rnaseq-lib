@@ -27,7 +27,7 @@ def log2fc(a, b, pad=0.001):
     return np.log2(a + pad) - np.log2(b + pad)
 
 
-def de_pearson_dataframe(df, genes, pair_by='type'):
+def de_pearson_dataframe(df, genes, pair_by='type', gtex=True, tcga=True):
     """
     PearsonR scores of gene differential expression between tumor and normal types.
 
@@ -38,12 +38,19 @@ def de_pearson_dataframe(df, genes, pair_by='type'):
     :param pd.DataFrame df: Exp/TPM dataframe containing "type"/"tissue/tumor/label" metadata columns
     :param list genes: Genes to use in differential expression calculation
     :param str pair_by: How to pair tumors/normals. Either by "type" or "tissue"
+    :param bool gtex: If True, includes GTEx in normal set
+    :param bool tcga: If True, includes TCGA in normal set
     :return: PearsonR dataframe
     :rtype: pd.DataFrame
     """
     # Subset by Tumor/Normal
     tumor = df[df.label == 'tcga-tumor']
-    normal = df[df.tumor == 'no']
+    if gtex and tcga:
+        normal = df[df.tumor == 'no']
+    elif gtex:
+        normal = df[df.label == 'gtex']
+    else:
+        normal = df[df.label == 'tcga-normal']
 
     # Identify tumor types with paired tcga-normal
     tum_types = [x for x in sorted(tumor[pair_by].unique())
