@@ -7,10 +7,11 @@ from subprocess import call, Popen, PIPE
 
 import numpy as np
 import pandas as pd
+from scipy.stats import pearsonr
+
 from rnaseq_lib.docker import fix_permissions, get_base_call
 from rnaseq_lib.tissues import get_tumor_samples, get_gtex_samples, get_normal_samples, map_genes
 from rnaseq_lib.utils import mkdir_p
-from scipy.stats import pearsonr
 
 
 def log2fc(a, b, pad=0.001):
@@ -45,12 +46,11 @@ def de_pearson_dataframe(df, genes, pair_by='type', gtex=True, tcga=True):
     """
     # Subset by Tumor/Normal
     tumor = df[df.label == 'tcga-tumor']
-    if gtex and tcga:
+    tcga_n = df[df.label == 'tcga-normal']
+    if gtex:
         normal = df[df.tumor == 'no']
-    elif gtex:
-        normal = df[df.label == 'gtex']
     else:
-        normal = df[df.label == 'tcga-normal']
+        normal = tcga_n
 
     # Identify tumor types with paired tcga-normal
     tum_types = [x for x in sorted(tumor[pair_by].unique())
@@ -64,7 +64,7 @@ def de_pearson_dataframe(df, genes, pair_by='type', gtex=True, tcga=True):
         # First calculate TCGA tumor/normal prior for comparison
         t = tumor[tumor[pair_by] == tum_type]
         t_med = t[genes].median()
-        n = normal[normal[pair_by] == tum_type]
+        n = tcga_n[tcga_n[pair_by] == tum_type]
         prior_l2fc = log2fc(t_med, n[genes].median())
 
         # For every normal type, calculate pearsonR correlation
