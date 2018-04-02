@@ -250,9 +250,9 @@ class Holoview:
         else:
             return hv.Scatter(plot, kdims=kdims, vdims=vdims).opts(self._tissue_de_opts)
 
-    def gene_de(self, gene, tissue_subset=None, extents=None, tcga_normal=False):
+    def gene_de(self, gene, tissue_subset=None, extents=None, tcga_normal=False, groupby='type'):
         """
-        Scatter plot of differential expression across all tissues
+        Scatter plot of differential expression across all grouped types (tissue / type)
 
         :param str gene: Gene (ex: ERBB2) to select
         :param tuple extents: xmin/ymin/xmax/ymax values
@@ -266,9 +266,9 @@ class Holoview:
 
         # For each tissue, calculate L2FC and mean expression
         records = []
-        for tissue in sorted(df.tissue.unique()):
+        for group in sorted(df[groupby].unique()):
             # Subset by dataset
-            tumor, normal, gtex = subset_by_dataset(df[df.tissue == tissue])
+            tumor, normal, gtex = subset_by_dataset(df[df[groupby] == group])
 
             # Calculate tumor and normal expression and L2FC
             if tcga_normal:
@@ -281,7 +281,7 @@ class Holoview:
                 unit = 'log2(Tumor/GTEx)'
 
             # Store as record
-            records.append((exp, l2fc, tissue))
+            records.append((exp, l2fc, group))
 
         # Define dimensions of plot
         kdims = [hv.Dimension('Expression', label='Gene Expression', unit='log2(x+1)')]
