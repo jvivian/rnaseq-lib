@@ -77,8 +77,8 @@ def de_pearson_dataframe(df, genes, pair_by='type', gtex=True, tcga=True):
 
             # Calculate PearsonR Save l2fc and comparison tissue/type
             pearson_r = round(pearsonr(prior_l2fc, l2fc)[0], 2)
-            pearson_l2fc[tum_type[:15]].append(pearson_r)
-            norm_label = '{}_{}'.format(label, norm_type[:15])
+            pearson_l2fc[tum_type[:20]].append(pearson_r)
+            norm_label = '{}_{}'.format(label, norm_type[:20])
             if norm_label not in norm_types:
                 norm_types.append(norm_label)
 
