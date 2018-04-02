@@ -177,7 +177,7 @@ class Holoview:
         df = self._subset([gene], tissue_subset)
 
         # Normalize gene expression
-        df[gene] = df.loc[:,gene].apply(l2norm)
+        df[gene] = df.loc[:, gene].apply(l2norm)
         df['type'] = df.loc[:, 'type'].apply(lambda x: x[:20])  # Add label limit
 
         # Define Dimensions
