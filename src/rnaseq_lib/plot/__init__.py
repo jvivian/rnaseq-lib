@@ -163,7 +163,7 @@ class Holoview:
         # Combine into Overlay object
         return hv.Overlay(dists, label='{} Expression'.format(gene)).opts(self._gene_kde_opts)
 
-    def gene_distribution(self, gene, tissue_subset=None, types=None):
+    def gene_distribution(self, gene, tissue_subset=None, groupby='type'):
         """
         Box and Whisker expression distribution across tissues
 
@@ -179,11 +179,8 @@ class Holoview:
         # Normalize gene expression
         norm_exp = df[gene].apply(l2norm)
 
-        # Subgroup labeling
-        subgroup = df['type'] if types else df.tissue
-
         # Return grouped box and whiskers:
-        return hv.BoxWhisker((subgroup, df['label'], norm_exp), kdims=['Tissue', 'Dataset'],
+        return hv.BoxWhisker((groupby, df['label'], norm_exp), kdims=['Tissue', 'Dataset'],
                              vdims=[hv.Dimension('Gene Expression', unit='log2(x+1)')],
                              label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
 
