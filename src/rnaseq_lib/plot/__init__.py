@@ -177,12 +177,18 @@ class Holoview:
         df = self._subset([gene], tissue_subset)
 
         # Normalize gene expression
-        norm_exp = df[gene].apply(l2norm)
+        df[gene] = df[gene].apply(l2norm)
+        df['type'] = df['type'].apply(lambda x: x[:20])  # Add label limit
+
+        # Define Dimensions
+        kdims = [hv.Dimension(('label', 'Dataset')),
+                 hv.Dimension((groupby, groupby.capitalize()))]
+        vdims = hv.Dimension((gene, '{} Expression'.format(gene.capitalize())), unit=unit)
 
         # Return grouped box and whiskers:
-        return hv.BoxWhisker((groupby, df['label'], norm_exp), kdims=[groupby, 'Dataset'],
-                             vdims=[hv.Dimension('Gene Expression', unit=unit)],
+        return hv.BoxWhisker(df, kdims=kdims, vdims=vdims,
                              label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
+
 
     # Differential Expression
     def tissue_de(self, tissue, extents=None, tcga_normal=None, gene_labels=None):
