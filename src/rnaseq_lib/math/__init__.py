@@ -29,6 +29,17 @@ def mean_normalize(df):
     return (df - df.mean()) / df.std()
 
 
+def softmax(df):
+    """
+    Normalizes columns to sum to 1
+
+    :param pd.DataFrame df: Dataframe to normalize
+    :return: Normalized DataFrame
+    :rtype: pd.DataFrame
+    """
+    return df.divide(df.sum())
+
+
 def l2norm(x, pad=0.001):
     """
     Log2 normalization function
