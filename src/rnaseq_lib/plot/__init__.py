@@ -180,7 +180,7 @@ class Holoview:
         norm_exp = df[gene].apply(l2norm)
 
         # Return grouped box and whiskers:
-        return hv.BoxWhisker((groupby, df['label'], norm_exp), kdims=[groupby.capitalize(), 'Dataset'],
+        return hv.BoxWhisker((groupby, df['label'], norm_exp), kdims=[groupby, 'Dataset'],
                              vdims=[hv.Dimension('Gene Expression', unit=unit)],
                              label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
 
