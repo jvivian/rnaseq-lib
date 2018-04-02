@@ -285,10 +285,10 @@ class Holoview:
 
         # Define dimensions of plot
         kdims = [hv.Dimension('Expression', label='Gene Expression', unit='log2(x+1)')]
-        vdims = [hv.Dimension('L2FC', label='Fold Change', unit=unit), 'Tissue']
+        vdims = [hv.Dimension('L2FC', label='Fold Change', unit=unit), groupby.capitalize()]
 
         # Create dataframe
-        plot = pd.DataFrame.from_records(records, columns=['Expression', 'L2FC', 'Tissue'])
+        plot = pd.DataFrame.from_records(records, columns=['Expression', 'L2FC', groupby.capitalize()])
 
         if extents:
             return hv.Scatter(plot, kdims=kdims, vdims=vdims, extents=extents).opts(self._gene_de_opts)
