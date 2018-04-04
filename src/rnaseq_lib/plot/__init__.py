@@ -189,7 +189,6 @@ class Holoview:
         return hv.BoxWhisker(df, kdims=kdims, vdims=vdims,
                              label='{} Expression'.format(gene)).opts(self._gene_distribution_opts)
 
-
     # Differential Expression
     def tissue_de(self, tissue, extents=None, tcga_normal=None, gene_labels=None):
         """
@@ -615,7 +614,7 @@ class Holoview:
 
         return (c1 * s1 + c2 * s2 + c3 * s3).cols(1)
 
-    def sample_counts(self, groupby='tissue'):
+    def sample_counts(self, tissue_subset=None, groupby='tissue'):
         """
         Bargraph of tissues grouped by dataset
 
@@ -684,8 +683,9 @@ class Holoview:
         # Add results to dataframe
         df['x'] = z[:, 0]
         df['y'] = z[:, 1]
+        df['sample'] = df.index
 
-        return hv.Scatter(df, kdims=['x'], vdims=['y'] + self.df_cols).opts(self._dr_opts)
+        return hv.Scatter(df, kdims=['x'], vdims=['y', 'sample'] + self.df_cols).opts(self._dr_opts)
 
     def tsne(self, genes, tissue_subset=None, perplexity=50, learning_rate=1000):
         """
