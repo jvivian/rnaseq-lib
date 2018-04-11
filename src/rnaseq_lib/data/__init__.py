@@ -6,17 +6,6 @@ import pandas as pd
 _cwd = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
-def load_samples():
-    """
-    Returns sample dictionary which maps TCGA and GTEx samples to a tissue.
-    Synapse ID: syn10296681
-
-    :return: Tissues are keys are list of samples are values
-    :rtype: dict(str, list(str))
-    """
-    return pickle.load(open(os.path.join(_cwd, 'samples.pickle'), 'rb'))
-
-
 def load_gene_map():
     """
     Dictionary mapping gene ID to gene name
