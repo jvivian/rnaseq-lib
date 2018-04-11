@@ -10,7 +10,7 @@ import pandas as pd
 from scipy.stats import pearsonr
 
 from rnaseq_lib.docker import fix_permissions, get_base_call
-from rnaseq_lib.tissues import get_tumor_samples, get_gtex_samples, get_normal_samples, map_genes
+from rnaseq_lib.tissues import map_genes
 from rnaseq_lib.utils import mkdir_p
 
 
