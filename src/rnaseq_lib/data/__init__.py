@@ -6,6 +6,86 @@ import pandas as pd
 _cwd = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
+def add_metadata_to_exp(exp, met):
+    """
+    Adds metadata to the expression dataframe and returns the combined object
+
+    :param pd.DataFrame exp: Expression dataframe
+    :param pd.DataFrame met: Metadata dataframe
+    :return: Expression dataframe with added metadata columns
+    :rtype: pd.DataFrame
+    """
+    # Add metadata to dataframe
+    genes = exp.columns.tolist()
+
+    exp['id'] = met.id.tolist()
+    exp['tissue'] = met.tissue.tolist()
+    exp['type'] = met.type.tolist()
+    exp['label'] = label_vector_from_samples(exp)
+    return exp[['id', 'tissue', 'type', 'label'] + genes]
+
+
+def label_vector_from_samples(samples):
+    """
+    Produce a vector of labels for the sample vector provided
+
+    :param list(str) samples: List of samples to derive labels for
+    :return: Label vector
+    :rtype: list(str)
+    """
+    vector = []
+    for x in samples:
+        if x.startswith('TCGA'):
+            if x.endswith('11'):
+                vector.append('tcga-normal')
+            elif x.endswith('01'):
+                vector.append('tcga-tumor')
+            else:
+                vector.append('tcga-other')
+        else:
+            vector.append('gtex')
+    return vector
+
+
+def map_genes(genes, strict=True):
+    """
+    Maps gene IDs to gene names
+
+    :param list genes: ENSEMBL gene IDs to be mapped to gene names
+    :param bool strict: If true, raies a KeyError if gene is not found in the gene_map
+    :return: Mapped genes
+    :rtype: list
+    """
+    gene_map = load_gene_map()
+    if strict:
+        return [gene_map[x.split('.')[0]] for x in genes]
+    else:
+        mapped = []
+        for g in genes:
+            try:
+                mapped.append(gene_map[g.split('.')[0]])
+            except KeyError:
+                mapped.append(g)
+        return mapped
+
+
+def get_ucsf_subset(df, strict=False):
+    """
+    Subset UCSF dataframe and return.
+
+    :param pd.DataFrame df: Input Dataframe in the format of "Genes by Samples"
+    :param bool strict: If True, raises an error if gene is unmapped
+    :return: Subset of Dataframe that only includes UCSF genes
+    :rtype: pd.DataFrame
+    """
+    df.index = map_genes(df.index, strict=strict)
+
+    ucsf_genes = load_ucsf_genes()
+    ucsf_genes = [x for x in ucsf_genes if x in df.index]
+
+    return df.loc[ucsf_genes]
+
+
 def load_gene_map():
     """
     Dictionary mapping gene ID to gene name
