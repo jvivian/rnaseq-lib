@@ -4,7 +4,7 @@ import holoviews as hv
 import numpy as np
 import pandas as pd
 from rnaseq_lib.diff_exp import log2fc, de_pearson_dataframe
-from rnaseq_lib.dim_red import run_tsne, run_tete
+from rnaseq_lib.dim_red import run_tsne, run_trimap
 from rnaseq_lib.math import l2norm, iqr_bounds
 from rnaseq_lib.plot.opts import *
 from rnaseq_lib.tissues import subset_by_dataset
@@ -660,7 +660,7 @@ class Holoview:
                           label='Differential Expression Gene Concordance (PearsonR)').opts(self._de_concordance_opts)
 
     # Dimensionality Reduction
-    def trimap(self, genes, tissue_subset=None, num_neighbors=50):
+    def trimap(self, genes, tissue_subset=None, kin=50, kout=5, krand=5, eta=10000.0):
         """
         Dimensionality reduction via Trimap
 
@@ -678,7 +678,7 @@ class Holoview:
             df = df[df.tissue.isin(tissue_subset)]
 
         # Run Trimap (used to be called t-ETE)
-        z = run_tete(df[genes], num_dims=2, num_neighbors=num_neighbors)
+        z = run_trimap(df[genes], num_dims=2, kin=kin, kout=kout, krand=krand, eta=eta)
 
         # Add results to dataframe
         df['x'] = z[:, 0]
