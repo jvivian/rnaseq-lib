@@ -22,5 +22,6 @@ setup(name='rnaseq-lib',
               'bs4',
               'biopython',
               'synpaseclient',
-              'xmltodict']}
+              'xmltodict'],
+          'trimap': ['annoy']}
       )
