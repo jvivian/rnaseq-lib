@@ -7,11 +7,10 @@ from subprocess import call, Popen, PIPE
 
 import numpy as np
 import pandas as pd
-from scipy.stats import pearsonr
-
+from rnaseq_lib.data import map_genes
 from rnaseq_lib.docker import fix_permissions, get_base_call
-from rnaseq_lib.tissues import map_genes
 from rnaseq_lib.utils import mkdir_p
+from scipy.stats import pearsonr
 
 
 def log2fc(a, b, pad=0.001):
@@ -85,12 +84,13 @@ def de_pearson_dataframe(df, genes, pair_by='type', gtex=True, tcga=True):
     return pd.DataFrame(pearson_l2fc, index=norm_types)
 
 
-def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
+def run_deseq2(df_path, group_a, group_b, output_dir, gtex=True, cores=None):
     """
-    Runs DESeq2 on a specific tissue
+    Runs DESeq2 standard comparison between group A and group B
 
     :param str df_path: Path to samples by genes dataframe
-    :param str tissue: Tissue to run
+    :param list(str) group_a: List of samples in group A
+    :param list(str) group_b: List of samples in group B
     :param str output_dir: Full path to output directory
     :param bool gtex: If True uses GTEx as normal tissue. Otherwise uses TCGA Normal
     :param int cores: Number of cores to use. Defaults to # of cores on machine.
@@ -99,18 +99,14 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
     work_dir = os.path.join(output_dir, 'work_dir')
     mkdir_p(work_dir)
 
-    # Get samples for tissue
-    tumor = get_tumor_samples(tissue)
-    normal = get_gtex_samples(tissue) if gtex else get_normal_samples(tissue)
-
     # Write out vectors
     tissue_vector = os.path.join(work_dir, 'tissue.vector')
     with open(tissue_vector, 'w') as f:
-        f.write('\n'.join(tumor + normal))
+        f.write('\n'.join(group_a + group_b))
 
     disease_vector = os.path.join(work_dir, 'disease.vector')
     with open(disease_vector, 'w') as f:
-        f.write('\n'.join(['T' if x in tumor else 'N' for x in tumor + normal]))
+        f.write('\n'.join(['A' if x in group_a else 'B' for x in group_a + group_b]))
 
     # Write out script
     cores = cores if cores else int(cpu_count())
@@ -126,7 +122,6 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
             df_path <- args[1]
             tissue_path <- args[2]
             disease_path <- args[3]
-            tissue <- '{tissue}'
             output_dir <- '/data/'
 
             # Read in vectors
@@ -150,26 +145,26 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
 
             # Write out table
             resOrdered <- res[order(res$padj),]
-            res_name <- paste(tissue, '.tsv', sep='')
+            res_name <- 'results.tsv'
             res_path <- paste(output_dir, res_name, sep='/')
             write.table(as.data.frame(resOrdered), file=res_path, col.names=NA, sep='\\t',  quote=FALSE)
 
             # MA Plot
-            ma_name <- paste(tissue, '-MA.pdf', sep='')
+            ma_name <- 'MA.pdf'
             ma_path <- paste(output_dir, ma_name, sep='/')
             pdf(ma_path, width=7, height=7)
             plotMA(res, main='DESeq2')
             dev.off()
 
             # Dispersion Plot
-            disp_name <- paste(tissue, '-dispersion.pdf', sep='')
+            disp_name <- 'dispersion.pdf'
             disp_path <- paste(output_dir, disp_name, sep='/')
             pdf(disp_path, width=7, height=7)
             plotDispEsts( y, ylim = c(1e-6, 1e1) )
             dev.off()
 
             # PVal Hist
-            hist_name <- paste(tissue, '-pval-hist.pdf', sep='')
+            hist_name <- 'pval-hist.pdf'
             hist_path <- paste(output_dir, hist_name, sep='/')
             pdf(hist_path, width=7, height=7)
             hist( res$pvalue, breaks=20, col="grey" )
@@ -180,12 +175,12 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
             bins <- cut( res$baseMean, qs )
             levels(bins) <- paste0("~",round(.5*qs[-1] + .5*qs[-length(qs)]))
             ratios <- tapply( res$pvalue, bins, function(p) mean( p < .01, na.rm=TRUE ) )
-            ratio_name <- paste(tissue, '-ratios.pdf', sep='')
+            ratio_name <- 'ratios.pdf'
             ratio_path <- paste(output_dir, ratio_name, sep='/')
             pdf(ratio_path, width=7, height=7)
             barplot(ratios, xlab="mean normalized count", ylab="ratio of small $p$ values")
             dev.off()                                           
-            """.format(cores=cores, tissue=tissue)))
+            """.format(cores=cores)))
 
     # Call DESeq2
     docker_parameters = ['docker', 'run',
@@ -209,7 +204,7 @@ def run_deseq2(df_path, tissue, output_dir, gtex=True, cores=None):
     fix_permissions(tool='jvivian/deseq2', work_dir=output_dir)
 
     # Add gene names to output
-    output_tsv = os.path.join(output_dir, '{}.tsv'.format(tissue))
+    output_tsv = os.path.join(output_dir, 'results.tsv')
     df = pd.read_csv(output_tsv, index_col=0, sep='\t')
     df.index = map_genes(df.index)
     df.to_csv(output_tsv, sep='\t')
