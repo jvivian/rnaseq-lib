@@ -24,21 +24,21 @@ def upload_file(file_path, login, parent, description=None):
     syn.store(f)
 
 
-def download_file(synid, login, download_location='.'):
+def download_file(syn_id, login, download_location='.'):
     """
-    Synapse ID of file to download
+    Synapse ID of file to download. Password must be stored in environment variable SYNAPSE_PASS
 
-    :param str synid: Synapse ID
-    :param str login: Synapse ID
+    :param str syn_id: Synapse ID
+    :param str login: Login (usually an email address)
     :param str download_location: Download location for file
     """
     syn = _syn_login(login)
-    syn.get(synid, downloadLocation=download_location)
+    syn.get(syn_id, downloadLocation=download_location)
 
 
 def _syn_login(login):
     """
-    Login to synapse. Set environment variable SYNAPSE_PASS to the password for `login`
+    Login to synapse. Password must be stored in environment variable SYNAPSE_PASS
 
     :param str login:
     :return: Synapse instance
@@ -48,3 +48,14 @@ def _syn_login(login):
     syn = Synapse()
     syn.login(login, os.environ['SYNAPSE_PASS'])
     return syn
+
+
+# TODO: Finish eventually
+def mirror_synapse_dir(syn_id, login):
+    """
+    Mirror a synapse directory's contents. Password must be stored in environment variable SYNAPSE_PASS
+
+    :param str syn_id: Synapse ID
+    :param str login: Login (usually an email address)
+    """
+    pass
