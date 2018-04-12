@@ -4,7 +4,7 @@ from collections import defaultdict
 
 import pandas as pd
 
-from rnaseq_lib.data import load_ucsf_genes, load_gene_map, load_samples
+from rnaseq_lib.data import load_ucsf_genes, load_gene_map
 from rnaseq_lib.gtf import get_protein_coding_genes
 from rnaseq_lib.utils import flatten
 
@@ -68,36 +68,6 @@ def get_ucsf_subset(df, strict=False):
     return df.loc[ucsf_genes]
 
 
-def get_tumor_samples(tissue):
-    """
-    Returns TCGA tumor samples for a tissue
-    :param str tissue: Tissue to grab TCGA tumor samples from
-    :return: List of tumor samples
-    :rtype: list
-    """
-    return load_samples()[tissue]['tcga_t']
-
-
-def get_gtex_samples(tissue):
-    """
-    Returns GTEx samples for a tissue
-
-    :param str tissue: Tissue to grab GTEx samples from
-    :return: List of GTEx samples
-    :rtype: list
-    """
-    return load_samples()[tissue]['gtex']
-
-
-def get_normal_samples(tissue):
-    """
-    Returns TCGA normal samples for a tissue
-
-    :param str tissue: Tissue to grab TCGA normal samples from
-    :return: List of TCGA normal samples
-    :rtype: list
-    """
-    return load_samples()[tissue]['tcga_n']
 
 
 def identify_tissue_from_str(content):
