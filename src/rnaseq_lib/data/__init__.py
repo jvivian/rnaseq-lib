@@ -86,6 +86,30 @@ def get_ucsf_subset(df, strict=False):
     return df.loc[ucsf_genes]
 
 
+def yield_sample_type(samples, kind='tumor'):
+    """
+    Yield samples based on what kind is being requested
+
+    :param list(str) samples: List of samples
+    :param str kind: What to return. 'tumor' and 'normal' for TCGA and 'gtex' for GTEx data
+    :return: sample of the kind requested
+    :rtype: str
+    """
+    for s in samples:
+        if kind == 'tumor':
+            if s.startswith('TCGA') and s.endswith('01'):
+                yield s
+        elif kind == 'normal':
+            if s.startswith('TCGA') and s.endswith('11'):
+                yield s
+        elif kind == 'gtex':
+            if s.startswith('GTEX'):
+                yield s
+        else:
+            raise RuntimeError('Invalid argument for "kind". Valid options are "tumor", "normal", "gtex". '
+                               'User submitted: {}'.format(kind))
+
+
 def load_gene_map():
     """
     Dictionary mapping gene ID to gene name
