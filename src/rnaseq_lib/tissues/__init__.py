@@ -3,7 +3,6 @@ import re
 from collections import defaultdict
 
 import pandas as pd
-
 from rnaseq_lib.data import load_ucsf_genes, load_gene_map
 from rnaseq_lib.gtf import get_protein_coding_genes
 from rnaseq_lib.utils import flatten
@@ -68,6 +67,26 @@ def get_ucsf_subset(df, strict=False):
     return df.loc[ucsf_genes]
 
 
+def label_vector_from_samples(samples):
+    """
+    Produce a vector of labels for the sample vector provided
+
+    :param list(str) samples: List of samples to derive labels for
+    :return: Label vector
+    :rtype: list(str)
+    """
+    vector = []
+    for x in samples:
+        if x.startswith('TCGA'):
+            if x.endswith('11'):
+                vector.append('tcga-normal')
+            elif x.endswith('01'):
+                vector.append('tcga-tumor')
+            else:
+                vector.append('tcga-other')
+        else:
+            vector.append('gtex')
+    return vector
 
 
 def identify_tissue_from_str(content):
