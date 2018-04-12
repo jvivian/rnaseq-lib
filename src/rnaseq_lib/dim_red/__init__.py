@@ -2,20 +2,23 @@ import numpy as np
 import pandas as pd
 from sklearn.manifold import TSNE
 
-from tete import tete
+from trimap import trimap
 
 
-def run_tete(df, num_dims=2, num_neighbors=20):
+def run_trimap(df, num_dims=2, kin=50, kout=5, krand=5, eta=10000.0):
     """
     Runs t-ETE dimensionality reduction
 
     :param pd.DataFrame df: Dataframe or numpy array. Features need to be columns.
     :param int num_dims: Number of dimensions to reduce the array down to.
-    :param int num_neighbors: Number of neighbors to use during iteration.
+    :param int kin: Number of k-Nearest Neighbor points
+    :param int kout: Number of outliers (num triplets per point = kin * kout)
+    :param int krand: Number of random triplets per point
+    :param float eta: Initial learning rate
     :return: Reduced matrix
     :rtype: np.array
     """
-    return tete(np.array(df), num_dims=num_dims, num_neighbs=num_neighbors)
+    return trimap(np.array(df), num_dims=num_dims, kin=kin, kout=kout, krand=krand, eta=eta)
 
 
 def run_tsne(df, num_dims, perplexity=30, learning_rate=200):
