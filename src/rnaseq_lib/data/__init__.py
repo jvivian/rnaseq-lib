@@ -29,8 +29,9 @@ def add_metadata_to_exp(exp, met):
     exp['id'] = met.id
     exp['tissue'] = met.tissue
     exp['type'] = met.type
+    exp['tumor'] = met.tumor
     exp['label'] = label_vector_from_samples(exp.index)
-    return exp[['id', 'tissue', 'type', 'label'] + genes]
+    return exp[['id', 'tissue', 'type', 'label', 'tumor'] + genes]
 
 
 def label_vector_from_samples(samples):
