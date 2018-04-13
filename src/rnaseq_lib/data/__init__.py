@@ -15,9 +15,17 @@ def add_metadata_to_exp(exp, met):
     :return: Expression dataframe with added metadata columns
     :rtype: pd.DataFrame
     """
-    # Add metadata to dataframe
+    # Copy genes from expression dataframe
     genes = exp.columns.tolist()
 
+    # Remove duplicates from metadata
+    samples = [x for x in exp.index if x in met.id]
+    met = met[met.id.isin(samples)].drop_duplicates('id')
+
+    # Ensure index dims are the same length
+    assert len(exp) == len(met), 'Expression dataframe and metadata do not match index lengths'
+
+    # Add metadata and return resorted dataframe
     exp['id'] = met.id.tolist()
     exp['tissue'] = met.tissue.tolist()
     exp['type'] = met.type.tolist()
