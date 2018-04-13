@@ -26,9 +26,9 @@ def add_metadata_to_exp(exp, met):
     assert len(exp) == len(met), 'Expression dataframe and metadata do not match index lengths'
 
     # Add metadata and return resorted dataframe
-    exp['id'] = met.id.tolist()
-    exp['tissue'] = met.tissue.tolist()
-    exp['type'] = met.type.tolist()
+    exp['id'] = met.id
+    exp['tissue'] = met.tissue
+    exp['type'] = met.type
     exp['label'] = label_vector_from_samples(exp.index)
     return exp[['id', 'tissue', 'type', 'label'] + genes]
 
