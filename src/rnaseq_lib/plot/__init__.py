@@ -23,7 +23,7 @@ class Holoview:
         :param pd.DataFrame df: Dataframe containing metadata / expression values (Synapse.org: syn11515015)
         """
         self.df = df
-        self.df_cols = ['tissue', 'tumor', 'type', 'label']
+        self.df_cols = ['id', 'tissue', 'type', 'label']
 
         # Style attributes - used in conjunction with '.opts()'
         self._gene_curves_opts = gene_curves_opts
