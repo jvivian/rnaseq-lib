@@ -27,13 +27,14 @@ Reference:
     reduction method using triplets, arXiv preprint arXiv:1803.00854, 2018.
 """
 
-import numba
-from annoy import AnnoyIndex
 import sys
-from sklearn.neighbors import NearestNeighbors as knn
-from sklearn.decomposition import TruncatedSVD
-import numpy as np
 import time
+
+import numba
+import numpy as np
+from annoy import AnnoyIndex
+from sklearn.decomposition import TruncatedSVD
+from sklearn.neighbors import NearestNeighbors as knn
 
 
 @numba.njit()
@@ -175,7 +176,7 @@ def generate_triplets(X, kin, kout, krand):
             nbrs[i, :] = tree.get_nns_by_item(i, num_neighbors)
             for j in xrange(num_neighbors):
                 distances[i, j] = tree.get_distance(i, nbrs[i, j])
-    print("found nearest neighbors")
+    # print("found nearest neighbors")
     sig = np.maximum(np.mean(distances[:, 10:20], axis=1), 1e-20)  # scale parameter
     P = find_p(distances, sig, nbrs)
     triplets = sample_knn_triplets(P, nbrs, distances, kin, kout)
@@ -254,12 +255,12 @@ def trimap(X, num_dims=2, kin=50, kout=5, krand=5, eta=10000.0, Yinit=[]):
     t = time.time()
     n, dim = X.shape
     print "running TriMap on %d points with dimension %d" % (n, dim)
-    #print("pre-processing")
+    # print("pre-processing")
     X -= np.min(X)
     X /= np.max(X)
     X -= np.mean(X, axis=0)
     triplets, weights = generate_triplets(X, kin, kout, krand)
-    #print("sampled triplets")
+    # print("sampled triplets")
 
     if np.size(Yinit) > 0:
         Y = Yinit
@@ -270,7 +271,7 @@ def trimap(X, num_dims=2, kin=50, kout=5, krand=5, eta=10000.0, Yinit=[]):
     num_iter = 1500
     num_triplets = float(triplets.shape[0])
 
-    #print("running TriMap")
+    # print("running TriMap")
     for itr in range(num_iter):
         old_C = C
         grad = trimap_grad(Y, kin, kout, triplets, weights)
@@ -287,9 +288,9 @@ def trimap(X, num_dims=2, kin=50, kout=5, krand=5, eta=10000.0, Yinit=[]):
         else:
             eta = eta * 0.5
 
-        #if (itr + 1) % 100 == 0:
-        #    print 'Iteration: %4d, Loss: %3.3f, Violated triplets: %0.4f' % (
-        #    itr + 1, C, num_viol / num_triplets * 100.0)
+            # if (itr + 1) % 100 == 0:
+            #    print 'Iteration: %4d, Loss: %3.3f, Violated triplets: %0.4f' % (
+            #    itr + 1, C, num_viol / num_triplets * 100.0)
     print "Elapsed time %s" % (time.time() - t)
     return Y
 
