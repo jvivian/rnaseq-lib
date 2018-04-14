@@ -254,7 +254,7 @@ def trimap_grad(Y, kin, kout, triplets, weights):
 def trimap(X, num_dims=2, kin=50, kout=5, krand=5, eta=10000.0, Yinit=[]):
     t = time.time()
     n, dim = X.shape
-    print "running TriMap on %d points with dimension %d" % (n, dim)
+    print "Running TriMap on %d points with %d dimensions" % (n, dim)
     # print("pre-processing")
     X -= np.min(X)
     X /= np.max(X)
@@ -291,7 +291,7 @@ def trimap(X, num_dims=2, kin=50, kout=5, krand=5, eta=10000.0, Yinit=[]):
             # if (itr + 1) % 100 == 0:
             #    print 'Iteration: %4d, Loss: %3.3f, Violated triplets: %0.4f' % (
             #    itr + 1, C, num_viol / num_triplets * 100.0)
-    print "Elapsed time %s" % (time.time() - t)
+    print "Elapsed time %s" % round((time.time() - t), 2)
     return Y
 
 
