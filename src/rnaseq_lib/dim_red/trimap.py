@@ -254,12 +254,12 @@ def trimap(X, num_dims=2, kin=50, kout=5, krand=5, eta=10000.0, Yinit=[]):
     t = time.time()
     n, dim = X.shape
     print "running TriMap on %d points with dimension %d" % (n, dim)
-    print("pre-processing")
+    #print("pre-processing")
     X -= np.min(X)
     X /= np.max(X)
     X -= np.mean(X, axis=0)
     triplets, weights = generate_triplets(X, kin, kout, krand)
-    print("sampled triplets")
+    #print("sampled triplets")
 
     if np.size(Yinit) > 0:
         Y = Yinit
@@ -270,7 +270,7 @@ def trimap(X, num_dims=2, kin=50, kout=5, krand=5, eta=10000.0, Yinit=[]):
     num_iter = 1500
     num_triplets = float(triplets.shape[0])
 
-    print("running TriMap")
+    #print("running TriMap")
     for itr in range(num_iter):
         old_C = C
         grad = trimap_grad(Y, kin, kout, triplets, weights)
@@ -287,9 +287,9 @@ def trimap(X, num_dims=2, kin=50, kout=5, krand=5, eta=10000.0, Yinit=[]):
         else:
             eta = eta * 0.5
 
-        if (itr + 1) % 100 == 0:
-            print 'Iteration: %4d, Loss: %3.3f, Violated triplets: %0.4f' % (
-            itr + 1, C, num_viol / num_triplets * 100.0)
+        #if (itr + 1) % 100 == 0:
+        #    print 'Iteration: %4d, Loss: %3.3f, Violated triplets: %0.4f' % (
+        #    itr + 1, C, num_viol / num_triplets * 100.0)
     print "Elapsed time %s" % (time.time() - t)
     return Y
 
