@@ -678,7 +678,7 @@ class Holoview:
             df = df[df.tissue.isin(tissue_subset)]
 
         # Run Trimap (used to be called t-ETE)
-        z = run_trimap(np.array(df[genes]), num_dims=2, kin=kin, kout=kout, krand=krand, eta=eta)
+        z = run_trimap(df[genes], num_dims=2, kin=kin, kout=kout, krand=krand, eta=eta)
 
         # Add results to dataframe
         df['x'] = z[:, 0]
