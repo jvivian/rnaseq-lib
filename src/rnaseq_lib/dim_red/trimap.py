@@ -155,6 +155,7 @@ def find_weights(triplets, P, nbrs, distances, sig):
 def generate_triplets(X, kin, kout, krand):
     n, dim = X.shape
     num_neighbors = max(kin, 150)
+    num_neighbors = len(X) / 2 if len(X) >= num_neighbors else num_neighbors
     exact = n <= 1e4 or dim <= 50
     if exact:  # do exact knn search
         if dim > 50:
