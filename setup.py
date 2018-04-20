@@ -14,7 +14,8 @@ setup(name='rnaseq-lib',
                         'numpy',
                         'seaborn',
                         'holoviews',
-                        'scipy'],
+                        'scipy',
+                        'sklearn'],
       extras_require={
           'web': [
               'requests',
@@ -23,5 +24,6 @@ setup(name='rnaseq-lib',
               'biopython',
               'synpaseclient',
               'xmltodict'],
-          'trimap': ['annoy']}
+          'trimap': ['annoy',
+                     'numba']}
       )
