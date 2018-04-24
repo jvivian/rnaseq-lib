@@ -3,12 +3,13 @@ from __future__ import division
 import holoviews as hv
 import numpy as np
 import pandas as pd
+from scipy.stats import pearsonr
+
 from rnaseq_lib.diff_exp import log2fc, de_pearson_dataframe
 from rnaseq_lib.dim_red import run_tsne, run_trimap
 from rnaseq_lib.math import l2norm, iqr_bounds
 from rnaseq_lib.plot.opts import *
 from rnaseq_lib.tissues import subset_by_dataset
-from scipy.stats import pearsonr
 
 
 class Holoview:
@@ -653,11 +654,12 @@ class Holoview:
 
         # Convert  matrix into 3-column
         de = de.stack().reset_index()
-        de.columns = ['Tissue-Normal', 'Tissue-Tumor/Normal', 'PearsonR']
+        de.columns = ['Normal', 'TCGA_Tumor/Normal', 'PearsonR']
 
         # Return HeatMap object
-        return hv.HeatMap(de, kdims=['Tissue-Tumor/Normal', 'Tissue-Normal'], vdims=['PearsonR'],
-                          label='Differential Expression Gene Concordance (PearsonR)').opts(self._de_concordance_opts)
+        label = 'Differential Expression Gene Concordance (PearsonR) by {pair_by}'.format(pair_by=pair_by)
+        return hv.HeatMap(de, kdims=['TCGA_Tumor/Normal', 'Normal'], vdims=['PearsonR'],
+                          label=label).opts(self._de_concordance_opts)
 
     # Dimensionality Reduction
     def trimap(self, genes, tissue_subset=None, kin=50, kout=5, krand=5, eta=10000.0):
@@ -666,7 +668,10 @@ class Holoview:
 
         :param list(str) genes: List of genes to subset by
         :param list(str) tissue_subset: List of tissues to subset by
-        :param int num_neighbors: Hyperparameter for trimap
+        :param int kin: Number of k-Nearest Neighbor points
+        :param int kout: Number of outliers (num triplets per point = kin * kout)
+        :param int krand: Number of random triplets per point
+        :param float eta: Initial learning rate
         :return: Scatterplot of dimensionality reduction
         :rtype: hv.Scatter
         """
