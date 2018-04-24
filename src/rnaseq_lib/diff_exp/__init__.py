@@ -7,10 +7,11 @@ from subprocess import call, Popen, PIPE
 
 import numpy as np
 import pandas as pd
+from scipy.stats import pearsonr
+
 from rnaseq_lib.data import map_genes
 from rnaseq_lib.docker import fix_permissions, get_base_call
 from rnaseq_lib.utils import mkdir_p
-from scipy.stats import pearsonr
 
 
 def log2fc(a, b, pad=0.001):
@@ -46,8 +47,12 @@ def de_pearson_dataframe(df, genes, pair_by='type', gtex=True, tcga=True):
     # Subset by Tumor/Normal
     tumor = df[df.label == 'tcga-tumor']
     tcga_n = df[df.label == 'tcga-normal']
-    if gtex:
+
+    # Determine normal comparison group based on options
+    if gtex and tcga:
         normal = df[df.tumor == 'no']
+    elif gtex:
+        normal = df[df.label == 'gtex']
     else:
         normal = tcga_n
 
