@@ -89,7 +89,7 @@ def de_pearson_dataframe(df, genes, pair_by='type', gtex=True, tcga=True):
     return pd.DataFrame(pearson_l2fc, index=norm_types)
 
 
-def run_deseq2(df_path, group_a, group_b, output_dir, gtex=True, cores=None):
+def run_deseq2(df_path, group_a, group_b, output_dir, cores=None):
     """
     Runs DESeq2 standard comparison between group A and group B
 
@@ -97,7 +97,6 @@ def run_deseq2(df_path, group_a, group_b, output_dir, gtex=True, cores=None):
     :param list(str) group_a: List of samples in group A
     :param list(str) group_b: List of samples in group B
     :param str output_dir: Full path to output directory
-    :param bool gtex: If True uses GTEx as normal tissue. Otherwise uses TCGA Normal
     :param int cores: Number of cores to use. Defaults to # of cores on machine.
     """
     # Make workspace directories
