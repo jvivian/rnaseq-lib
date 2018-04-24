@@ -66,20 +66,19 @@ def de_pearson_dataframe(df, genes, pair_by='type', gtex=True, tcga=True):
     for tum_type in tum_types:
 
         # First calculate TCGA tumor/normal prior for comparison
-        t = tumor[tumor[pair_by] == tum_type]
-        t_med = t[genes].median()
-        n = tcga_n[tcga_n[pair_by] == tum_type]
-        prior_l2fc = log2fc(t_med, n[genes].median())
+        t_med = tumor[tumor[pair_by] == tum_type][genes].median()
+        n_med = tcga_n[tcga_n[pair_by] == tum_type][genes].median()
+        prior_l2fc = log2fc(t_med, n_med)
 
         # For every normal type, calculate pearsonR correlation
         for (norm_type, label), _ in normal.groupby(pair_by).label.value_counts().iteritems():
             if tum_type == norm_type:
                 l2fc = prior_l2fc
             else:
-                n = normal[normal[pair_by] == norm_type]
-                l2fc = log2fc(t_med, n[genes].median())
+                n_med = normal[normal[pair_by] == norm_type][genes].median()
+                l2fc = log2fc(t_med, n_med)
 
-            # Calculate PearsonR Save l2fc and comparison tissue/type
+            # Calculate PearsonR of l2fc and comparison tissue/type
             pearson_r = round(pearsonr(prior_l2fc, l2fc)[0], 2)
             pearson_l2fc[tum_type[:20]].append(pearson_r)
             norm_label = '{}_{}'.format(label, norm_type[:20])
