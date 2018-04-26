@@ -11,6 +11,7 @@ import rnaseq_lib.gtf
 import rnaseq_lib.images
 import rnaseq_lib.jupyter
 import rnaseq_lib.math
+import rnaseq_lib.math.dists
 import rnaseq_lib.ml
 # Main plot module and opts
 import rnaseq_lib.plot
