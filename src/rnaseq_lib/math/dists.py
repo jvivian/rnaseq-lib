@@ -45,5 +45,13 @@ DISTRIBUTIONS = [
     stats.vonmises_line,
     stats.weibull_min]
 
+
 def name_from_dist(dist_func):
+    """
+    Derives string name from scipy dist function
+
+    :param func dist_func: Scipy distribution function
+    :return: Name of function
+    :rtype: str
+    """
     return str(dist_func).split()[0].split('.')[-1][:-4]
