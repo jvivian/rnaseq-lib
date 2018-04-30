@@ -1,7 +1,11 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from rnaseq_lib.math.dists import name_from_dist, DISTRIBUTIONS
 from scipy import stats
+from scipy.stats import norm
+from sklearn import mixture
+
+from rnaseq_lib.math.dists import name_from_dist, DISTRIBUTIONS
 
 
 # Outlier
@@ -92,3 +96,30 @@ def find_gaussian_intersection(m1, m2, std1, std2):
     # Return intersection between means
     mean_min, mean_max = sorted([m1, m2])
     return [x for x in np.roots([a, b, c]) if mean_min < x < mean_max][0]
+
+
+def overlay_gmm_to_hist(source_dist, label, figsize=(12, 8)):
+    """
+    Given a source distribution, fit a 2-component Gaussian mixture model and return plot
+
+    :param np.array source_dist: Source distribution
+    :param tuple(int, int) figsize: Figure size
+    """
+    # Fit GMM
+    gmm = mixture.GaussianMixture(n_components=2).fit(pd.DataFrame(source_dist))
+    m1, m2 = gmm.means_
+    std1, std2 = gmm.covariances_
+
+    # Identify intersection between the two Gaussians
+    cutoff = find_gaussian_intersection(m1, m2, std1, std2)
+
+    # Plot source data
+    plt.subplots(figsize=figsize)
+    plt.hist(source_dist, normed=True, alpha=0.25, bins=50, label='Tumor', color='red')
+
+    # Plot Gaussian fits and intersection
+    x = np.linspace(min(source_dist), max(source_dist), len(source_dist))
+    plt.plot(x, *norm.pdf(x, m1, std1), label='u={}, o={}'.format(round(m1, 1), round(std1, 1)))
+    plt.plot(x, *norm.pdf(x, m2, std2), label='u={}, o={}'.format(round(m2, 1), round(std2, 1)))
+    plt.vlines(cutoff, *plt.ylim(), label='Cutoff: {}'.format(cutoff), color='red', linestyles='--')
+    plt.legend()
