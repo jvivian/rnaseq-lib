@@ -117,7 +117,7 @@ def overlay_gmm_to_hist(source_dist, figsize=(12, 8)):
 
     # Plot source data
     f, ax = plt.subplots(figsize=figsize)
-    plt.hist(source_dist, normed=True, alpha=0.25, bins=50, label='Tumor', color='red')
+    plt.hist(source_dist, density=True, alpha=0.25, bins=50, label='Tumor', color='red')
 
     # Plot Gaussian fits and intersection
     x = np.linspace(min(source_dist), max(source_dist), len(source_dist))
