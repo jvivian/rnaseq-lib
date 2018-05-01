@@ -139,10 +139,10 @@ def find_gene_given_alias(alias, strict=True):
     :return: gene
     :rtype: str
     """
-    from rnaseq_lib.tissues import get_gene_map
+    from rnaseq_lib.data import load_gene_map
 
     # Create valid gene set from gene_map
-    gene_map = get_gene_map()
+    gene_map = load_gene_map()
     valid_genes = set(gene_map.keys() + gene_map.values())
 
     # MyGene query
