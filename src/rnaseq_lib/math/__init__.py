@@ -125,4 +125,4 @@ def overlay_gmm_to_hist(source_dist, figsize=(12, 8)):
     plt.plot(x, *norm.pdf(x, m2, std2), label='u={}, o={}'.format(round(m2, 1), round(std2, 1)))
     plt.vlines(cutoff, *plt.ylim(), label='Cutoff: {}'.format(cutoff), color='red', linestyles='--')
     plt.legend()
-    return f
+    return f, cutoff
