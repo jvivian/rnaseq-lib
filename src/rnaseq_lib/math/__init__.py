@@ -98,7 +98,7 @@ def find_gaussian_intersection(m1, m2, std1, std2):
     return [x for x in np.roots([a, b, c]) if mean_min < x < mean_max][0]
 
 
-def overlay_gmm_to_hist(source_dist, figsize=(12, 8)):
+def overlay_gmm_to_hist(source_dist, figsize=(12, 4), color='red'):
     """
     Given a source distribution, fit a 2-component Gaussian mixture model and return plot
 
@@ -117,7 +117,7 @@ def overlay_gmm_to_hist(source_dist, figsize=(12, 8)):
 
     # Plot source data
     f, ax = plt.subplots(figsize=figsize)
-    plt.hist(source_dist, density=True, alpha=0.25, bins=50, label='Tumor', color='red')
+    plt.hist(source_dist, density=True, alpha=0.25, bins=50, label='Tumor', color=color)
 
     # Plot Gaussian fits and intersection
     x = np.linspace(min(source_dist), max(source_dist), len(source_dist))
