@@ -95,7 +95,10 @@ def find_gaussian_intersection(m1, m2, std1, std2):
 
     # Return intersection between means
     mean_min, mean_max = sorted([m1, m2])
-    return [x for x in np.roots([a, b, c]) if mean_min < x < mean_max][0]
+    try:
+        return [x for x in np.roots([a, b, c]) if mean_min < x < mean_max][0]
+    except IndexError:
+        return None
 
 
 def overlay_gmm_to_hist(source_dist, figsize=(12, 4), color='red'):
