@@ -116,7 +116,7 @@ def overlay_gmm_to_hist(source_dist, figsize=(12, 4), color='red'):
     std1, std2 = gmm.covariances_
 
     # Identify intersection between the two Gaussians
-    cutoff = find_gaussian_intersection(m1, m2, std1, std2)
+    cutoff = round(find_gaussian_intersection(m1, m2, std1, std2), 2)
 
     # Plot source data
     f, ax = plt.subplots(figsize=figsize)
@@ -128,4 +128,4 @@ def overlay_gmm_to_hist(source_dist, figsize=(12, 4), color='red'):
     plt.plot(x, *norm.pdf(x, m2, std2), label='u={}, o={}'.format(round(m2, 1), round(std2, 1)))
     plt.vlines(cutoff, *plt.ylim(), label='Cutoff: {}'.format(cutoff), color='red', linestyles='--')
     plt.legend()
-    return f, round(cutoff, 2)
+    return f, cutoff
