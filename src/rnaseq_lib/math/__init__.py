@@ -84,8 +84,8 @@ def find_gaussian_intersection(m1, m2, std1, std2):
     :param float m2: Mean for second Gaussian
     :param float std1: Standard deviation for first Gaussian
     :param float std2: Standard deviation for second Gaussian
-    :return: Intersection between Gaussian distributions
-    :rtype: float
+    :return: Intersection(s) between Gaussian distributions
+    :rtype: list(float,)
     """
     # Define systems of equations
     m1, m2, std1, std2 = float(m1), float(m2), float(std1), float(std2)
@@ -95,10 +95,14 @@ def find_gaussian_intersection(m1, m2, std1, std2):
 
     # Return intersection between means
     mean_min, mean_max = sorted([m1, m2])
-    try:
-        return [x for x in np.roots([a, b, c]) if mean_min < x < mean_max][0]
-    except IndexError:
-        return None
+
+    # Only return the intersection if one exists between the means
+    roots = np.roots([a, b, c])
+    inter = [x for x in np.roots([a, b, c]) if mean_min < x < mean_max]
+    if len(inter) == 0:
+        return roots
+    else:
+        return inter
 
 
 def overlay_gmm_to_hist(source_dist, figsize=(12, 4), color='red'):
@@ -108,7 +112,7 @@ def overlay_gmm_to_hist(source_dist, figsize=(12, 4), color='red'):
     :param np.array source_dist: Source distribution
     :param tuple(int, int) figsize: Figure size
     :return: Fig object and cutoff value
-    :rtype: tuple(plt.figure.Figure, float)
+    :rtype: float
     """
     # Fit GMM
     gmm = mixture.GaussianMixture(n_components=2).fit(pd.DataFrame(source_dist))
@@ -116,7 +120,7 @@ def overlay_gmm_to_hist(source_dist, figsize=(12, 4), color='red'):
     std1, std2 = gmm.covariances_
 
     # Identify intersection between the two Gaussians
-    cutoff = round(find_gaussian_intersection(m1, m2, std1, std2), 2)
+    cutoffs = round(find_gaussian_intersection(m1, m2, std1, std2), 2)
 
     # Plot source data
     f, ax = plt.subplots(figsize=figsize)
@@ -126,6 +130,11 @@ def overlay_gmm_to_hist(source_dist, figsize=(12, 4), color='red'):
     x = np.linspace(min(source_dist), max(source_dist), len(source_dist))
     plt.plot(x, *norm.pdf(x, m1, std1), label='u={}, o={}'.format(round(m1, 1), round(std1, 1)))
     plt.plot(x, *norm.pdf(x, m2, std2), label='u={}, o={}'.format(round(m2, 1), round(std2, 1)))
-    plt.vlines(cutoff, *plt.ylim(), label='Cutoff: {}'.format(cutoff), color='red', linestyles='--')
+    # Add intersectional lines
+    for cutoff in cutoffs:
+        plt.vlines(cutoff, *plt.ylim(), label='Cutoff: {}'.format(cutoff), color='red', linestyles='--')
     plt.legend()
-    return f, cutoff
+    if len(cutoffs) == 1:
+        return cutoffs
+    else:
+        return None
