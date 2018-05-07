@@ -97,7 +97,7 @@ def find_gaussian_intersection(m1, m2, std1, std2):
     mean_min, mean_max = sorted([m1, m2])
 
     # Only return the intersection if one exists between the means
-    roots = np.roots([a, b, c])
+    roots = [round(x, 2) for x in np.roots([a, b, c])]
     inter = [x for x in np.roots([a, b, c]) if mean_min < x < mean_max]
     if len(inter) == 0:
         return roots
@@ -120,10 +120,10 @@ def overlay_gmm_to_hist(source_dist, figsize=(12, 4), color='red'):
     std1, std2 = gmm.covariances_
 
     # Identify intersection between the two Gaussians
-    cutoffs = round(find_gaussian_intersection(m1, m2, std1, std2), 2)
+    cutoffs = find_gaussian_intersection(m1, m2, std1, std2)
 
     # Plot source data
-    f, ax = plt.subplots(figsize=figsize)
+    plt.subplots(figsize=figsize)
     plt.hist(source_dist, density=True, alpha=0.25, bins=50, label='Tumor', color=color)
 
     # Plot Gaussian fits and intersection
