@@ -135,6 +135,6 @@ def overlay_gmm_to_hist(source_dist, figsize=(12, 4), color='red'):
         plt.vlines(cutoff, *plt.ylim(), label='Cutoff: {}'.format(cutoff), color='red', linestyles='--')
     plt.legend()
     if len(cutoffs) == 1:
-        return cutoffs
+        return cutoffs[0]
     else:
-        return None
+        return max(cutoffs)
