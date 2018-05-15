@@ -159,4 +159,4 @@ def normalize_df(df, a, b):
     delta = df_max - df_min
 
     # Apply and return
-    return df.apply(lambda x: c * (x - df_min) / delta)
+    return df.apply(lambda x: (c * (x - df_min) / delta) + a)
