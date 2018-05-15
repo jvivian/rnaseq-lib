@@ -138,3 +138,25 @@ def overlay_gmm_to_hist(source_dist, figsize=(12, 4), color='red'):
         return cutoffs[0]
     else:
         return max(cutoffs)
+
+
+def normalize_df(df, a, b):
+    """
+    Normalize an entire dataframe within the range [a, b]
+
+    :param pd.DataFrame df: Input DataFrame
+    :param int|float a: Lower range value
+    :param int|float b: Upper range value
+    :return: Normalized DataFrame
+    :rtype: pd.DataFrame
+    """
+    assert b > a, 'Invalid range (B > A)'
+
+    # Define variables for normalization
+    df_max = df.max().max()
+    df_min = df.min().min()
+    c = b - a
+    delta = df_max - df_min
+
+    # Apply and return
+    return df.apply(lambda x: c * (x - df_min) / delta)
