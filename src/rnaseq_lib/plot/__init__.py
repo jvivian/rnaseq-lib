@@ -682,6 +682,10 @@ class Holoview:
         if tissue_subset:
             df = df[df.tissue.isin(tissue_subset)]
 
+        # Check DTYPE - TriMap will only run with float64
+        if df[genes[0]].dtype != 'float64':
+            df[genes] = df[genes].astype(np.float64)
+
         # Run Trimap (used to be called t-ETE)
         z = run_trimap(df[genes], num_dims=2, kin=kin, kout=kout, krand=krand, eta=eta)
 
